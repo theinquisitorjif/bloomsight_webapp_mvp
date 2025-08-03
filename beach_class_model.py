@@ -6,7 +6,6 @@ import requests_cache
 from retry_requests import retry
 from datetime import datetime
 
-#add lightning data later
 
 #Pull in data from Open-Meteo API
 # Setup the Open-Meteo API client with cache and retry on error
