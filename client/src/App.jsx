@@ -11,7 +11,7 @@ function App() {
   const [zoom, setZoom] = useState(10.12);
 
   useEffect(() => {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic29waGlhZGRsIiwiYSI6ImNtZHhycmc5cjJoODQybXB2ZDMzM2RzbTkifQ.8jEMsP2QeMvTwDUhhtomMQ';
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
