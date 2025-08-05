@@ -71,7 +71,14 @@ data = response.json()
 print("Parking locations found:")
 print("=" * 80)
 
-for i, element in enumerate(data['elements']):
+# Limit to first 20 locations
+max_locations = 20
+locations_to_show = data['elements'][:max_locations]
+
+if len(data['elements']) > max_locations:
+    print(f"Showing first {max_locations} of {len(data['elements'])} total parking locations found.\n")
+
+for i, element in enumerate(locations_to_show):
     lat = element.get('lat') or element.get('center', {}).get('lat')
     lon = element.get('lon') or element.get('center', {}).get('lon')
     
@@ -93,5 +100,3 @@ for i, element in enumerate(data['elements']):
     
     print()
     
-    # Add a small delay to be respectful to the Nominatim service
-    time.sleep(1)
