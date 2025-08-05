@@ -1,69 +1,47 @@
-# React + TypeScript + Vite
+# Bloomsight Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Make sure you have node installed. You can install nodejs via nvm or fnm https://nodejs.org/en/download.
 
-Currently, two official plugins are available:
+## Development Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+I recommend using node 20 which is the LTS version of node to prevent setup headaches
 
-## Expanding the ESLint configuration
+1. Setup node version
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```
+# Using fnm
+fnm install 20
+fnm use 20
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Using nvm
+nvm install 20
+nvm use 20
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Clone the project (including the previous directory)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+git clone https://github.com/theinquisitorjif/bloomsight_webapp_mvp
+```
+
+3. Create `.env` file in `/frontend` and fill it with the following contents
+
+```
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+```
+
+4. Stand up the frontend
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+5. Open up http://localhost:5173 and start developing!
+
+## Notes
+
+1. We are using react-router-dom to navigate between pages
+2. We are using tailwindcss and shadcn-UI for fast prototyping
