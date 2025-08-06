@@ -17,8 +17,11 @@ after that, activate it
 
 install stuff
 
-``` pip install -r requirements.txt ```
+``` pip install -r requirements.txt 
+beach_api.py
+```
 
 # to run frontend
 
-``` cd frontend/src && npm run dev ```
+``` cd frontend/src
+npm run dev ```
