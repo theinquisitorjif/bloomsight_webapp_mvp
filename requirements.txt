@@ -1,0 +1,5 @@
+pandas
+Flask
+Flask-CORS
+numpy
+exceptiongroup

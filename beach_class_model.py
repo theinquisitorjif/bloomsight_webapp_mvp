@@ -419,7 +419,7 @@ for i in range(len(hourly_temperature_2m)):
         print(f"  Weather: {hour_conditions['Weather Code']}")
         print(f"  Overall: {hour_overall}")
 
-def get_beach_weather():
+def get_beach_weather(lat, lon):
     current_beach_model = BeachClassModel(
         temperature=current_temperature_2m,
         precipitation=current_precipitation,
@@ -433,14 +433,15 @@ def get_beach_weather():
         uv_index=current_uv_index
     )
     return {
-        "latitude": 28.778396,
-        "longitude": -81.3509308,
+        "latitude": lat,
+        "longitude": lon,
         "temperature": current_temperature_2m,
         "conditions": current_beach_model.classify_beach_conditions(),
         "overall": current_beach_model.classify_beach_overall(),
         "recommendation": current_beach_model.overall_recommendation(),
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
+
 
 if __name__ == "__main__":
     data = get_beach_weather()

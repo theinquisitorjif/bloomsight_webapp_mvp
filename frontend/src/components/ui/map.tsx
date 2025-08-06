@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { type LngLatLike } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { GeoJSON } from 'geojson';
+import { type Point } from 'geojson';
 
 type MapRef = mapboxgl.Map | null;
 
@@ -39,7 +39,6 @@ const Map = () => {
         type: 'circle', 
         source: 'my-points',
         'source-layer': 'fl_beaches', // LAYER NAME INSIDE THE TILE SET
-        //can addd more for different states here
         paint: {
           'circle-radius': 6,
           'circle-color': '#007cbf',
@@ -47,6 +46,34 @@ const Map = () => {
           'circle-stroke-color': '#fff',
         },
       });
+
+      mapRef.current?.on('mousemove', 'points-layer', (e) => {
+        const feature = e.features?.[0];
+        if (!feature || feature.geometry.type !== 'Point') return;
+
+        const coords = (feature.geometry as Point).coordinates;
+        const [lng, lat] = coords;
+
+        const url = `/beach-weather?lat=${lat}&lon=${lng}`;
+        console.log(" :", url);
+
+        fetch(`/beach-weather?lat=${lat}&lon=${lng}`)
+          .then((res) => res.json())
+          .then((data) => {
+            new mapboxgl.Popup()
+              .setLngLat([lng, lat] as LngLatLike)
+              .setHTML(`
+                <p><strong>Overall:</strong> ${data.overall}</p>
+                <p><strong>Recommendation:</strong> ${data.recommendation}</p>
+              `)
+              .addTo(mapRef.current!);
+          })
+          .catch((err) => {
+            console.error('Weather fetch error:', err);
+          });
+      });
+
+
     });
 
     new mapboxgl.Marker().setLngLat([centerLng, centerLat]).addTo(mapRef.current);
@@ -70,12 +97,15 @@ const Map = () => {
       { enableHighAccuracy: true }
     );
 
+    
+
     return () => {
       if (mapRef.current) mapRef.current.remove();
     };
   }, []); // run once on mount
 
   useEffect(() => {
+    
     fetch('http://localhost:5000/beach-weather')
       .then((res) => res.json())
       .then((data) => {
