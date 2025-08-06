@@ -29,6 +29,7 @@ git clone https://github.com/theinquisitorjif/bloomsight_webapp_mvp
 ```
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+VITE_FRONTEND_URL=http://localhost:5173
 ```
 
 4. Stand up the frontend
