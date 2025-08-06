@@ -1,3 +1,5 @@
-Necessary Dependencies:
-    pip install requests
-    pip install pandas 
+pandas
+Flask
+Flask-CORS
+numpy
+exceptiongroup
