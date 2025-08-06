@@ -6,6 +6,7 @@ import requests_cache
 from retry_requests import retry
 from datetime import datetime
 
+
 #add lighstning data later
 
 #Pull in data from Open-Meteo API
@@ -16,8 +17,8 @@ openmeteo = openmeteo_requests.Client(session=retry_session)
 # Make sure all required weather variables are listed here
 url = "https://api.open-meteo.com/v1/forecast"
 params = {
-	"latitude": 29.651634,
-	"longitude": -82.324826,
+	"latitude": 28.778396,
+	"longitude": -81.3509308,
 	"current": ["temperature_2m", "precipitation", "rain", "wind_speed_10m", "wind_gusts_10m", "is_day", "cloud_cover", "weathercode", "relative_humidity_2m", "uv_index"],
 	"hourly": ["temperature_2m", "weather_code", "wind_speed_10m", "wind_gusts_10m", "cloud_cover", "rain", "precipitation_probability", "relative_humidity_2m", "uv_index"],
 	"forecast_days": 1,
@@ -417,3 +418,30 @@ for i in range(len(hourly_temperature_2m)):
         print(f"  Cloud Cover: {hourly_cloud_cover[i]:.0f}% ({hour_conditions['Cloud Cover']})")
         print(f"  Weather: {hour_conditions['Weather Code']}")
         print(f"  Overall: {hour_overall}")
+
+def get_beach_weather():
+    current_beach_model = BeachClassModel(
+        temperature=current_temperature_2m,
+        precipitation=current_precipitation,
+        rain=current_rain,
+        wind_speed=current_wind_speed_10m * 3.6,
+        wind_gusts=current_wind_gusts_10m * 3.6,
+        is_day=current_is_day,
+        cloud_cover=current_cloud_cover,
+        weather_code=current_weathercode,
+        humidity=current_relative_humidity_2m,
+        uv_index=current_uv_index
+    )
+    return {
+        "latitude": 28.778396,
+        "longitude": -81.3509308,
+        "temperature": current_temperature_2m,
+        "conditions": current_beach_model.classify_beach_conditions(),
+        "overall": current_beach_model.classify_beach_overall(),
+        "recommendation": current_beach_model.overall_recommendation(),
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+if __name__ == "__main__":
+    data = get_beach_weather()
+    print(data)
