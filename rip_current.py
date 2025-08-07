@@ -6,7 +6,6 @@ import math
 from bs4 import BeautifulSoup
 import re
 
-
 class NOAAMarineData:
     """
     Python class for fetching marine data and assessing rip current risks using NOAA APIs
@@ -377,61 +376,11 @@ class NOAAMarineData:
             raise
 
 
-# Usage Examples
-def example_rip_current_check():
-    """Example usage for rip current assessment"""
-    noaa = NOAAMarineData()
-    
-    # Popular beach locations
-    locations = [
-        {"name": "Miami Beach, FL", "lat": 25.7617, "lon": -80.1918},
-        {"name": "Virginia Beach, VA", "lat": 36.8529, "lon": -75.9780},
-        {"name": "Ocean City, MD", "lat": 38.3365, "lon": -75.0849}
-    ]
-    
-    for location in locations:
-        try:
-            print(f"\n=== RIP CURRENT ASSESSMENT: {location['name']} ===")
-            
-            assessment = noaa.get_rip_current_risk(location['lat'], location['lon'])
-            
-            print(f"Risk Level: {assessment['risk_level']}")
-            print(f"Recommendation: {assessment['conditions']['recommendation']}")
-            
-            if assessment['alerts']:
-                print('\n🚨 ACTIVE ALERTS:')
-                for alert in assessment['alerts']:
-                    headline = alert.get('properties', {}).get('headline', 'Alert')
-                    print(f"- {headline}")
-            
-            print('\nConditions:')
-            conditions = assessment['conditions']
-            for key, value in conditions.items():
-                if key not in ['overall', 'score', 'recommendation']:
-                    print(f"- {key.upper()}: {value}")
-                    
-        except Exception as e:
-            print(f"Error for {location['name']}: {e}")
-
-
 def check_rip_current_alerts(lat: float, lon: float):
     noaa = NOAAMarineData()
     
     try:
         alerts = noaa.get_rip_current_alerts(lat, lon)
-        
-        if alerts:
-            print('⚠️  ACTIVE RIP CURRENT ALERTS:')
-            for alert in alerts:
-                properties = alert.get('properties', {})
-                print(f"Event: {properties.get('event', 'Unknown')}")
-                print(f"Headline: {properties.get('headline', 'No headline')}")
-                description = properties.get('description', '')
-                if description:
-                    print(f"Description: {description[:200]}...")
-                print('---')
-        else:
-            print('✅ No active rip current alerts for this location')
         
         return alerts
         
@@ -498,14 +447,3 @@ def get_rip_info(lat, lon):
             "conditions": {},
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-
-
-
-if __name__ == "__main__":
-    # Uncomment to run examples
-    example_rip_current_check()
-    
-    # Quick alert check for Miami Beach
-    check_rip_current_alerts(25.7617, -80.1918)
-
-    pass
