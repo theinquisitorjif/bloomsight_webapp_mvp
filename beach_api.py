@@ -22,7 +22,6 @@ def beach_weather():
         return jsonify({"error": "Missing lat or lon"}), 400
 
     weather_data = get_beach_weather(lat, lon)
-    # these are cooked:
     weather_data["rip_risk"] = get_rip_info(lat, lon)
     weather_data["parking_info"] = get_parking_info(lat, lon)
 

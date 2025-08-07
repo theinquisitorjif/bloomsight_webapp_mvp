@@ -119,3 +119,87 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.mapboxgl-popup-content {
+  min-width: 200px;
+}
+
+.weather-section {
+  align-items: center;
+  background: linear-gradient(to bottom right, #7EB2F5, #3D85DA);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 30px;
+  justify-content: center;
+  margin: 10px;
+  padding: 25px;
+  text-align: center;
+  min-width: 50px;
+  display: block;
+}
+
+
+.row-value {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 0.875rem;
+    padding-right: 16px;
+    text-align: right;
+    margin: 8px 0;
+}
+
+.beach-name {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+.route-city {
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 0.8rem;
+    margin-bottom: 0;
+    padding: 8px;
+}
+
+.weather-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px 0;
+}
+
+.weather-category {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 0.875rem;
+}
+
+.weather-rating {
+    background-color: #28a745;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+h2 {
+    margin: 12px 0 8px 0;
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 1.1rem;
+}
+
+h4 {
+    margin: 10px 0 4px 0;
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 0.9rem;
+}
+
+
+.card-subtitle {
+
+}

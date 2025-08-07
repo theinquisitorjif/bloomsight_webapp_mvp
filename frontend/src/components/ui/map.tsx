@@ -2,8 +2,6 @@ import { useRef, useEffect, useState } from 'react';
 import mapboxgl, { type LngLatLike } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { FeatureCollection, Feature, Point } from 'geojson';
-import { createBeachWeatherPopup } from './popup.js';
-
 
 type MapRef = mapboxgl.Map | null;
 
@@ -64,7 +62,27 @@ const Map = () => {
           fetch(`/beach-weather?lat=${lat}&lon=${lng}`)
             .then((res) => res.json())
             .then((data) => {
-              createBeachWeatherPopup(mapRef, feature, data, lat, lng);
+             new mapboxgl.Popup()
+              .setLngLat([lng, lat] as LngLatLike)
+              .setHTML(`
+                <h3 class="beach-name">${feature.properties?.name}</h3>
+                <h4 class="weather-section">${Math.round((data.temperature * 9/5) + 32)}°F</h4>
+                <h2>Current Conditions</h2>
+                <div class="row-value">${data.recommendation}</div>
+                <div class="weather-row">
+                    <div class="weather-category">Overall Rating</div>
+                    <div class="weather-rating">${data.overall}</div>
+                </div>
+                <div class="weather-row">
+                    <div class="weather-category">Available Parking</div>
+                    <div class="weather-rating">${data.parking_info.count}</div>
+                </div>
+                <div class="weather-row">
+                    <div class="weather-category">Rip Currents</div>
+                    <div class="weather-rating">${data.rip_risk.risk_level}</div>
+                </div>
+              `)
+              .addTo(mapRef.current!);
             })
             .catch((err) => {
               console.error('Weather fetch error:', err);
