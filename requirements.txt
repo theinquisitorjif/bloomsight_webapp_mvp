@@ -4,3 +4,6 @@ Flask-CORS
 numpy
 exceptiongroup
 earthaccess
+dotenv
+supabase
+datetime

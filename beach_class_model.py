@@ -445,4 +445,3 @@ def get_beach_weather(lat, lon):
 
 if __name__ == "__main__":
     data = get_beach_weather()
-    print(data)
