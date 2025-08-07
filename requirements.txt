@@ -3,3 +3,4 @@ Flask
 Flask-CORS
 numpy
 exceptiongroup
+earthaccess
