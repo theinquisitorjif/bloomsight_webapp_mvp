@@ -60,18 +60,10 @@ export default function WeatherForecast() {
               <BasicDetails
                 temperature={dayData.temperature}
                 description="Partly Cloudy"
+                sunrise="6:00 AM"
+                sunset="7:32 PM"
+                precipitation={12}
               />
-              <div className="grid md:grid-cols-2 text-sm gap-y-1 gap-x-8 mt-4">
-                {weatherDetails.map((detail, detailIndex) => (
-                  <WeatherDetail
-                    key={detailIndex}
-                    icon={detail.icon}
-                    label={detail.label}
-                    value={detail.value}
-                    valueClassName={detail.valueClassName}
-                  />
-                ))}
-              </div>
             </AccordionContent>
           </AccordionItem>
         ))}

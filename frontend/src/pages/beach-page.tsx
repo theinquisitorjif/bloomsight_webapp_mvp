@@ -10,16 +10,24 @@ import {
 import WeatherForecast from "@/components/weather/weather-forecast";
 import clsx from "clsx";
 import {
+  Bird,
   BookmarkIcon,
+  Car,
   CarIcon,
-  Check,
+  Droplet,
+  Droplets,
   Ellipsis,
   ImageIcon,
   MapPinIcon,
+  Mountain,
   ShareIcon,
   StarIcon,
+  Sun,
+  Thermometer,
+  TreePine,
+  Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { createAvatar } from "@dicebear/core";
@@ -32,6 +40,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
+
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 const commentsTest = [
   {
@@ -70,10 +89,33 @@ const commentsTest = [
 ];
 
 export const BeachPage = () => {
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
   const [activeSection, setActiveSection] = useState("Overview");
 
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
+
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+    }
+
+    mapInstanceRef.current = new mapboxgl.Map({
+      container: mapRef.current,
+      center: [-117.3201, 33.1026],
+      zoom: 13,
+      style: "mapbox://styles/mapbox/satellite-v9",
+    });
+
+    // return () => {
+    //   if (mapInstanceRef.current) mapInstanceRef.current.remove();
+    // };
+  }, []);
+
   return (
-    <div className="flex flex-col items-center py-20">
+    <div className="flex flex-col items-center pt-10 pb-20">
       <main className="container p-2 xl:max-w-[1000px] space-y-4">
         <div className="flex items-center gap-4">
           <Link to="/" className="underline underline-offset-2">
@@ -140,10 +182,6 @@ export const BeachPage = () => {
                 <MapPinIcon size={18} />
                 <p>Carlsbad, CA</p>
               </div>
-
-              <Badge variant="outline" className="bg-green-50 rounded-full">
-                Good Conditions <Check />
-              </Badge>
             </div>
           </div>
 
@@ -184,7 +222,7 @@ export const BeachPage = () => {
           </div>
         </div>
 
-        <nav className="border-t flex gap-10 border-border w-full my-10 sticky top-0 bg-background z-10">
+        <nav className="border-t flex gap-10 border-border w-full mt-10 pb-4 sticky top-0 bg-background z-10">
           <Link
             to="#overview"
             className={clsx(
@@ -195,6 +233,29 @@ export const BeachPage = () => {
             onClick={() => setActiveSection("Overview")}
           >
             Overview
+          </Link>
+
+          <Link
+            to="#water"
+            className={clsx(
+              "pt-2 font-medium",
+              activeSection == "Comments" &&
+                "font-semibold border-t-3 border-primary -translate-y-0.5"
+            )}
+            onClick={() => setActiveSection("water")}
+          >
+            Water Conditions
+          </Link>
+          <Link
+            to="#directions"
+            className={clsx(
+              "pt-2 font-medium",
+              activeSection == "Comments" &&
+                "font-semibold border-t-3 border-primary -translate-y-0.5"
+            )}
+            onClick={() => setActiveSection("Comments")}
+          >
+            Directions
           </Link>
           <Link
             to="#comments"
@@ -220,11 +281,195 @@ export const BeachPage = () => {
           </Link>
         </nav>
 
-        <div className="flex gap-4">
+        <div className="flex gap-6 mt-10">
           <div className="flex-1">
-            <p className="text-lg font-semibold mt-6">something goes here</p>
+            <div className="flex justify-between">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Overview
+              </h2>
+            </div>
+            <div className="p-2 rounded-lg border border-border mt-2">
+              <p className="text-muted-foreground text-sm">
+                Current Conditions
+              </p>
+              <div className="flex items-center gap-1">
+                <p className="font-semibold text-green-800 text-xl mr-2">
+                  Good
+                </p>
+
+                <span className="w-9 h-3 rounded-lg bg-green-800"></span>
+                <span className="w-9 h-3 rounded-lg bg-green-800"></span>
+                <span className="w-9 h-3 rounded-lg bg-green-800"></span>
+                <span className="w-9 h-3 rounded-lg bg-green-800"></span>
+                <span className="w-9 h-3 rounded-lg bg-neutral-200"></span>
+              </div>
+            </div>
+
+            <div className="rounded-lg overflow-hidden mt-6">
+              <div ref={mapRef} style={{ width: "100%", height: "320px" }} />
+            </div>
           </div>
           <WeatherForecast />
+        </div>
+
+        <Separator className="my-10" />
+
+        <section id="water">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Current Conditions
+          </h2>
+          <p>What to expect when visiting Carlsbad Beach</p>
+
+          <div className="mt-4 rounded-lg border border-border flex-1 h-40 overflow-hidden">
+            <img src="/tide.png" className="w-full h-full" />
+          </div>
+
+          <div className="flex gap-4 mt-4">
+            <div className="mt-4 p-4 rounded-lg border border-border flex-1 h-40 bg-white">
+              <div className="grid grid-cols-2 gap-3 h-full">
+                <dl>
+                  <dt className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Sun size={14} /> UV Index
+                  </dt>
+                  <dd className="text-xl font-medium flex items-center gap-2">
+                    6{" "}
+                    <Badge
+                      className="text-sm rounded-full bg-amber-100 text-orange-400"
+                      variant="outline"
+                    >
+                      High
+                    </Badge>
+                  </dd>
+                </dl>
+                <dl>
+                  <dt className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Droplets size={14} />
+                    Precipitation
+                  </dt>
+                  <dd className="text-xl font-medium">12%</dd>
+                </dl>
+                <dl>
+                  <dt className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Droplet size={14} /> Humidity
+                  </dt>
+                  <dd className="text-xl font-medium">63%</dd>
+                </dl>
+                <dl>
+                  <dt className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Thermometer size={14} /> Water Temp
+                  </dt>
+                  <dd className="text-xl font-medium">920</dd>
+                </dl>
+              </div>
+            </div>
+            <div className="mt-4 rounded-lg border border-border h-40 py-4 pl-4 pr-10">
+              <p className="text-sm text-muted-foreground">Surf Height</p>
+              <p className="text-2xl font-medium">
+                1-3
+                <span className="text-lg font-normal">ft</span>
+              </p>
+              <p className="font-medium tracking-wide mt-1">Knee to Thigh</p>
+            </div>
+            <div className="mt-4 rounded-lg border border-border h-40 py-4 pl-4 pr-10">
+              <p className="text-sm text-muted-foreground">Wind</p>
+              <p className="text-2xl font-medium">
+                8<span className="text-lg font-normal">mph E</span>
+              </p>
+              <p className="text-lg font-medium">
+                3-5<span className="font-normal text-sm">mph gusts</span>
+              </p>
+            </div>
+            <div className="mt-4 rounded-lg border border-border flex-1 h-40 p-4">
+              <p className="text-sm text-muted-foreground">
+                Current & Rip Tides
+              </p>
+              <div className="flex gap-1">
+                <p className="text-2xl font-medium">
+                  2{" "}
+                  <span className="text-sm text-muted-foreground">
+                    Risk Score
+                  </span>
+                </p>
+
+                <Badge
+                  className="text-sm rounded-full ml-1 bg-blue-100 text-blue-400"
+                  variant="outline"
+                >
+                  Low-Moderate
+                </Badge>
+              </div>
+              <p className="mt-3 text-sm font-medium text-primary/80">
+                Some risk present. Be aware of changing conditions.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <Separator className="my-10" />
+
+        <div className="flex gap-10">
+          <div className="w-1/3">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Plan your visit
+            </h2>
+
+            <div className="mt-6 rounded-lg border border-border h-[455px] p-10">
+              <ul className="flex flex-col gap-4">
+                <li className="flex items-center gap-4">
+                  <Car
+                    size={50}
+                    className="border border-border bg-neutral-100 p-3 rounded-full"
+                  />{" "}
+                  <p className="font-medium text-primary/80">Good parking</p>
+                </li>
+                <li className="flex items-center gap-4">
+                  <Users
+                    size={50}
+                    className="border border-border bg-neutral-100 p-3 rounded-full"
+                  />{" "}
+                  <p className="font-medium text-primary/80">Kid-friendly</p>
+                </li>
+                <li className="flex items-center gap-4">
+                  <TreePine
+                    size={50}
+                    className="border border-border bg-neutral-100 p-3 rounded-full"
+                  />{" "}
+                  <p className="font-medium text-primary/80">Forests</p>
+                </li>
+                <li className="flex items-center gap-4">
+                  <Mountain
+                    size={50}
+                    className="border border-border bg-neutral-100 p-3 rounded-full"
+                  />{" "}
+                  <p className="font-medium text-primary/80">Mountains</p>
+                </li>
+                <li className="flex items-center gap-4">
+                  <Bird
+                    size={50}
+                    className="border border-border bg-neutral-100 p-3 rounded-full"
+                  />{" "}
+                  <p className="font-medium text-primary/80">Birding</p>
+                </li>
+
+                <Button
+                  className="rounded-full px-20 mt-4 w-fit"
+                  variant="outline"
+                >
+                  Show more
+                </Button>
+              </ul>
+            </div>
+          </div>
+          <div className="flex-1">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Parking Spots
+            </h2>
+
+            <img
+              src="/beach-map.png"
+              className="mt-4 rounded-lg w-full h-[455px] object-cover"
+            />
+          </div>
         </div>
 
         <Separator className="my-10" />
@@ -340,6 +585,35 @@ export const BeachPage = () => {
               Who to call in case of emergencies
             </Badge>
           </div>
+        </section>
+
+        <Separator className="my-10" />
+
+        <section id="water">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Nearby Beaches
+          </h2>
+          <p>Explore other beaches near this one</p>
+
+          <Carousel className="mt-4">
+            <CarouselContent className="-ml-4">
+              <CarouselItem className="pl-4 basis-1/4">
+                <Skeleton className="aspect-square bg-neutral-300" />
+              </CarouselItem>
+              <CarouselItem className="pl-4 basis-1/4">
+                <Skeleton className="aspect-square bg-neutral-300" />
+              </CarouselItem>
+              <CarouselItem className="pl-4 basis-1/4">
+                <Skeleton className="aspect-square bg-neutral-300" />
+              </CarouselItem>
+              <CarouselItem className="pl-4 basis-1/4">
+                <Skeleton className="aspect-square bg-neutral-300" />
+              </CarouselItem>
+            </CarouselContent>
+
+            <CarouselNext />
+            <CarouselPrevious />
+          </Carousel>
         </section>
       </main>
     </div>
