@@ -63,6 +63,7 @@ const Map = () => {
             new mapboxgl.Popup()
               .setLngLat([lng, lat] as LngLatLike)
               .setHTML(`
+                <h3>${feature.properties?.name}</h3>
                 <p><strong>Overall:</strong> ${data.overall}</p>
                 <p><strong>Recommendation:</strong> ${data.recommendation}</p>
               `)
