@@ -381,7 +381,6 @@ def check_rip_current_alerts(lat: float, lon: float):
     
     try:
         alerts = noaa.get_rip_current_alerts(lat, lon)
-        
         return alerts
         
     except Exception as e:
