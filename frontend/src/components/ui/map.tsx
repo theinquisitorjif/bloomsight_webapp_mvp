@@ -65,10 +65,12 @@ const Map = () => {
              new mapboxgl.Popup()
               .setLngLat([lng, lat] as LngLatLike)
               .setHTML(`
-                <h3 class="beach-name">${feature.properties?.name}</h3>
-                <h4 class="weather-section">${Math.round((data.temperature * 9/5) + 32)}°F</h4>
+                <h3 class="beach-name">${feature.properties? feature.properties?.name : "Unknown Beach"}</h3>
+                <h4 class="weather-section">${Math.round((data.temperature * 9/5) + 32)}°F
+                <p style="font-size: 16px; padding: 10px;">${data.conditions["Cloud Cover"]}</p>
+                </h4>
+
                 <h2>Current Conditions</h2>
-                <div class="row-value">${data.recommendation}</div>
                 <div class="weather-row">
                     <div class="weather-category">Overall Rating</div>
                     <div class="weather-rating">${data.overall}</div>
