@@ -11,7 +11,7 @@ const Map = () => {
 
   const [lng, setLng] = useState<number>(-74.0242);
   const [lat, setLat] = useState<number>(40.6941);
-  const [zoom, setZoom] = useState<number>(10.12);
+  const [zoom, setZoom] = useState<number>(7);
   type HeatmapFeature = Feature<Point, { intensity: number }>;
 
   const [heatmapData, setHeatmapData] = useState<FeatureCollection<Point, { intensity: number }> | null>(null);
@@ -32,7 +32,6 @@ const Map = () => {
       });
 
       mapRef.current.on('load', () => {
-        // Load vector point layer
         mapRef.current?.addSource('my-points', {
           type: 'vector',
           url: 'mapbox://sophiadadla.cmdzazrza0kaw1old7xtl2drp-3l3jx',
@@ -51,7 +50,7 @@ const Map = () => {
           },
         });
 
-        // Add hover popup for beach data
+        // Add hover popup
         mapRef.current?.on('mousemove', 'points-layer', (e) => {
           const feature = e.features?.[0];
           if (!feature || feature.geometry.type !== 'Point') return;
@@ -70,10 +69,10 @@ const Map = () => {
                 <p style="font-size: 16px; padding: 10px;">${data.conditions["Cloud Cover"]}</p>
                 </h4>
 
-                <h2>Current Conditions</h2>
+                <h2><strong>Current Conditions</strong></h2>
                 <div class="weather-row">
                     <div class="weather-category">Overall Rating</div>
-                    <div class="weather-rating">${data.overall}</div>
+                    <div class="weather-rating">TODO</div>
                 </div>
                 <div class="weather-row">
                     <div class="weather-category">Available Parking</div>
@@ -82,6 +81,10 @@ const Map = () => {
                 <div class="weather-row">
                     <div class="weather-category">Rip Currents</div>
                     <div class="weather-rating">${data.rip_risk.risk_level}</div>
+                </div>
+                <div class="weather-row">
+                    <div class="weather-category">Humidity</div>
+                    <div class="weather-rating">${data.conditions["Humidity"]}</div>
                 </div>
               `)
               .addTo(mapRef.current!);
@@ -131,9 +134,9 @@ const Map = () => {
 
         setLng(userLng);
         setLat(userLat);
-        setZoom(20);
+        setZoom(7);
 
-        initializeMap(userLng, userLat, 14);
+        initializeMap(userLng, userLat, zoom);
       },
       (err) => {
         console.error('Could not get location', err);
