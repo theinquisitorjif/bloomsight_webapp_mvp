@@ -19,9 +19,28 @@ def index():
 # Retrieve all beaches from Supabase
 @app.route('/api/beaches', methods=['GET'])
 def get_beaches():
-    # assumes you have a "beaches" table in Supabase
     response = supabase.table('beaches').select('*').execute()
     return jsonify(response.data), 200
+
+# Manually add a beach to Supabase
+@app.route('/api/beaches', methods=['POST'])
+def add_beach():
+    data = request.json
+    result = supabase.table("beaches").insert(data).execute()
+    return jsonify(result.data), 201
+
+# Update a beach in Supabase
+@app.route('/api/beaches/<int:id>', methods=['PUT'])
+def update_beach(id):
+    data = request.json
+    result = supabase.table("beaches").update(data).eq('id', id).execute()
+    return jsonify(result.data), 200
+
+# Delete a beach from Supabase
+@app.route('/api/beaches/<int:id>', methods=['DELETE'])
+def delete_beach(id):
+    result = supabase.table("beaches").delete().eq('id', id).execute()
+    return jsonify({"message": "Deleted"}), 204
 
 # Weather endpoint used by the map; returns a simple suitability rating
 @app.route('/beach-weather', methods=['GET'])

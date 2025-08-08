@@ -34,7 +34,7 @@ const Map = () => {
       mapRef.current.on('load', () => {
         mapRef.current?.addSource('my-points', {
           type: 'vector',
-          url: 'mapbox://sophiadadla.cmdzazrza0kaw1old7xtl2drp-3l3jx',
+          url: 'mapbox://sophiadadla.cmdzazrza0kaw1old7xtl2drp-4tyrf',
         });
 
         mapRef.current?.addLayer({
@@ -65,14 +65,15 @@ const Map = () => {
               .setLngLat([lng, lat] as LngLatLike)
               .setHTML(`
                 <h3 class="beach-name">${feature.properties? feature.properties?.name : "Unknown Beach"}</h3>
-                <h4 class="weather-section">${Math.round((data.temperature * 9/5) + 32)}°F
-                <p style="font-size: 16px; padding: 10px;">${data.conditions["Cloud Cover"]}</p>
+                <h4 class="weather-section">
+                  ${Math.round((data.temperature * 9/5) + 32)}°F
+                  <p style="font-size: 16px; padding-top: 10px;">${data.conditions["Cloud Cover"]}</p>
                 </h4>
 
                 <h2><strong>Current Conditions</strong></h2>
                 <div class="weather-row">
                     <div class="weather-category">Overall Rating</div>
-                    <div class="weather-rating">TODO</div>
+                    <div class="weather-rating">TO DO</div>
                 </div>
                 <div class="weather-row">
                     <div class="weather-category">Available Parking</div>
@@ -83,8 +84,8 @@ const Map = () => {
                     <div class="weather-rating">${data.rip_risk.risk_level}</div>
                 </div>
                 <div class="weather-row">
-                    <div class="weather-category">Humidity</div>
-                    <div class="weather-rating">${data.conditions["Humidity"]}</div>
+                    <div class="weather-category">Tides</div>
+                    <div class="weather-rating">TO DO</div>
                 </div>
               `)
               .addTo(mapRef.current!);

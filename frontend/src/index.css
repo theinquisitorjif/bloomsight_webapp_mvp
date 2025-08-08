@@ -135,7 +135,7 @@
   font-size: 30px;
   justify-content: center;
   margin: 10px;
-  padding: 25px;
+  padding: 20px 20px 12px;
   text-align: center;
   min-width: 50px;
   display: block;
@@ -190,9 +190,4 @@ h4 {
     margin: 10px 0 4px 0;
     color: black;
     font-size: 0.9rem;
-}
-
-
-.card-subtitle {
-
 }
