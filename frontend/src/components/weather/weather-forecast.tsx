@@ -1,14 +1,5 @@
-import {
-  Cloud,
-  CloudRain,
-  CloudSun,
-  Droplet,
-  Droplets,
-  Sun,
-  Wind,
-} from "lucide-react";
+import { Cloud, CloudRain, CloudSun, Sun } from "lucide-react";
 import { SimpleDayHeader } from "./day-header";
-import { WeatherDetail } from "./weather-detail";
 import {
   Accordion,
   AccordionContent,
@@ -18,18 +9,6 @@ import {
 import { BasicDetails } from "./basic-details";
 
 export default function WeatherForecast() {
-  const weatherDetails = [
-    {
-      icon: Sun,
-      label: "UV Index",
-      value: "4",
-      valueClassName: "text-blue-500",
-    },
-    { icon: Droplet, label: "Humidity", value: "24%" },
-    { icon: Wind, label: "Wind", value: "8mph" },
-    { icon: Droplets, label: "Precipitation", value: "10%" },
-  ];
-
   const upcomingDays = [
     { day: "Thursday", icon: CloudSun, temperature: 83, low: 69, high: 94 },
     { day: "Friday", icon: Sun, temperature: 83, low: 69, high: 94 },
