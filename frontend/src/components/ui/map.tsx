@@ -28,7 +28,7 @@ const Map = () => {
 useEffect(() => {
   const fetchAlgaeDataFromCSV = async () => {
     try {
-      const res = await fetch('/output.csv');
+      const res = await fetch('/output_florida.csv');
       const csvText = await res.text();
             
       const parsed = Papa.parse(csvText, { 
@@ -38,15 +38,6 @@ useEffect(() => {
       });
       
       const rows = parsed.data as Row[];
-      
-      console.log('Parsed data sample:', rows.slice(0, 5));
-      console.log('Available columns:', Object.keys(rows[0] || {}));
-      console.log('First row values:', {
-        chlor_a: rows[0]?.chlor_a,
-        lat: rows[0]?.lat, 
-        lon: rows[0]?.lon,
-        palette: rows[0]?.palette
-      });
       
       const geojson: FeatureCollection<Point, { intensity: number }> = {
         type: 'FeatureCollection',
@@ -70,7 +61,6 @@ useEffect(() => {
             
             // Validate coordinates
             if (isNaN(lat) || isNaN(lon) || isNaN(intensity)) {
-              console.warn('Invalid coordinate:', { lat: row.lat, lon: row.lon, palette: row.palette });
               return null;
             }
             
