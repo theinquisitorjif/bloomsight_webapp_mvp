@@ -78,9 +78,7 @@ useEffect(() => {
               console.warn('Out of range:', { lat, lon });
               return null;
             }
-            
-            console.log('Valid point:', { lat, lon, intensity });
-            
+                        
             return {
               type: "Feature" as const,
               geometry: {
@@ -165,8 +163,9 @@ useEffect(() => {
                     <p style="font-size: 16px; padding-top: 10px;">${data.conditions['Cloud Cover']}</p>
                   </h4>
                   <h2><strong>Current Conditions</strong></h2>
-                  <div class="weather-row"><div class="weather-category">Available Parking</div><div class="weather-rating">${data.parking_info.count}</div></div>
-                  <div class="weather-row"><div class="weather-category">Rip Currents</div><div class="weather-rating">${data.rip_risk.risk_level}</div></div>
+                  <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">TO DO</div></div>
+                  <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">TO DO</div></div>
+                  <div class="weather-row"><div class="weather-category">UV</div><div class="weather-rating">TO DO</div></div>
                 `)
                 .addTo(mapRef.current!);
             })
