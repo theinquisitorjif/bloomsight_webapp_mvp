@@ -1,7 +1,7 @@
 import requests
 from flask import Flask, request, jsonify
 from beach_class_model import get_beach_weather
-from rip_current import get_rip_info
+from backend.rip_current import get_rip_info
 from find_parking import get_parking_info
 from flask_cors import CORS
 import numpy as np
