@@ -20,7 +20,7 @@ source venv/bin/activate   # On Mac/Linux
 ### 2. **Install Dependencies**
 
 ```bash
-pip install -r Flask flask-cors requests python-dotenv supabase
+pip install Flask flask-cors requests python-dotenv supabase
 ```
 
 ### 3. **Set Environment Variables**
