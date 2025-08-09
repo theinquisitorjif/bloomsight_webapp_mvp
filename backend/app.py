@@ -1,13 +1,16 @@
-# backend/app.py
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 from supabase_client import init_supabase
-import os
+from rip_current import NOAAMarineData
+
+
 TEMP_THRESHOLD = float(os.environ.get("BEACH_TEMP_THRESHOLD", 20.0))
 WIND_THRESHOLD = float(os.environ.get("BEACH_WIND_THRESHOLD", 10.0))
 
 supabase = init_supabase()
+noaa = NOAAMarineData()
 
 app = Flask(__name__)
 CORS(app)  # allows frontend running on a different port to call the backend
@@ -78,6 +81,23 @@ def beach_weather():
 
     return jsonify({'overall': overall, 'recommendation': recommendation})
 
+# Beach Conditions Endpoint
+@app.route('/api/beach-conditions', methods=['GET'])
+def beach_conditions():
+    lat = request.args.get('lat', type=float)
+    lon = request.args.get('lon', type=float)
+    force = request.args.get('force', default='0')
+
+    if lat is None or lon is None:
+        return jsonify({'error': 'Missing lat or lon'}), 400
+
+    try:
+        result = noaa.get_rip_current_risk(lat, lon, force_refresh=(force == '1'))
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Run on port 5000 to match vite.config.ts proxy
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+
