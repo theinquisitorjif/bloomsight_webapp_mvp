@@ -48,19 +48,6 @@ current_weathercode = current.Variables(7).Value()
 current_relative_humidity_2m = current.Variables(8).Value()
 current_uv_index = current.Variables(9).Value()
 
-#Print current weather data
-print(f"\nCurrent Weather Data (as of {current_time_formatted}):")
-print(f"Current Temperature: {current_temperature_2m}°C")
-print(f"Current Precipitation: {current_precipitation}mm")
-print(f"Current Rain: {current_rain}mm")
-print(f"Current Wind Speed: {current_wind_speed_10m * 3.6:.1f}km/h")
-print(f"Current Wind Gusts: {current_wind_gusts_10m * 3.6:.1f}km/h")
-print(f"Current Humidity: {current_relative_humidity_2m}%")
-print(f"Current UV Index: {current_uv_index}")
-print(f"Is it Daytime? {'Yes' if current_is_day else 'No'}")
-print(f"Current Cloud Cover: {current_cloud_cover}%")
-print(f"Current Weather Code: {current_weathercode}")
-
 # Process hourly data. The order of variables needs to be the same as requested.
 hourly = response.Hourly()
 hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
@@ -406,18 +393,6 @@ for i in range(len(hourly_temperature_2m)):
             overall_trend = "⚠️"
         else:
             overall_trend = "❌"
-        
-        print(f"\n{current_datetime.strftime('%Y-%m-%d %H:%M')} {overall_trend}:")
-        print(f"  Temperature: {hourly_temperature_2m[i]:.1f}°C ({hour_conditions['Temperature']}) {temp_trend}")
-        print(f"  Rain: {hourly_rain[i]:.1f}mm ({hour_conditions['Rain']})")
-        print(f"  Rain Chance: {hourly_precipitation_probability[i]:.0f}% ({hour_conditions['Rain Chance']})")
-        print(f"  Wind: {hourly_wind_speed_10m[i] * 3.6:.1f}km/h ({hour_conditions['Wind']})")
-        print(f"  Wind Gusts: {hourly_wind_gusts_10m[i] * 3.6:.1f}km/h ({hour_conditions['Wind Gusts']})")
-        print(f"  Humidity: {hourly_relative_humidity_2m[i]:.0f}% ({hour_conditions['Humidity']})")
-        print(f"  UV Index: {hourly_uv_index[i]:.1f} ({hour_conditions['UV Index']})")
-        print(f"  Cloud Cover: {hourly_cloud_cover[i]:.0f}% ({hour_conditions['Cloud Cover']})")
-        print(f"  Weather: {hour_conditions['Weather Code']}")
-        print(f"  Overall: {hour_overall}")
 
 def get_beach_weather(lat, lon):
     current_beach_model = BeachClassModel(
@@ -445,4 +420,3 @@ def get_beach_weather(lat, lon):
 
 if __name__ == "__main__":
     data = get_beach_weather()
-    print(data)

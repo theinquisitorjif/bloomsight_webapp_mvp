@@ -245,15 +245,6 @@ for i in range(7):
     # Get the date for this day
     forecast_date = daily_dataframe['date'].iloc[i]
     day_name = forecast_date.strftime('%A')
-    
-    print(f"\n{forecast_date.strftime('%Y-%m-%d')} ({day_name}) - {daily_overall}")
-    print(f"  Temperature: {daily_temperature_2m_min[i]:.0f}°C - {daily_temperature_2m_max[i]:.0f}°C ({daily_conditions['Temperature']}, {daily_conditions['Temperature Range']})")
-    print(f"  Precipitation: {daily_precipitation_sum[i]:.1f}mm ({daily_conditions['Precipitation']})")
-    print(f"  Rain Chance: {daily_precipitation_probability_max[i]:.0f}% ({daily_conditions['Rain Chance']})")
-    print(f"  Wind: Max {daily_wind_speed_10m_max[i]:.1f}km/h ({daily_conditions['Wind']})")
-    print(f"  Wind Gusts: Max {daily_wind_gusts_10m_max[i]:.1f}km/h ({daily_conditions['Wind Gusts']})")
-    print(f"  UV Index: Max {daily_uv_index_max[i]:.1f} ({daily_conditions['UV Index']})")
-    print(f"  Weather: {daily_conditions['Weather']}")
 
 # Summary
 print("\n" + "="*80)

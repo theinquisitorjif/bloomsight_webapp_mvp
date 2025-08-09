@@ -1,0 +1,67 @@
+Metadata-Version: 2.1
+Name: pyhdf
+Version: 0.11.6
+Summary: Python interface to the NCSA HDF4 library
+Author-email: Andre Gosselin <Andre.Gosselin@dfo-mpo.gc.ca>, "Travis E. Oliphant" <teoliphant@gmail.com>
+Maintainer-email: Fazlul Shahriar <fshahriar@gmail.com>
+License: MIT License
+Project-URL: Homepage, https://github.com/fhs/pyhdf
+Keywords: hdf4,netcdf,numpy,python,pyhdf
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Software Development
+Classifier: Topic :: Scientific/Engineering
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Unix
+Classifier: Operating System :: MacOS
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: AUTHORS
+Requires-Dist: numpy
+
+[![Tests](https://github.com/fhs/pyhdf/actions/workflows/tests.yml/badge.svg)](https://github.com/fhs/pyhdf/actions/workflows/tests.yml)
+[![Pypi build](https://github.com/fhs/pyhdf/actions/workflows/package_and_publish.yml/badge.svg)](https://github.com/fhs/pyhdf/actions/workflows/package_and_publish.yml)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyhdf/badges/version.svg)](https://anaconda.org/conda-forge/pyhdf)
+
+# pyhdf
+
+pyhdf is a python wrapper around the NCSA HDF version 4 library.
+The SD (Scientific Dataset), VS (Vdata) and V (Vgroup) API's 
+are currently implemented. NetCDF files can also be
+read and modified. It supports both Python 2 and Python 3.
+
+*Note:* The sourceforge pyhdf
+[website](http://pysclint.sourceforge.net/pyhdf/) and
+[project](https://sourceforge.net/projects/pysclint/) are out-of-date.
+The original author of pyhdf have abandoned the project and it is
+currently maintained in [github](https://github.com/fhs/pyhdf).
+
+Version 0.9.x was called
+[python-hdf4](https://pypi.org/project/python-hdf4/)
+in PyPI because at that time we didn't have
+[access](https://github.com/pypa/warehouse/issues/5157) to the
+[pyhdf package](https://pypi.org/project/pyhdf/) in PyPI.  For version
+0.10.0 and onward, please install `pyhdf` instead of `python-hdf4`.
+
+## Installation
+
+See [pyhdf installation instructions](http://fhs.github.io/pyhdf/install.html)
+or [doc/install.rst](doc/install.rst).
+
+## Documentation
+
+See [pyhdf documentation](http://fhs.github.io/pyhdf/).
+
+Additional documentation on the HDF4 format can be found in the
+[HDF4 Support Page](https://portal.hdfgroup.org/display/HDF4/HDF4).
+
+## Examples
+
+Example python programs using the pyhdf package
+can be found inside the [examples/](examples/) subdirectory.
