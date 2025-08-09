@@ -49,17 +49,17 @@ current_relative_humidity_2m = current.Variables(8).Value()
 current_uv_index = current.Variables(9).Value()
 
 #Print current weather data
-print(f"\nCurrent Weather Data (as of {current_time_formatted}):")
-print(f"Current Temperature: {current_temperature_2m}°C")
-print(f"Current Precipitation: {current_precipitation}mm")
-print(f"Current Rain: {current_rain}mm")
-print(f"Current Wind Speed: {current_wind_speed_10m * 3.6:.1f}km/h")
-print(f"Current Wind Gusts: {current_wind_gusts_10m * 3.6:.1f}km/h")
-print(f"Current Humidity: {current_relative_humidity_2m}%")
-print(f"Current UV Index: {current_uv_index}")
-print(f"Is it Daytime? {'Yes' if current_is_day else 'No'}")
-print(f"Current Cloud Cover: {current_cloud_cover}%")
-print(f"Current Weather Code: {current_weathercode}")
+# print(f"\nCurrent Weather Data (as of {current_time_formatted}):")
+# print(f"Current Temperature: {current_temperature_2m}°C")
+# print(f"Current Precipitation: {current_precipitation}mm")
+# print(f"Current Rain: {current_rain}mm")
+# print(f"Current Wind Speed: {current_wind_speed_10m * 3.6:.1f}km/h")
+# print(f"Current Wind Gusts: {current_wind_gusts_10m * 3.6:.1f}km/h")
+# print(f"Current Humidity: {current_relative_humidity_2m}%")
+# print(f"Current UV Index: {current_uv_index}")
+# print(f"Is it Daytime? {'Yes' if current_is_day else 'No'}")
+# print(f"Current Cloud Cover: {current_cloud_cover}%")
+# print(f"Current Weather Code: {current_weathercode}")
 
 # Process hourly data. The order of variables needs to be the same as requested.
 hourly = response.Hourly()
@@ -445,4 +445,3 @@ def get_beach_weather(lat, lon):
 
 if __name__ == "__main__":
     data = get_beach_weather()
-    print(data)

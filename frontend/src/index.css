@@ -119,3 +119,75 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.mapboxgl-popup-content {
+  min-width: 240px;
+  border-radius: 10px;
+  border: none;
+}
+
+.weather-section {
+  align-items: center;
+  background: linear-gradient(to bottom right, #7EB2F5, #217ebf);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 30px;
+  justify-content: center;
+  margin: 10px;
+  padding: 20px 20px 13px;
+  text-align: center;
+  min-width: 50px;
+  display: block;
+}
+
+
+.row-value {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 0.875rem;
+    padding-right: 16px;
+    text-align: right;
+    margin: 8px 0;
+}
+
+.beach-name {
+    color: black;
+    font-size: 21px;
+    margin: 0 0 8px 0;
+    text-align: center;
+    font-weight: bold;
+    padding: 7px;
+}
+
+.weather-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px 0;
+}
+
+.weather-category {
+    color: black;
+    font-size: 12px;
+}
+
+.weather-rating {
+    background-color: #28a745;
+    color: white;
+    padding: 3px 9px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+h2 {
+    margin: 12px 0 8px 0;
+    color: black;
+    font-size: 14px;
+}
+
+h4 {
+    margin: 10px 0 4px 0;
+    color: black;
+    font-size: 0.9rem;
+}

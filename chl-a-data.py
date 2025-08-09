@@ -1,41 +1,77 @@
-
 import netCDF4
 import pandas as pd
 import numpy as np
-import os
 
-# Path to your .nc file
-nc_file = 'chl-a-data\AQUA_MODIS.20250808.L3m.DAY.CHL.chlor_a.9km.NRT.nc'
-csv_file = 'output.csv'   
+# Configuration
+nc_file = 'chl-a-data/AQUA_MODIS.20250808.L3m.DAY.CHL.chlor_a.9km.NRT.nc'
+csv_file = 'frontend/public/output.csv'
 
-# Open the NetCDF file
+# Florida bounding box (extended to include surrounding waters)
+FLORIDA_BOUNDS = {
+    'lat_min': 24.0,   # Southern tip of Florida Keys
+    'lat_max': 31.0,   # Northern Florida/Georgia border
+    'lon_min': -87.5,  # Western Florida panhandle + Gulf
+    'lon_max': -79.0   # Eastern Florida + Atlantic
+}
+
 with netCDF4.Dataset(nc_file, mode='r') as ds:
-	# List all variables
-	print('Variables:', ds.variables.keys())
-	# Example: extract all variables into a DataFrame
-	data = {}
-	for var in ds.variables:
-		arr = ds.variables[var][:]
-		# Flatten arrays if needed
-		if arr.ndim > 1:
-			arr = arr.flatten()
-		data[var] = arr
-	# Find the minimum length among variables
-	min_len = min(len(v) for v in data.values())
-	# Truncate all arrays to the same length
-	for k in data:
-		data[k] = data[k][:min_len]
-
-	# Create DataFrame keep out all data that is nan palette
-	df = pd.DataFrame(data)
-	df = df[df['palette'].notna()]
-	# Save to CSV
-	df.to_csv(csv_file, index=False)
-	print(f'CSV file saved to {csv_file}')
-
-
-
-#Extract only palette values that dont have a value of 0 and nan
-palette_values = df['palette'].values
-#Print them
-print(palette_values[palette_values != 0])
+    print('Variables:', ds.variables.keys())
+    
+    chlor_a = ds.variables['chlor_a'][:]
+    lat_var = ds.variables['lat'][:]
+    lon_var = ds.variables['lon'][:]
+    
+    # Find indices for Florida region
+    lat_indices = np.where((lat_var >= FLORIDA_BOUNDS['lat_min']) & 
+                          (lat_var <= FLORIDA_BOUNDS['lat_max']))[0]
+    lon_indices = np.where((lon_var >= FLORIDA_BOUNDS['lon_min']) & 
+                          (lon_var <= FLORIDA_BOUNDS['lon_max']))[0]
+    
+    # Extract Florida region data
+    lat_florida = lat_var[lat_indices]
+    lon_florida = lon_var[lon_indices]
+    
+    # Extract the subset of chlorophyll data
+    chlor_florida = chlor_a[lat_indices, :][:, lon_indices]
+    
+    # Create coordinate grid for Florida region
+    lon_grid, lat_grid = np.meshgrid(lon_florida, lat_florida)
+    
+    # Extract valid data points
+    lats = []
+    lons = []
+    values = []
+        
+    for i in range(chlor_florida.shape[0]):
+        for j in range(chlor_florida.shape[1]):
+            value = chlor_florida[i, j]
+            lat = lat_grid[i, j]
+            lon = lon_grid[i, j]
+            
+            # Skip invalid data
+            if np.ma.is_masked(value) or np.isnan(value) or value <= 0:
+                continue
+            
+            # Skip invalid coordinates
+            if np.ma.is_masked(lat) or np.ma.is_masked(lon) or np.isnan(lat) or np.isnan(lon):
+                continue
+            
+            # Double-check bounds (in case of floating point issues)
+            if (lat < FLORIDA_BOUNDS['lat_min'] or lat > FLORIDA_BOUNDS['lat_max'] or
+                lon < FLORIDA_BOUNDS['lon_min'] or lon > FLORIDA_BOUNDS['lon_max']):
+                continue
+            
+            lats.append(float(lat))
+            lons.append(float(lon))
+            values.append(float(value))
+    
+    
+    # Create DataFrame
+    df = pd.DataFrame({
+        'chlor_a': values,
+        'lat': lats,
+        'lon': lons,
+        'palette': values
+    })
+    
+    df.to_csv(csv_file, index=False)
