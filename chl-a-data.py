@@ -8,10 +8,10 @@ csv_file = 'frontend/public/output.csv'
 
 # Florida bounding box (extended to include surrounding waters)
 FLORIDA_BOUNDS = {
-    'lat_min': 24.0,   # Southern tip of Florida Keys
-    'lat_max': 31.0,   # Northern Florida/Georgia border
-    'lon_min': -87.5,  # Western Florida panhandle + Gulf
-    'lon_max': -79.0   # Eastern Florida + Atlantic
+    'lat_min': 18.1,   # Southern 
+    'lat_max': 32.1,   # Northern 
+    'lon_min': -95,  # Western 
+    'lon_max': -61.0   # Eastern 
 }
 
 with netCDF4.Dataset(nc_file, mode='r') as ds:
