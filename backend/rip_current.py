@@ -4,7 +4,9 @@ import json
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 import math
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv())
 
 class NOAAMarineData:
     """
@@ -488,11 +490,116 @@ POPULAR_STATIONS = {
     'los_angeles': '9410840',     # San Pedro, CA
 }
 
-if __name__ == "__main__":
-    # Uncomment to run examples
-    example_rip_current_check()
-    
-    # Quick alert check for Miami Beach
-    check_rip_current_alerts(25.7617, -80.1918)
+# Supabase REST helpers
 
-    pass
+def _supabase_headers():
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+    if not url or not key:
+        raise RuntimeError("Missing SUPABASE_URL or SUPABASE_*_KEY in environment")
+    return url, {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+
+def _fetch_all_beaches() -> list[dict]:
+    """Reads beaches from Supabase; expects 'name' and 'location'='lat, lon'."""
+    url, headers = _supabase_headers()
+    resp = requests.get(f"{url}/rest/v1/beaches?select=*", headers=headers, timeout=60)
+    resp.raise_for_status()
+    return resp.json()
+
+def _bulk_upsert(table: str, rows: list[dict], conflict: str | None = None):
+    """Bulk insert/upsert into Supabase (chunks for safety)."""
+    if not rows:
+        return
+    url, headers = _supabase_headers()
+    endpoint = f"{url}/rest/v1/{table}"
+    if conflict:
+        headers = dict(headers)
+        headers["Prefer"] = f"resolution=merge-duplicates,return=representation"
+        endpoint += f"?on_conflict={conflict}"
+    # chunk to avoid large payloads
+    CHUNK = 500
+    for i in range(0, len(rows), CHUNK):
+        payload = rows[i:i+CHUNK]
+        r = requests.post(endpoint, headers=headers, data=json.dumps(payload), timeout=120)
+        if r.status_code >= 400:
+            raise RuntimeError(f"Upsert to {table} failed: {r.status_code} {r.text}")
+
+def _parse_lat_lon(location_str: str) -> tuple[float, float] | None:
+    try:
+        parts = [p.strip() for p in location_str.split(",")]
+        return float(parts[0]), float(parts[1])
+    except Exception:
+        return None
+
+# Public JSON function (for frontend reuse)
+
+def get_rip_risk_json(lat: float, lon: float) -> dict:
+    """Return normalized rip-risk JSON for a point (no Supabase dependency)."""
+    client = NOAAMarineData()
+    result = client.get_rip_current_risk(lat, lon, force_refresh=True)
+    # Make sure it’s compact & stable for storing
+    out = {
+        "risk_level": result.get("risk_level"),
+        "score": result.get("conditions", {}).get("score"),
+        "recommendation": result.get("conditions", {}).get("recommendation"),
+        "alerts": result.get("alerts", []),
+        "conditions": result.get("conditions", {}),
+        "surf_forecast": result.get("surf_forecast"),
+        "nearby_stations": result.get("nearby_stations", []),
+        "last_updated": result.get("last_updated"),
+    }
+    return out
+
+# Seeding into Supabase
+
+def seed_rip_risk_for_all_beaches():
+    """Fetch all beaches, compute rip risk JSON, upsert into 'rip_current_data'."""
+    beaches = _fetch_all_beaches()
+    rows = []
+    now_iso = datetime.utcnow().isoformat()
+
+    for b in beaches:
+        loc = b.get("location")
+        parsed = _parse_lat_lon(loc) if isinstance(loc, str) else None
+        if not parsed:
+            continue
+        lat, lon = parsed
+        try:
+            data = get_rip_risk_json(lat, lon)
+            rows.append({
+                # expected columns (create this table in Supabase beforehand):
+                # id (auto), beach_id (bigint), lat (float8), lon (float8),
+                # risk_level (text), score (int4), recommendation (text),
+                # data (jsonb), updated_at (timestamptz)
+                "beach_id": b.get("id"),
+                "lat": lat,
+                "lon": lon,
+                "risk_level": data.get("risk_level"),
+                "score": data.get("score"),
+                "recommendation": data.get("recommendation"),
+                "data": data,               # full JSON in jsonb
+                "updated_at": now_iso
+            })
+        except Exception as e:
+            print(f"rip seed failed for beach {b.get('id')} {b.get('name')}: {e}")
+
+    # upsert by beach_id (so one row per beach)
+    _bulk_upsert("rip_current_data", rows, conflict="beach_id")
+    print(f"Seeded rip current data for {len(rows)} beaches.")
+
+# CLI 
+
+if __name__ == "__main__":
+    import sys
+    # `python backend\rip_current.py --seed` to seed all beaches
+    if "--seed" in sys.argv:
+        seed_rip_risk_for_all_beaches()
+    # else:
+        # demo functions 
+        #example_rip_current_check()
+        #check_rip_current_alerts(25.7617, -80.1918)
