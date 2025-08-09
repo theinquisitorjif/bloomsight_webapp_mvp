@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 from datetime import datetime, timedelta
@@ -18,6 +19,35 @@ class NOAAMarineData:
         self.session.headers.update({
             'User-Agent': '(YourAppName, your-email@example.com)'  # Replace with your info
         })
+        
+        # In-memory cache
+        ttl_min = int(os.getenv("RIPCACHE_TTL_MIN", "10"))
+        self._ttl = timedelta(minutes=ttl_min)
+        self._cache = {}  # key -> {'data': <dict>, 'ts': datetime}
+        
+    # Cache Helpers
+    def _key(self, lat: float, lon: float) -> str:
+        return f"{lat:.4f},{lon:.4f}"
+
+    def _get_cached(self, lat: float, lon: float):
+        key = self._key(lat, lon)
+        entry = self._cache.get(key)
+        if not entry:
+            return None
+        if datetime.utcnow() - entry['ts'] > self._ttl:
+            # expired
+            self._cache.pop(key, None)
+            return None
+        print(f"[CACHE HIT] {self._key(lat, lon)}")
+        return entry['data']
+
+    def _set_cached(self, lat: float, lon: float, data: dict):
+        key = self._key(lat, lon)
+        self._cache[key] = {'data': data, 'ts': datetime.utcnow()}
+        print(f"[CACHE SET] {self._key(lat, lon)}")
+
+    def invalidate(self, lat: float, lon: float):
+        self._cache.pop(self._key(lat, lon), None)
     
     def get_tide_data(self, station_id: str, start_date: str, end_date: str) -> Optional[Dict]:
         """Get water levels and tide data from NOAA station"""
@@ -337,41 +367,49 @@ class NOAAMarineData:
             **factors
         }
     
-    def get_rip_current_risk(self, lat: float, lon: float) -> Dict:
-        """Comprehensive rip current risk assessment"""
+    def get_rip_current_risk(self, lat: float, lon: float, force_refresh: bool = False) -> Dict:
+        result = None
         try:
-            # Find nearby stations
+            if not force_refresh:
+                cached = self._get_cached(lat, lon)
+                if cached is not None:
+                    # return a COPY so you don’t mutate cached object
+                    out = dict(cached)
+                    out['cached'] = True
+                    return out
+
+            # ... SLOW path ...
             stations = self.find_nearby_stations(lat, lon)
-            
-            # Get date range (today and tomorrow)
             today = datetime.now()
             start_date = today.strftime('%Y%m%d')
             end_date = (today + timedelta(days=1)).strftime('%Y%m%d')
-            
-            # Get multiple data sources
+
             alerts = self.get_rip_current_alerts(lat, lon)
             surf_conditions = self.get_surf_conditions(lat, lon)
             nearby_station_data = self.get_nearby_station_data(stations, start_date, end_date)
-            
-            # Calculate risk factors specific to rip currents
+
             risk_factors = self.calculate_rip_current_risk({
                 'alerts': alerts,
                 'surf_conditions': surf_conditions,
                 'station_data': nearby_station_data,
                 'stations': stations
             })
-            
-            return {
-                'risk_level': risk_factors['overall'],
-                'alerts': alerts,
+
+            result = {
+                'risk_level': risk_factors.get('overall', 'LOW'),
+                'alerts': alerts or [],
                 'conditions': risk_factors,
                 'surf_forecast': surf_conditions,
-                'nearby_stations': stations[:3],  # Top 3 closest
+                'nearby_stations': stations[:3],
                 'last_updated': datetime.now().isoformat()
             }
-            
+
+            self._set_cached(lat, lon, result)
+            # return a COPY with flag
+            return {**result, 'cached': False}
+
         except Exception as e:
-            print(f"Error assessing rip current risk: {e}")
+            # IMPORTANT: don’t reference 'result' here
             raise
 
 
