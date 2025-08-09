@@ -120,7 +120,10 @@
   }
 }
 
-
+html {
+  scroll-behavior: smooth;
+}
+  
 .mapboxgl-popup-content {
   min-width: 240px;
   border-radius: 10px;
