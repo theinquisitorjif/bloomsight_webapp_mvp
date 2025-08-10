@@ -16,8 +16,8 @@ const Map = () => {
   const mapRef = useRef<MapRef>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
-  //fall back coords is central FL
-  const [lng] = useState<number>(81.3792);
+  // fallback coords central FL
+  const [lng] = useState<number>(-81.3792); 
   const [lat] = useState<number>(28.5383);
   const [zoom] = useState<number>(7);
 
@@ -25,60 +25,58 @@ const Map = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   interface Row {
-  chlor_a: string;  // First column
-  lat: string;      // Latitude column
-  lon: string;      // Longitude column  
-  palette: string;  // Palette/intensity column
-}
+    chlor_a: string;  // First column
+    lat: string;      // Latitude column
+    lon: string;      // Longitude column
+    palette: string;  // Palette/intensity column
+  }
 
   const fetchAlgaeDataFromCSV = async () => {
     try {
       const res = await fetch('/output_florida.csv');
       const csvText = await res.text();
-            
-      const parsed = Papa.parse(csvText, { 
-        header: true, 
+
+      const parsed = Papa.parse(csvText, {
+        header: true,
         skipEmptyLines: true,
         transformHeader: (header) => header.trim()
       });
-      
+
       const rows = parsed.data as Row[];
-      
+
       const geojson: FeatureCollection<Point, { intensity: number }> = {
         type: 'FeatureCollection',
         features: rows
           .filter((row) => {
-            // Filter based on actual column names
             const hasLat = row.lat && row.lat !== '';
             const hasLon = row.lon && row.lon !== '';
             const hasPalette = row.palette && row.palette !== '';
-            
+
             if (!hasLat || !hasLon || !hasPalette) {
               console.log('Filtered out row:', row);
             }
-            
+
             return hasLat && hasLon && hasPalette;
           })
           .map((row) => {
-            const lat = parseFloat(row.lat);    // Note: lat first
-            const lon = parseFloat(row.lon);    // Note: lon second  
+            const lat = parseFloat(row.lat);
+            const lon = parseFloat(row.lon);
             const intensity = parseFloat(row.palette);
-            
-            // Validate coordinates
+
             if (isNaN(lat) || isNaN(lon) || isNaN(intensity)) {
               return null;
             }
-            
+
             if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
               console.warn('Out of range:', { lat, lon });
               return null;
             }
-                        
+
             return {
               type: "Feature" as const,
               geometry: {
                 type: "Point" as const,
-                coordinates: [lon, lat], // GeoJSON format: [longitude, latitude]
+                coordinates: [lon, lat],
               },
               properties: {
                 intensity: intensity,
@@ -98,7 +96,6 @@ const Map = () => {
 
   const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number) => {
     try {
-      // Look up by coordinates using lat/lon columns in beach_forecasts
       if (lat && lng) {
         const tolerance = 0.005;
         const { data: forecasts, error: forecastError } = await supabase
@@ -116,28 +113,23 @@ const Map = () => {
           return null;
         }
 
-        console.log(forecasts, forecasts[0].current.temperature_2m);
-
         if (forecasts && forecasts.length > 0) {
           return forecasts[0].current;
         }
 
         console.log('No forecast found for coordinates:', lat, lng);
-        // Explicitly return null when no forecast is found
         return null;
       }
     } catch (error) {
-        console.error('An unexpected error occurred:', error);
-        return null;
+      console.error('An unexpected error occurred:', error);
+      return null;
     }
-    // Also, you need a return statement for when lat/lng are not provided
     return null;
-};
+  };
 
-useEffect(() => {
-
-  fetchAlgaeDataFromCSV();
-}, []);
+  useEffect(() => {
+    fetchAlgaeDataFromCSV();
+  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -152,36 +144,68 @@ useEffect(() => {
         container: mapContainerRef.current as HTMLDivElement,
         center: [centerLng, centerLat],
         zoom: zoomLevel,
-        style: 'mapbox://styles/sophiadadla/cmdzb7ypd00ff01s7eokp2okh',
+        style: 'mapbox://styles/sophiadadla/cme5opmc500qq01ryca404kxz',
       });
 
       mapRef.current.on('load', () => {
         console.log('Map loaded');
-        setMapLoaded(true); // Set state when map is loaded
-        
-        // Beaches vector layer
-        mapRef.current?.addSource('my-points', {
-          type: 'vector',
-          url: 'mapbox://sophiadadla.cmdzazrza0kaw1old7xtl2drp-4tyrf',
-        });
+        setMapLoaded(true);
 
-        mapRef.current?.addLayer({
-          id: 'points-layer',
-          type: 'circle',
-          source: 'my-points',
-          'source-layer': 'fl_beaches',
-          paint: {
-            'circle-radius': 6,
-            'circle-color': '#007cbf',
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#fff',
-          },
-        });
+        //  your vector source & base points layer (beaches)
+        // if your style already contains the source/layer this will create a new source named 'my-points' and a new layer 'points-layer'
+        if (!mapRef.current!.getSource('my-points')) {
+          mapRef.current?.addSource('my-points', {
+            type: 'vector',
+            url: 'mapbox://sophiadadla.cmdzazrza0kaw1old7xtl2drp-4tyrf',
+          });
+        }
 
-        mapRef.current?.on('mousemove', 'points-layer', async (e) => {
-          //i want to eventually make the points have an effect on hover
-        });
-        // Hover popup for beaches - Updated to use direct Supabase access
+        // add the layer that shows beach points (keeps your paint expression but highlight handled separately)
+        if (!mapRef.current!.getLayer('points-layer')) {
+          mapRef.current?.addLayer({
+            id: 'points-layer',
+            type: 'circle',
+            source: 'my-points',
+            'source-layer': 'fl_beaches',
+            paint: {
+              'circle-radius': [
+                'case',
+                ['boolean', ['feature-state', 'hover'], false],
+                10,
+                5
+              ],
+              'circle-color': '#1c47b5'
+            }
+          });
+        }
+
+        // --- Add a client-side GeoJSON "hover-point" source + a hover layer that paints black ---
+        // This avoids depending on vector tile feature IDs / feature-state.
+        if (!mapRef.current!.getSource('hover-point')) {
+          mapRef.current?.addSource('hover-point', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: []
+            }
+          });
+        }
+
+        // Add hover layer on top 
+        if (!mapRef.current!.getLayer('points-hover')) {
+          mapRef.current?.addLayer({
+            id: 'points-hover',
+            type: 'circle',
+            source: 'hover-point',
+            paint: {
+              'circle-radius': 10,             // bigger radius for hover
+              'circle-color': '#3d60d1',       // color on hover
+              'circle-opacity': 1
+            }
+          });
+        }
+
+        // --- Click popup for beaches ---
         mapRef.current?.on('click', 'points-layer', async (e) => {
           const feature = e.features?.[0];
           if (!feature || feature.geometry.type !== 'Point') return;
@@ -191,15 +215,12 @@ useEffect(() => {
           const beachName = feature.properties?.name || 'Unknown Beach';
 
           try {
-            // Fetch beach forecast data directly from Supabase using name and coordinates
             const beachData = await fetchBeachForecast(beachName, lat, lng);
-            console.log(beachData, beachData["temperature_2m"])
-            
             let popupContent;
 
             if (beachData) {
               const forecast = beachData;
-              
+
               popupContent = `
                 <h4 class="weather-section">
                   <p style="font-size: 16px; padding: 5px">${forecast["cloud_cover"]}</p>
@@ -230,7 +251,6 @@ useEffect(() => {
                 ` : ''}
               `;
             } else {
-              // Beach not found in database
               popupContent = `
                 <h3 class="beach-name">${beachName}</h3>
                 <p style="color: #666; font-style: italic;">Beach data not available</p>
@@ -247,8 +267,7 @@ useEffect(() => {
 
           } catch (error) {
             console.error('Error fetching beach data:', error);
-            
-            // Show error popup
+
             new mapboxgl.Popup()
               .setLngLat([lng, lat] as LngLatLike)
               .setHTML(`
@@ -261,9 +280,61 @@ useEffect(() => {
               .addTo(mapRef.current!);
           }
         });
+
+        // --- Hover: update hover-point source with the hovered feature geometry ---
+        mapRef.current?.on('mousemove', 'points-layer', (e) => {
+          const hoverSource = mapRef.current!.getSource('hover-point') as mapboxgl.GeoJSONSource | undefined;
+          if (!hoverSource) return;
+
+          if (!e.features || e.features.length === 0) {
+            // clear hover
+            hoverSource.setData({ type: 'FeatureCollection', features: [] });
+            return;
+          }
+
+          const feature = e.features[0];
+          const geom = feature.geometry;
+          if (!geom || geom.type !== 'Point') {
+            hoverSource.setData({ type: 'FeatureCollection', features: [] });
+            return;
+          }
+
+          const coords = geom.coordinates as [number, number];
+          const hoverFeature = {
+            type: 'Feature' as const,
+            geometry: {
+              type: 'Point' as const,
+              coordinates: coords
+            },
+            properties: { originalProps: feature.properties || {} }
+          };
+
+          hoverSource.setData({
+            type: 'FeatureCollection',
+            features: [hoverFeature]
+          });
+        });
+
+        mapRef.current?.on('mouseleave', 'points-layer', () => {
+          const hoverSource = mapRef.current!.getSource('hover-point') as mapboxgl.GeoJSONSource | undefined;
+          if (!hoverSource) return;
+          hoverSource.setData({ type: 'FeatureCollection', features: [] });
+        });
+
+        try {
+          const style = mapRef.current?.getStyle();
+          if (style?.layers) {
+            console.log('Style layer IDs:', style.layers.map(l => l.id));
+          }
+        } catch (err) {
+          // ignore
+        }
       });
 
-      new mapboxgl.Marker().setLngLat([centerLng, centerLat]).addTo(mapRef.current);
+      // Add a small marker for debugging/center marker
+      new mapboxgl.Marker()
+        .setLngLat([centerLng, centerLat])
+        .addTo(mapRef.current);
     };
 
     navigator.geolocation.getCurrentPosition(
@@ -296,12 +367,10 @@ useEffect(() => {
       return;
     }
 
-    // Add heatmap immediately since we know everything is ready
     const addHeatmapLayer = () => {
       console.log('Adding heatmap layer...');
 
       try {
-        // Remove existing layer/source if it exists
         if (mapRef.current!.getLayer('algae-heatmap')) {
           mapRef.current!.removeLayer('algae-heatmap');
         }
@@ -309,20 +378,17 @@ useEffect(() => {
           mapRef.current!.removeSource('algae');
         }
 
-        // Calculate intensity range
         const intensities = heatmapData.features.map(f => f.properties.intensity);
         const minIntensity = Math.min(...intensities);
         const maxIntensity = Math.max(...intensities);
-        
+
         console.log('Intensity range:', minIntensity, 'to', maxIntensity);
 
-        // Add source
         mapRef.current!.addSource('algae', {
           type: 'geojson',
           data: heatmapData,
         });
 
-        // Add heatmap layer
         mapRef.current!.addLayer({
           id: 'algae-heatmap',
           type: 'heatmap',
@@ -364,12 +430,11 @@ useEffect(() => {
           },
         });
 
-        // Fit map to show all data
         const coordinates = heatmapData.features.map(f => f.geometry.coordinates);
         const bounds = new mapboxgl.LngLatBounds();
         coordinates.forEach(coord => bounds.extend(coord as [number, number]));
-        
-        mapRef.current!.fitBounds(bounds, { 
+
+        mapRef.current!.fitBounds(bounds, {
           padding: { top: 50, bottom: 50, left: 50, right: 50 }
         });
 
