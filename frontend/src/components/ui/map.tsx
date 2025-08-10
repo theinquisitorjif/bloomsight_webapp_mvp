@@ -201,12 +201,11 @@ useEffect(() => {
               const forecast = beachData;
               
               popupContent = `
-                <h3 class="beach-name">${beachName}</h3>
                 <h4 class="weather-section">
+                  <p style="font-size: 16px; padding: 5px">${forecast["cloud_cover"]}</p>
                   ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
-                  <p style="font-size: 16px; padding-top: 10px;">${forecast["cloud_cover"]}</p>
+                  <p style="font-size: 12px; padding: 5 5 0 0">${beachName}</p>
                 </h4>
-                <h2><strong>Current Conditions</strong></h2>
                 <div class="weather-row">
                   <div class="weather-category">Tides</div>
                   <div class="weather-rating">${forecast.tides || 'N/A'}</div>
