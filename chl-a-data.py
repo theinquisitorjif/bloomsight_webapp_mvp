@@ -1,6 +1,7 @@
 import netCDF4
 import pandas as pd
 import numpy as np
+import os
 
 # Configuration
 nc_file = 'chl-a-data/AQUA_MODIS.20250808.L3m.DAY.CHL.chlor_a.9km.NRT.nc'
@@ -93,63 +94,76 @@ def map_palette_to_rgb(index):
         return (0, 0, 0)
     return palette_lookup.get(int(index), (0, 0, 0))
 
-with netCDF4.Dataset(nc_file, mode='r') as ds:
-    print('Variables:', ds.variables.keys())
-    
-    # Extract latitude, longitude, and chlorophyll-a data
-    lat = ds.variables['lat'][:]
-    lon = ds.variables['lon'][:]
-    chlor_a = ds.variables['chlor_a'][:]
-    
-    # Get fill value from chlor_a variable (default to -32767.0 if not specified)
-    fill_value = getattr(ds.variables['chlor_a'], '_FillValue', -32767.0)
-    
-    # Create meshgrid for coordinates
-    lon_grid, lat_grid = np.meshgrid(lon, lat)
-    
-    # Filter data to Florida bounds and valid chlorophyll-a values
-    mask = (lat_grid >= FLORIDA_BOUNDS['lat_min']) & (lat_grid <= FLORIDA_BOUNDS['lat_max']) & \
-           (lon_grid >= FLORIDA_BOUNDS['lon_min']) & (lon_grid <= FLORIDA_BOUNDS['lon_max']) & \
-           (chlor_a != fill_value) & (~np.ma.is_masked(chlor_a)) & (chlor_a > 0)
-    
-    # Apply mask to data
-    chlor_a = np.where(mask, chlor_a, np.nan)
-    lat_grid = np.where(mask, lat_grid, np.nan)
-    lon_grid = np.where(mask, lon_grid, np.nan)
-    
-    # Flatten arrays for DataFrame
-    lats = lat_grid.flatten()
-    lons = lon_grid.flatten()
-    chlor_values = chlor_a.flatten()
-    
-    # Create DataFrame and filter out invalid data
-    df = pd.DataFrame({
-        'lat': lats,
-        'lon': lons,
-        'chlor_a': chlor_values
-    })
-    df = df.dropna()
-    
-    if not df.empty:
-        # Map chlorophyll-a to palette indices
-        df['palette'] = df['chlor_a'].apply(chlor_to_palette_index)
+# Ensure output directory exists
+os.makedirs(os.path.dirname(csv_file), exist_ok=True)
+
+try:
+    with netCDF4.Dataset(nc_file, mode='r') as ds:
+        print('Variables:', ds.variables.keys())
         
-        # Map palette indices to RGB values
-        df[['R', 'G', 'B']] = pd.DataFrame(
-            df['palette'].apply(map_palette_to_rgb).tolist(),
-            index=df.index
-        )
+        # Extract latitude, longitude, and chlorophyll-a data
+        lat = ds.variables['lat'][:]
+        lon = ds.variables['lon'][:]
+        chlor_a = ds.variables['chlor_a'][:]
         
-        # Flag potential red tide areas (Chl-a >= 10 mg/m³)
-        df['red_tide'] = df['chlor_a'].apply(lambda x: 'Yes' if x >= 10 else 'No')
+        # Get fill value from chlor_a variable (default to -32767.0 if not specified)
+        fill_value = getattr(ds.variables['chlor_a'], '_FillValue', -32767.0)
         
-        # Save to CSV
-        df.to_csv(csv_file, index=False)
-        print(f'CSV file saved to {csv_file}')
+        # Create meshgrid for coordinates
+        lon_grid, lat_grid = np.meshgrid(lon, lat)
         
-        # Print unique RGB values, chlorophyll-a concentrations, and red tide flags
-        print("Unique colours, chlorophyll-a concentrations, and red tide flags in Florida dataset:")
-        unique_data = df[['R', 'G', 'B', 'chlor_a', 'red_tide']].drop_duplicates()
-        print(unique_data)
-    else:
-        print('No valid data found within Florida bounds.')
+        # Filter data to Florida bounds and valid chlorophyll-a values
+        mask = (lat_grid >= FLORIDA_BOUNDS['lat_min']) & (lat_grid <= FLORIDA_BOUNDS['lat_max']) & \
+               (lon_grid >= FLORIDA_BOUNDS['lon_min']) & (lon_grid <= FLORIDA_BOUNDS['lon_max']) & \
+               (chlor_a != fill_value) & (~np.ma.is_masked(chlor_a)) & (chlor_a > 0)
+        
+        # Apply mask to data
+        chlor_a = np.where(mask, chlor_a, np.nan)
+        lat_grid = np.where(mask, lat_grid, np.nan)
+        lon_grid = np.where(mask, lon_grid, np.nan)
+        
+        # Flatten arrays for DataFrame
+        lats = lat_grid.flatten()
+        lons = lon_grid.flatten()
+        chlor_values = chlor_a.flatten()
+        
+        # Create DataFrame and filter out invalid data
+        df = pd.DataFrame({
+            'lat': lats,
+            'lon': lons,
+            'chlor_a': chlor_values
+        })
+        df = df.dropna()
+        
+        if not df.empty:
+            print(f"Found {len(df)} valid data points within Florida bounds.")
+            
+            # Map chlorophyll-a to palette indices
+            df['palette'] = df['chlor_a'].apply(chlor_to_palette_index)
+            
+            # Map palette indices to RGB values
+            df[['R', 'G', 'B']] = pd.DataFrame(
+                df['palette'].apply(map_palette_to_rgb).tolist(),
+                index=df.index
+            )
+            
+            # Flag potential red tide areas (Chl-a >= 10 mg/m³)
+            df['red_tide'] = df['chlor_a'].apply(lambda x: 'Yes' if x >= 10 else 'No')
+            
+            # Save to CSV and verify creation
+            df.to_csv(csv_file, index=False)
+            if os.path.exists(csv_file):
+                print(f"CSV file successfully created at {csv_file} with {len(df)} rows.")
+            else:
+                print(f"Failed to create CSV file at {csv_file}.")
+            
+            # Print unique RGB values, chlorophyll-a concentrations, and red tide flags
+            print("Unique colours, chlorophyll-a concentrations, and red tide flags in Florida dataset:")
+            unique_data = df[['R', 'G', 'B', 'chlor_a', 'red_tide']].drop_duplicates()
+            print(unique_data)
+        else:
+            print('No valid data found within Florida bounds.')
+except FileNotFoundError:
+    print(f"Error: NetCDF file {nc_file} not found. Please check the file path.")
+except Exception as e:
+    print(f"Error processing NetCDF file: {str(e)}")
