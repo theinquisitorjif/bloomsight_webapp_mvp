@@ -39,7 +39,7 @@ export const BeachOverview = () => {
     >
       <div className="flex-1">
         <div className="flex justify-between">
-          <h2 className="text-2xl font-semibold tracking-tight">Overview</h2>
+          <h3 className="text-2xl font-semibold tracking-tight">Overview</h3>
         </div>
         <div className="p-2 rounded-lg border border-border mt-2">
           <p className="text-muted-foreground text-sm">Current Conditions</p>

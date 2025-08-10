@@ -11,9 +11,9 @@ export const BeachParking = () => {
       className="grid grid-cols-1 lg:grid-cols-3 gap-10"
     >
       <div className="lg:col-span-1">
-        <h2 className="text-2xl font-semibold tracking-tight">
+        <h3 className="text-2xl font-semibold tracking-tight">
           Plan your visit
-        </h2>
+        </h3>
 
         <div className="mt-6 rounded-lg border border-border h-[455px] p-10">
           <ul className="flex flex-col gap-4">
@@ -60,7 +60,7 @@ export const BeachParking = () => {
         </div>
       </div>
       <div className="lg:col-span-2">
-        <h2 className="text-2xl font-semibold tracking-tight">Parking Spots</h2>
+        <h3 className="text-2xl font-semibold tracking-tight">Parking Spots</h3>
 
         <img
           src="/beach-map.png"

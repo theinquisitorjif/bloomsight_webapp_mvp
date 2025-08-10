@@ -51,7 +51,7 @@ export const BeachComments = () => {
     <section ref={ref} id="comments">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Comments</h2>
+          <h3 className="text-2xl font-semibold tracking-tight">Comments</h3>
           <p>See what others say about this place</p>
         </div>
 

@@ -46,7 +46,7 @@ export const BeachNavigation = () => {
               "font-semibold border-t-3 border-primary"
           )}
           onClick={() => {
-            setActiveSection(link.name);
+            setActiveSection(link.href.slice(1));
             setTimeOfLastClick(Date.now());
           }}
         >

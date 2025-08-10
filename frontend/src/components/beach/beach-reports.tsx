@@ -114,12 +114,12 @@ export const BeachReports = () => {
 
   return (
     <section ref={ref} id="reports">
-      <h2 className="text-2xl font-semibold tracking-tight">
+      <h3 className="text-2xl font-semibold tracking-tight">
         Reports{" "}
         <span className="text-muted-foreground text-base ml-2 underline">
           last 7 days
         </span>
-      </h2>
+      </h3>
 
       <ScrollArea className="max-h-[400px] h-[400px] mt-4">
         <div className="flex flex-col gap-7">

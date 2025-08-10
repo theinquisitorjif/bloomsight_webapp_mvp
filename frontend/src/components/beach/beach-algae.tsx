@@ -7,7 +7,7 @@ export const BeachAlgae = () => {
 
   return (
     <section ref={ref} id="algae">
-      <h2 className="text-2xl font-semibold tracking-tight">Water Quality</h2>
+      <h3 className="text-2xl font-semibold tracking-tight">Water Quality</h3>
 
       <div className="md:gap-6 grid grid-cols-1 md:grid-cols-3">
         <div className="mt-4 rounded-lg border border-border flex-1 p-4">
