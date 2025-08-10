@@ -3,8 +3,14 @@ import mapboxgl, { type LngLatLike } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Papa from 'papaparse';
 import type { FeatureCollection, Point } from 'geojson';
+import { createClient } from '@supabase/supabase-js';
 
 type MapRef = mapboxgl.Map | null;
+
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
@@ -25,7 +31,6 @@ const Map = () => {
   palette: string;  // Palette/intensity column
 }
 
-useEffect(() => {
   const fetchAlgaeDataFromCSV = async () => {
     try {
       const res = await fetch('/output_florida.csv');
@@ -91,6 +96,46 @@ useEffect(() => {
     }
   };
 
+  const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number) => {
+    try {
+      // Look up by coordinates using lat/lon columns in beach_forecasts
+      if (lat && lng) {
+        const tolerance = 0.005;
+        const { data: forecasts, error: forecastError } = await supabase
+          .from('beach_forecasts')
+          .select('current')
+          .gte('lat', lat - tolerance)
+          .lte('lat', lat + tolerance)
+          .gte('lon', lng - tolerance)
+          .lte('lon', lng + tolerance)
+          .order('updated_at', { ascending: false })
+          .limit(1);
+
+        if (forecastError) {
+          console.error('Error fetching forecast:', forecastError);
+          return null;
+        }
+
+        console.log(forecasts, forecasts[0].current.temperature_2m);
+
+        if (forecasts && forecasts.length > 0) {
+          return forecasts[0].current;
+        }
+
+        console.log('No forecast found for coordinates:', lat, lng);
+        // Explicitly return null when no forecast is found
+        return null;
+      }
+    } catch (error) {
+        console.error('An unexpected error occurred:', error);
+        return null;
+    }
+    // Also, you need a return statement for when lat/lng are not provided
+    return null;
+};
+
+useEffect(() => {
+
   fetchAlgaeDataFromCSV();
 }, []);
 
@@ -133,35 +178,89 @@ useEffect(() => {
           },
         });
 
-        // Hover popup for beaches
-        mapRef.current?.on('mousemove', 'points-layer', (e) => {
+        mapRef.current?.on('mousemove', 'points-layer', async (e) => {
+          //i want to eventually make the points have an effect on hover
+        });
+        // Hover popup for beaches - Updated to use direct Supabase access
+        mapRef.current?.on('click', 'points-layer', async (e) => {
           const feature = e.features?.[0];
           if (!feature || feature.geometry.type !== 'Point') return;
 
           const coords = feature.geometry.coordinates as [number, number];
           const [lng, lat] = coords;
+          const beachName = feature.properties?.name || 'Unknown Beach';
 
-          fetch(`/beach-weather?lat=${lat}&lon=${lng}`)
-            .then((res) => res.json())
-            .then((data) => {
-              new mapboxgl.Popup()
-                .setLngLat([lng, lat] as LngLatLike)
-                .setHTML(`
-                  <h3 class="beach-name">${feature.properties?.name || 'Unknown Beach'}</h3>
-                  <h4 class="weather-section">
-                    ${Math.round((data.temperature * 9) / 5 + 32)}°F
-                    <p style="font-size: 16px; padding-top: 10px;">${data.conditions['Cloud Cover']}</p>
-                  </h4>
-                  <h2><strong>Current Conditions</strong></h2>
-                  <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">TO DO</div></div>
-                  <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">TO DO</div></div>
-                  <div class="weather-row"><div class="weather-category">UV</div><div class="weather-rating">TO DO</div></div>
-                `)
-                .addTo(mapRef.current!);
-            })
-            .catch((err) => {
-              console.error('Weather fetch error:', err);
-            });
+          try {
+            // Fetch beach forecast data directly from Supabase using name and coordinates
+            const beachData = await fetchBeachForecast(beachName, lat, lng);
+            console.log(beachData, beachData["temperature_2m"])
+            
+            let popupContent;
+
+            if (beachData) {
+              const forecast = beachData;
+              
+              popupContent = `
+                <h3 class="beach-name">${beachName}</h3>
+                <h4 class="weather-section">
+                  ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
+                  <p style="font-size: 16px; padding-top: 10px;">${forecast["cloud_cover"]}</p>
+                </h4>
+                <h2><strong>Current Conditions</strong></h2>
+                <div class="weather-row">
+                  <div class="weather-category">Tides</div>
+                  <div class="weather-rating">${forecast.tides || 'N/A'}</div>
+                </div>
+                <div class="weather-row">
+                  <div class="weather-category">Air Quality</div>
+                  <div class="weather-rating">${forecast.air_quality || 'N/A'}</div>
+                </div>
+                <div class="weather-row">
+                  <div class="weather-category">UV Index</div>
+                  <div class="weather-rating">${Math.round(forecast["uv_index"])}</div>
+                </div>
+                <div class="weather-row">
+                  <div class="weather-category">Algae</div>
+                  <div class="weather-rating">${forecast.wind_speed ? Math.round(forecast["wind_speed"]) + ' mph' : 'N/A'}</div>
+                </div>
+                ${forecast.overall_rating || forecast.recommendation ? `
+                  <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+                    ${forecast.overall_rating ? `<strong style="color: #007cbf;">${forecast.overall_rating}</strong>` : ''}
+                    ${forecast.recommendation ? `<p style="font-size: 14px; margin-top: 5px; color: #555;">${forecast.recommendation}</p>` : ''}
+                  </div>
+                ` : ''}
+              `;
+            } else {
+              // Beach not found in database
+              popupContent = `
+                <h3 class="beach-name">${beachName}</h3>
+                <p style="color: #666; font-style: italic;">Beach data not available</p>
+                <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                  Beach not found in database
+                </div>
+              `;
+            }
+
+            new mapboxgl.Popup()
+              .setLngLat([lng, lat] as LngLatLike)
+              .setHTML(popupContent)
+              .addTo(mapRef.current!);
+
+          } catch (error) {
+            console.error('Error fetching beach data:', error);
+            
+            // Show error popup
+            new mapboxgl.Popup()
+              .setLngLat([lng, lat] as LngLatLike)
+              .setHTML(`
+                <h3 class="beach-name">${beachName}</h3>
+                <p style="color: #d32f2f;">Unable to load weather data</p>
+                <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                  Database connection error
+                </div>
+              `)
+              .addTo(mapRef.current!);
+          }
         });
       });
 
@@ -282,7 +381,7 @@ useEffect(() => {
     };
 
     addHeatmapLayer();
-  }, [heatmapData, mapLoaded]); // Depend on both data and map loaded state
+  }, [heatmapData, mapLoaded]);
 
   return <div ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />;
 };
