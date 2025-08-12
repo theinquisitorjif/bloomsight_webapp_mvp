@@ -9,9 +9,33 @@ import {
 import { useSectionInView } from "@/hooks/use-section-in-view";
 import { SeverityBadge } from "../severity-badge";
 import { TideChart } from "./tide-chart";
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
+import { useEffect, useState } from "react";
+import { FaLocationArrow } from "react-icons/fa";
+
+const windData = [
+  { direction: "N", speed: 8 },
+  { direction: "NE", speed: 12 },
+  { direction: "E", speed: 5 },
+  { direction: "SE", speed: 9 },
+  { direction: "S", speed: 14 },
+  { direction: "SW", speed: 10 },
+  { direction: "W", speed: 6 },
+  { direction: "NW", speed: 11 },
+];
 
 export const BeachConditions = () => {
   const { ref } = useSectionInView("conditions", 0.5);
+
+  const [windDirection, setWindDirection] = useState(90);
+
+  useEffect(() => {
+    // Simulate direction change
+    const interval = setInterval(() => {
+      setWindDirection(Math.floor(Math.random() * 360));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section ref={ref} id="conditions">
@@ -74,7 +98,29 @@ export const BeachConditions = () => {
           </div>
 
           <div className="overflow-hidden relative rounded-lg h-full">
-            <img src="/wind.png" className="object-cover w-full h-full" />
+            <RadarChart
+              cx={100}
+              cy={70}
+              outerRadius={45}
+              width={200}
+              height={200}
+              data={windData}
+            >
+              <PolarGrid />
+              <PolarAngleAxis dataKey="direction" fontSize={12} />
+              <Radar
+                name="Wind Speed"
+                dataKey="speed"
+                fill="#8884d8"
+                fillOpacity={0}
+              />
+            </RadarChart>
+
+            <FaLocationArrow
+              size={20}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 text-primary/80 transition-transform duration-500"
+              style={{ transform: `rotate(${windDirection}deg)` }}
+            />
           </div>
         </div>
         <div className="rounded-lg border border-border lg:col-span-3 flex-1 h-40 p-4">
