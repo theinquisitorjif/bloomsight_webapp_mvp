@@ -4,6 +4,8 @@ import json
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 import math
+from bs4 import BeautifulSoup
+import re
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -415,69 +417,16 @@ class NOAAMarineData:
             raise
 
 
-# Usage Examples
-def example_rip_current_check():
-    """Example usage for rip current assessment"""
-    noaa = NOAAMarineData()
-    
-    # Popular beach locations
-    locations = [
-        {"name": "Miami Beach, FL", "lat": 25.7617, "lon": -80.1918},
-        {"name": "Virginia Beach, VA", "lat": 36.8529, "lon": -75.9780},
-        {"name": "Ocean City, MD", "lat": 38.3365, "lon": -75.0849}
-    ]
-    
-    for location in locations:
-        try:
-            print(f"\n=== RIP CURRENT ASSESSMENT: {location['name']} ===")
-            
-            assessment = noaa.get_rip_current_risk(location['lat'], location['lon'])
-            
-            print(f"Risk Level: {assessment['risk_level']}")
-            print(f"Recommendation: {assessment['conditions']['recommendation']}")
-            
-            if assessment['alerts']:
-                print('\n🚨 ACTIVE ALERTS:')
-                for alert in assessment['alerts']:
-                    headline = alert.get('properties', {}).get('headline', 'Alert')
-                    print(f"- {headline}")
-            
-            print('\nConditions:')
-            conditions = assessment['conditions']
-            for key, value in conditions.items():
-                if key not in ['overall', 'score', 'recommendation']:
-                    print(f"- {key.upper()}: {value}")
-                    
-        except Exception as e:
-            print(f"Error for {location['name']}: {e}")
-
-
 def check_rip_current_alerts(lat: float, lon: float):
-    """Quick rip current alert checker"""
     noaa = NOAAMarineData()
     
     try:
         alerts = noaa.get_rip_current_alerts(lat, lon)
-        
-        if alerts:
-            print('⚠️  ACTIVE RIP CURRENT ALERTS:')
-            for alert in alerts:
-                properties = alert.get('properties', {})
-                print(f"Event: {properties.get('event', 'Unknown')}")
-                print(f"Headline: {properties.get('headline', 'No headline')}")
-                description = properties.get('description', '')
-                if description:
-                    print(f"Description: {description[:200]}...")
-                print('---')
-        else:
-            print('✅ No active rip current alerts for this location')
-        
         return alerts
         
     except Exception as e:
         print(f'Error checking alerts: {e}')
         return []
-
 
 # Popular NOAA station IDs for reference:
 POPULAR_STATIONS = {
@@ -593,6 +542,55 @@ def seed_rip_risk_for_all_beaches():
     print(f"Seeded rip current data for {len(rows)} beaches.")
 
 # CLI 
+
+def get_rip_info(lat, lon):
+    noaa = NOAAMarineData()
+    
+    try:
+        assessment = noaa.get_rip_current_risk(lat, lon)
+        if not assessment:
+            return {
+                "latitude": lat,
+                "longitude": lon,
+                "risk_level": "unknown",
+                "recommendation": "No data available",
+                "alerts": [],
+                "conditions": {},
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+        
+        result = {
+            "latitude": lat,
+            "longitude": lon,
+            "risk_level": assessment.get('risk_level', 'unknown'),
+            "recommendation": assessment.get('conditions', {}).get('recommendation', 'No recommendation'),
+            "alerts": [],
+            "conditions": {},
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        for alert in assessment.get('alerts', []):
+            headline = alert.get('properties', {}).get('headline', 'Alert')
+            result["alerts"].append(headline)
+        
+        conditions = assessment.get('conditions', {})
+        for key, value in conditions.items():
+            if key not in ['overall', 'score', 'recommendation']:
+                result["conditions"][key] = value
+        
+        return result
+    
+    except Exception as e:
+        print(f"Error in get_rip_info: {e}")
+        return {
+            "latitude": lat,
+            "longitude": lon,
+            "risk_level": "error",
+            "recommendation": f"Error fetching data: {e}",
+            "alerts": [],
+            "conditions": {},
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
 
 if __name__ == "__main__":
     import sys

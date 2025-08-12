@@ -14,6 +14,7 @@ import { ResetPasswordPage } from "./pages/auth/reset-password-page";
 import { VerifyEmailPage } from "./pages/auth/verify-email-page";
 import { Button } from "./components/ui/button";
 import supabase from "./supabase";
+import { BeachPage } from "./pages/beach-page";
 
 const authRoutes = [
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <HomePage />,
+      },
+      {
+        path: "/beach",
+        element: <BeachPage />,
       },
       /** Routes that only non-authenticated users can access */
       {

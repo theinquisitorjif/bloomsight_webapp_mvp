@@ -4,6 +4,7 @@ import time
 import requests
 from typing import List, Dict, Optional
 from dotenv import load_dotenv, find_dotenv
+from datetime import datetime
 
 load_dotenv(find_dotenv())
 

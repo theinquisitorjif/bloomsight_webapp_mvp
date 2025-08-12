@@ -8,7 +8,16 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
+      '/algae-data': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
       '/beach-weather': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/algae_heatmap.json': {
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,

@@ -173,7 +173,7 @@ export const SignUpPage = () => {
                     <Button
                       disabled={isLoading}
                       type="submit"
-                      className="w-full"
+                      className="w-full bg-[#4CAF50]"
                     >
                       Create account
                     </Button>
@@ -215,9 +215,7 @@ export const SignUpPage = () => {
               </Form>
 
               <div className="bg-radial from-sidebar-accent to-sidebar relative hidden md:flex flex-col gap-y-4 items-center justify-center">
-                <p className="text-2xl font-semibold text-primary">
-                  Bloomsight
-                </p>
+                <img src="/logo-nobg.png" />
               </div>
             </CardContent>
           </Card>
