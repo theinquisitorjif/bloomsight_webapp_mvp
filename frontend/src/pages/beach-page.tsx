@@ -44,8 +44,8 @@ export const BeachPage = () => {
           <BeachComments />
           <Separator className="my-10" />
           <BeachSafety />
-          <Separator className="my-10" />
-          <BeachNearby />
+          {/* <Separator className="my-10" />
+          <BeachNearby /> */}
         </main>
       </div>
     </ActiveSectionContext.Provider>

@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
 import { useSectionInView } from "@/hooks/use-section-in-view";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { CommentForm } from "../comments/comment-form";
 
 const commentsTest = [
   {
@@ -48,28 +50,45 @@ export const BeachComments = () => {
   const { ref } = useSectionInView("comments", 0.5);
 
   return (
-    <section ref={ref} id="comments">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-2xl font-semibold tracking-tight">Comments</h3>
-          <p>See what others say about this place</p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <p className="text-2xl font-semibold">4.6</p>
-            <Star fill="black" size={18} />
-            <Link to="#" className="underline underline-offset-2">
-              336 reviews
-            </Link>
+    <section
+      ref={ref}
+      id="comments"
+      className="grid grid-cols-1 md:grid-cols-3"
+    >
+      <div>
+        <div className="flex flex-row md:flex-col items-center justify-between md:justify-start md:items-start md:sticky md:top-20">
+          <div>
+            <h3 className="text-2xl font-semibold tracking-tight">Comments</h3>
           </div>
-          <Button className="px-10 rounded-full" variant="brand" size="sm">
-            Add a review
-          </Button>
+
+          <div className="flex items-center md:items-start md:flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <p className="text-2xl font-semibold">4.6</p>
+              <Star fill="black" size={18} />
+              <Link to="#" className="underline underline-offset-2">
+                336 reviews
+              </Link>
+            </div>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  className="px-10 rounded-full"
+                  variant="brand"
+                  size="sm"
+                >
+                  Add a review
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <CommentForm />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-2 mt-8">
+      <div className="space-y-2 mt-8 col-span-2">
         {commentsTest.map((comment, key) => {
           return (
             <div key={key}>
