@@ -96,6 +96,16 @@ def beach_conditions():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+        
+# Endpoint to get top beach parking/access points
+@app.route('/api/beaches/<beach_name>/parking-spots', methods=['GET'])
+def beach_parking(beach_name):
+    try:
+        # Call the function from beach_access_points.py
+        data = get_beach_access_json(beach_name)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     # Run on port 5000 to match vite.config.ts proxy
