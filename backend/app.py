@@ -25,14 +25,14 @@ def index():
 
 
 # Retrieve all beaches from Supabase
-@app.route('/api/beaches', methods=['GET'])
+@app.route('/beaches', methods=['GET'])
 def get_beaches():
     response = supabase.table('beaches').select('*').execute()
     return jsonify(response.data), 200
 
 
 # Manually add a beach to Supabase
-@app.route('/api/beaches', methods=['POST'])
+@app.route('/beaches', methods=['POST'])
 def add_beach():
     data = request.json
     result = supabase.table("beaches").insert(data).execute()
@@ -40,7 +40,7 @@ def add_beach():
 
 
 # Update a beach in Supabase
-@app.route('/api/beaches/<int:id>', methods=['PUT'])
+@app.route('/beaches/<int:id>', methods=['PUT'])
 def update_beach(id):
     data = request.json
     result = supabase.table("beaches").update(data).eq('id', id).execute()
@@ -48,54 +48,26 @@ def update_beach(id):
 
 
 # Delete a beach from Supabase
-@app.route('/api/beaches/<int:id>', methods=['DELETE'])
+@app.route('/beaches/<int:id>', methods=['DELETE'])
 def delete_beach(id):
     result = supabase.table("beaches").delete().eq('id', id).execute()
     return jsonify({"message": "Deleted"}), 204
 
-
-# Weather endpoint used by the map; returns a simple suitability rating
-@app.route('/beach-weather', methods=['GET'])
-def beach_weather():
-    lat = request.args.get('lat')
-    lon = request.args.get('lon')
-    if not lat or not lon:
-        return jsonify({'error': 'Missing lat or lon'}), 400
-
-    # call weather API
-    weather_res = requests.get(
-        'https://api.open-meteo.com/v1/forecast',
-        params={
-            'latitude': lat,
-            'longitude': lon,
-            'hourly': 'temperature_2m,wind_speed_10m',
-            'current_weather': True
-        }
-    )
-
-    if weather_res.status_code != 200:
-        return jsonify({'error': 'Failed to fetch weather'}), 500
-
-    data = weather_res.json()
-    temp = data['current_weather']['temperature']
-    wind = data['current_weather']['windspeed']
-
-    # Classification logic
-    if temp >= TEMP_THRESHOLD and wind <= WIND_THRESHOLD:
-        overall = 'Suitable for Beach'
-        recommendation = 'Great day for the beach!'
-    else:
-        overall = 'Not Suitable for Beach'
-        recommendation = 'Not suitable for beach activities. Consider other plans.'
-
-    return jsonify({'overall': overall, 'recommendation': recommendation})
-
-
 # Beach Conditions Endpoint
-@app.route('/api/beach-conditions', methods=['GET'])
-def beach_conditions():
-    lat = request.args.get('lat', type=float)
-    lon = request.args.get('lon', type=float)
+@app.route('/beaches/<int:beach_id>/riptide-risk', methods=['GET'])
+def beach_conditions(beach_id):
+    # Retrieve the beach info from Supabase
+    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+
+    if not beach_data.data:
+        return jsonify({'error': 'Beach not found'}), 404
+    
+    beach = beach_data.data
+    location = beach.get('location')
+    lat_str, lon_str = location.split(",")
+    lat = float(lat_str.strip())
+    lon = float(lon_str.strip())
+    
     force = request.args.get('force', default='0')
 
     if lat is None or lon is None:
@@ -107,10 +79,18 @@ def beach_conditions():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 # Endpoint to get top beach parking/access points
-@app.route('/api/beaches/<beach_name>/parking-spots', methods=['GET'])
-def beach_parking(beach_name):
+@app.route('/beaches/<int:beach_id>/parking-spots', methods=['GET'])
+def beach_parking(beach_id):
+    # Retrieve the beach info from Supabase
+    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+
+    if not beach_data.data:
+        return jsonify({'error': 'Beach not found'}), 404
+
+    beach = beach_data.data
+    beach_name = beach.get('name')
+
     try:
         # Call the function from beach_access_points.py
         data = get_beach_access_json(beach_name)
@@ -135,7 +115,6 @@ def beach_weather_forecast(beach_id):
 
     beach = beach_data.data
     location = beach.get('location')
-    
     lat_str, lon_str = location.split(",")
     lat = float(lat_str.strip())
     lon = float(lon_str.strip())
@@ -159,8 +138,10 @@ def beach_water_quality(beach_id):
         return jsonify({'error': 'Beach not found'}), 404
 
     beach = beach_data.data
-    lat = beach.get('latitude')
-    lon = beach.get('longitude')
+    location = beach.get('location')
+    lat_str, lon_str = location.split(",")
+    lat = float(lat_str.strip())
+    lon = float(lon_str.strip())
     name = beach.get('name')
 
     # Find the FWC red tide data from the local beaches list
