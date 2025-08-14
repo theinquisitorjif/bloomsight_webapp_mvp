@@ -61,9 +61,13 @@ def get_beach_forecast(lat, lon):
         "forecast_days": 7,
         "timezone": "auto",
         "temperature_unit": "fahrenheit",
+        "current": "temperature_2m",
     }
     forecast_responses = openmeteo.weather_api(url_forecast, params=params_forecast)
     forecast_daily = forecast_responses[0].Daily()
+
+    current = forecast_responses[0].Current()
+    temp = current.Variables(0).Value()
 
     def var_list(idx, as_int=False):
         vals = forecast_daily.Variables(idx).ValuesAsNumpy()
@@ -117,9 +121,30 @@ def get_beach_forecast(lat, lon):
     except Exception:
         air_quality_daily = [None] * 7
 
-    # --- 4. Merge into daily dictionaries ---
+    # --- 4. Recommendation score ---
+    def recommendation_score(i):
+        score = 0
+        # temperature between 70-85°F
+        if 70 <= temp_max[i] <= 85:
+            score += 1
+        # low precipitation
+        if precipitation[i] is not None and precipitation[i] < 20:
+            score += 1
+        # moderate wind
+        if wind_speed[i] < 15:
+            score += 1
+        # UV index not extreme
+        if uv_index[i] is not None and uv_index[i] <= 8:
+            score += 1
+        # air quality good
+        if air_quality_daily[i] is not None and air_quality_daily[i] < 50:
+            score += 1
+        return score
+
+    # --- 5. Merge into daily dictionaries ---
     return [
         {
+            "temp": float(temp) if i == 0 else (float(temp_max[i]) + float(temp_min[i])) / 2,
             "temp_max": float(temp_max[i]),
             "temp_min": float(temp_min[i]),
             "weather_code": int(weather_code[i]),
@@ -131,6 +156,7 @@ def get_beach_forecast(lat, lon):
             "humidity": float(humidity[i]) if humidity[i] is not None else None,
             "sunrise": sunrise[i],
             "sunset": sunset[i],
-            "air_quality": float(air_quality_daily[i]) if air_quality_daily[i] is not None else None
+            "air_quality": float(air_quality_daily[i]) if air_quality_daily[i] is not None else None,
+            "recommendation_score": recommendation_score(i)
         } for i in range(7)
     ]

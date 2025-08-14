@@ -16,7 +16,7 @@ supabase = init_supabase()
 noaa = NOAAMarineData()
 
 app = Flask(__name__)
-CORS(app)  # allows frontend running on a different port to call the backend
+CORS(app, supports_credentials=True, origins="http://localhost:5173")  # allows frontend running on a different port to call the backend
 
 
 @app.route('/')
