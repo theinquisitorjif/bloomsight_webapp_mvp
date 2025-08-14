@@ -134,15 +134,18 @@ def beach_weather_forecast(beach_id):
         return jsonify({'error': 'Beach not found'}), 404
 
     beach = beach_data.data
-    lat = beach.get('latitude')
-    lon = beach.get('longitude')
+    location = beach.get('location')
+    
+    lat_str, lon_str = location.split(",")
+    lat = float(lat_str.strip())
+    lon = float(lon_str.strip())
 
     if lat is None or lon is None:
         return jsonify({'error': 'Beach coordinates missing'}), 400
 
     try:
-        forecast = get_beach_forecast(lat, lon)
-        return jsonify(forecast.to_dict()), 200
+        forecasts = get_beach_forecast(lat, lon)
+        return jsonify(forecasts), 200
     except Exception as e:
         return jsonify({'error': f'Failed to fetch forecast: {str(e)}'}), 500
 
@@ -188,4 +191,4 @@ def beach_water_quality(beach_id):
 
 if __name__ == '__main__':
     # Run on port 5000 to match vite.config.ts proxy
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5002, debug=True, use_reloader=False)

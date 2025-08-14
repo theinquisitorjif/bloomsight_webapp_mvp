@@ -4,6 +4,8 @@ import requests_cache
 from retry_requests import retry
 import openmeteo_requests
 import json
+import numpy as np
+import requests
 
 # -----------------------------
 # Setup Open-Meteo API Client
@@ -32,109 +34,107 @@ WEATHER_CODES = {
 }
 
 # -----------------------------
-# Daily Beach Forecast Model
-# -----------------------------
-class DailyBeachForecast:
-    def __init__(self, temp_max, temp_min, weather_code, wind_speed, wind_dir,
-                 gust_speed, gust_dir, precipitation, uv_index, humidity,
-                 sunrise_time, sunset_time, water_temp, air_quality):
-        self.temp_max = temp_max
-        self.temp_min = temp_min
-        self.weather_code = weather_code
-        self.wind_speed = wind_speed
-        self.wind_dir = wind_dir
-        self.gust_speed = gust_speed
-        self.gust_dir = gust_dir
-        self.precipitation = precipitation
-        self.uv_index = uv_index
-        self.humidity = humidity
-        self.sunrise_time = sunrise_time
-        self.sunset_time = sunset_time
-        self.water_temp = water_temp
-        self.air_quality = air_quality
-
-    def get_weathercode_description(self):
-        return WEATHER_CODES.get(self.weather_code, "Unknown")
-
-    def calculate_recommendation(self):
-        """Score 0-5 based on weather factors"""
-        score = 0
-        avg_temp = (self.temp_max + self.temp_min)/2
-        if 20 <= avg_temp <= 30:
-            score += 2
-        if self.precipitation < 1:
-            score += 1
-        if self.wind_speed < 10:
-            score += 1
-        if self.uv_index < 8:
-            score += 1
-        return min(score, 5)
-
-    def to_dict(self):
-        """Return a JSON-compatible dictionary"""
-        return {
-            "low": self.temp_min,
-            "high": self.temp_max,
-            "current": (self.temp_max + self.temp_min)/2,
-            "weathercode": self.get_weathercode_description(),
-            "sunrise_time": self.sunrise_time,
-            "sunset_time": self.sunset_time,
-            "humidity": self.humidity,
-            "uv_index": self.uv_index,
-            "precipitation": self.precipitation,
-            "wind": {"speed": self.wind_speed, "direction": self.wind_dir},
-            "gust_speed": {"speed": self.gust_speed, "direction": self.gust_dir},
-            "air_quality": self.air_quality,
-            "water_temperature": self.water_temp,
-            "recommendation": self.calculate_recommendation()
-        }
-
-# -----------------------------
 # Fetch beach forecast
 # -----------------------------
 def get_beach_forecast(lat, lon):
-    """
-    Fetch daily beach forecast for any latitude/longitude
-    Returns DailyBeachForecast object
-    """
-    url = "https://api.open-meteo.com/v1/forecast"
-    params = {
+    def safe_values(var):
+        try:
+            vals = var.ValuesAsNumpy()
+            if np.isscalar(vals):
+                return [float(vals)]
+            else:
+                return [float(v) for v in vals.tolist()]
+        except Exception:
+            return [None] * 7
+
+    # --- 1. Main Forecast ---
+    url_forecast = "https://api.open-meteo.com/v1/forecast"
+    params_forecast = {
         "latitude": lat,
         "longitude": lon,
-        "daily": [
+        "daily": ",".join([
             "temperature_2m_max", "temperature_2m_min",
-            "weather_code", "wind_speed_10m_max", "wind_direction_10m_dominant",
-            "wind_gusts_10m_max", "wind_gusts_direction_10m_dominant",
-            "precipitation_sum", "uv_index_max", "humidity_2m_max",
-            "sunrise", "sunset", "water_temperature_2m", "air_quality_index_pm10"
-        ],
-        "forecast_days": 1
+            "weather_code", "wind_speed_10m_max",
+            "wind_direction_10m_dominant",
+            "wind_gusts_10m_max",
+            "precipitation_probability_max", "uv_index_max",
+            "relative_humidity_2m_max",
+            "sunrise", "sunset"
+        ]),
+        "forecast_days": 7,
+        "timezone": "auto",
+        "temperature_unit": "fahrenheit",
     }
+    forecast_responses = openmeteo.weather_api(url_forecast, params=params_forecast)
+    forecast_daily = forecast_responses[0].Daily()
 
-    responses = openmeteo.weather_api(url, params=params)
-    response = responses[0]
-    daily = response.Daily()
+    def var_list(idx, as_int=False):
+        vals = forecast_daily.Variables(idx).ValuesAsNumpy()
+        if np.isscalar(vals):
+            return [int(vals) if as_int else float(vals)]
+        else:
+            return [int(v) if as_int else float(v) for v in vals.tolist()]
 
-    # Helper function to safely extract values
-    def get_value(variable_index):
-        try:
-            return daily.Variables(variable_index).ValuesAsNumpy()[0]
-        except Exception:
-            return None
+    temp_max = var_list(0)
+    temp_min = var_list(1)
+    weather_code = var_list(2, as_int=True)
+    wind_speed = var_list(3)
+    wind_dir = var_list(4)
+    gust_speed = var_list(5)
+    precipitation = safe_values(forecast_daily.Variables(6))
+    uv_index = safe_values(forecast_daily.Variables(7))
+    humidity = safe_values(forecast_daily.Variables(8))
 
-    return DailyBeachForecast(
-        temp_max=get_value(0),
-        temp_min=get_value(1),
-        weather_code=int(get_value(2)) if get_value(2) is not None else 0,
-        wind_speed=get_value(3) or 0,
-        wind_dir=get_value(4) or 0,
-        gust_speed=get_value(5) or 0,
-        gust_dir=get_value(6) or 0,
-        precipitation=get_value(7) or 0,
-        uv_index=get_value(8) or 0,
-        humidity=get_value(9) or 0,
-        sunrise_time=get_value(10),
-        sunset_time=get_value(11),
-        water_temp=get_value(12),
-        air_quality=get_value(13)
-    )
+    # --- 2. Sunrise and Sunset ---
+    import requests
+    res = requests.get(
+        "https://api.open-meteo.com/v1/forecast",
+        params={
+            "latitude": lat,
+            "longitude": lon,
+            "daily": "sunrise,sunset",
+            "forecast_days": 7,
+            "timezone": "auto"
+        }
+    ).json()
+    sunrise = res["daily"]["sunrise"]
+    sunset = res["daily"]["sunset"]
+
+    # --- 3. Air Quality ---
+    url_air = "https://air-quality-api.open-meteo.com/v1/air-quality"
+    params_air = {
+        "latitude": lat,
+        "longitude": lon,
+        "hourly": "pm10",
+        "forecast_days": 5,
+        "timezone": "auto"
+    }
+    air_responses = openmeteo.weather_api(url_air, params=params_air)
+    air_hourly = air_responses[0].Hourly()
+    try:
+        pm10_values = air_hourly.Variables(0).ValuesAsNumpy()
+        air_quality_daily = [
+            float(np.nanmean(pm10_values[i:i+24])) if len(pm10_values[i:i+24]) > 0 else None
+            for i in range(0, len(pm10_values), 24)
+        ]
+        air_quality_daily += [None] * (7 - len(air_quality_daily))
+    except Exception:
+        air_quality_daily = [None] * 7
+
+    # --- 4. Merge into daily dictionaries ---
+    return [
+        {
+            "temp_max": float(temp_max[i]),
+            "temp_min": float(temp_min[i]),
+            "weather_code": int(weather_code[i]),
+            "wind_speed": float(wind_speed[i]),
+            "wind_dir": float(wind_dir[i]),
+            "gust_speed": float(gust_speed[i]),
+            "precipitation": float(precipitation[i]) if precipitation[i] is not None else None,
+            "uv_index": float(uv_index[i]) if uv_index[i] is not None else None,
+            "humidity": float(humidity[i]) if humidity[i] is not None else None,
+            "sunrise": sunrise[i],
+            "sunset": sunset[i],
+            "air_quality": float(air_quality_daily[i]) if air_quality_daily[i] is not None else None
+        } for i in range(7)
+    ]
