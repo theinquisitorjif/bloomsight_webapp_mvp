@@ -1,9 +1,6 @@
-import pandas as pd
-from datetime import datetime
 import requests_cache
 from retry_requests import retry
 import openmeteo_requests
-import json
 import numpy as np
 import requests
 
@@ -11,7 +8,7 @@ import requests
 # Setup Open-Meteo API Client
 # -----------------------------
 cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
-retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+retry_session = retry(cache_session, retries=10, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
 
 # Weather code mapping
@@ -86,7 +83,6 @@ def get_beach_forecast(lat, lon):
     humidity = safe_values(forecast_daily.Variables(8))
 
     # --- 2. Sunrise and Sunset ---
-    import requests
     res = requests.get(
         "https://api.open-meteo.com/v1/forecast",
         params={

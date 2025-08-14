@@ -145,7 +145,7 @@ def beach_water_quality(beach_id):
     name = beach.get('name')
 
     # Find the FWC red tide data from the local beaches list
-    fwc_beach = next((b for b in beaches if b["name"] == name), None)
+    fwc_beach = next((b for b in redtide_beaches if b["name"] == name), None)
     if not fwc_beach:
         return jsonify({'error': 'No water quality data for this beach'}), 404
 
