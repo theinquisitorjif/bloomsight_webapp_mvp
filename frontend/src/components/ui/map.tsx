@@ -94,6 +94,30 @@ const Map = () => {
     }
   };
 
+    function getCloudCoverColor(cloudCover: string) {
+      if (cloudCover == "Mostly Clear") {
+          return "linear-gradient(to bottom right, #7EB2F5, #217ebf)"; // Sky blue for mostly clear
+      } else if (cloudCover == "Partly Cloudy") {
+          return "linear-gradient(to bottom right, #B0C4DE, #217ebf)"; // Light steel blue for partly cloudy
+      } else if (cloudCover == "Cloudy") {
+          return "linear-gradient(to bottom right, #778899, #217ebf)"; // Light slate gray for cloudy
+      } else { //overcast
+          return "linear-gradient(to bottom right, #696969, #8A8A8A)"; // Dim gray for overcast
+      }
+    }
+  
+  function getCardImg(cloudCover: string){
+    if (cloudCover == "Mostly Clear") {
+        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 36px; height: 36px; display: flex;">';
+      } else if (cloudCover == "Partly Cloudy") {
+        return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 36px; height: 36px; display: flex;">';
+      } else if (cloudCover == "Cloudy") {
+        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 36px; height: 36px; display: flex;">';
+      } else { //overcast
+        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 36px; height: 36px; display: flex;">';
+      }
+  }
+
   const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number) => {
     try {
       if (lat && lng) {
@@ -114,6 +138,19 @@ const Map = () => {
         }
 
         if (forecasts && forecasts.length > 0) {
+
+          if (forecasts[0].current['Cloud Cover'] >= 0 && forecasts[0].current['Cloud Cover'] < 20) {
+                forecasts[0].current['Cloud Cover'] = "Mostly Clear";
+            } else if (forecasts[0].current['Cloud Cover'] >= 20 && forecasts[0].current['Cloud Cover'] < 50) {
+                forecasts[0].current['Cloud Cover'] = "Partly Cloudy";
+            } else if (forecasts[0].current['Cloud Cover'] >= 50 && forecasts[0].current['Cloud Cover'] < 80) {
+                forecasts[0].current['Cloud Cover'] = "Cloudy";
+            } else {
+                forecasts[0].current['Cloud Cover'] = "Overcast";
+            }
+
+
+
           return forecasts[0].current;
         }
 
@@ -222,8 +259,9 @@ const Map = () => {
               const forecast = beachData;
 
               popupContent = `
-                <h4 class="weather-section">
-                  <p style="font-size: 16px; padding: 5px">${forecast["cloud_cover"]}</p>
+                <h4 class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}">
+                ${getCardImg(forecast['Cloud Cover'])}
+                  <p style="font-size: 12px; padding: 5px">${forecast['Cloud Cover']}</p>
                   ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
                   <p style="font-size: 12px; padding: 5 5 0 0">${beachName}</p>
                 </h4>
