@@ -1,5 +1,8 @@
 # env
 .env
+.env.*
+ENV/
+env/
 
 # Logs
 logs
@@ -12,6 +15,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist/
 dist-ssr
 *.local
 
@@ -26,5 +30,14 @@ dist-ssr
 *.sln
 *.sw?
 
+venv/
+.venv/
 venv
 __pycache__
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyd
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
