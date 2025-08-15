@@ -36,11 +36,8 @@ def get_beach_coordinates(beach_name):
     return location.latitude, location.longitude, location.address
 
 # Fetch tide predictions
-def get_tide_prediction_json(beach_name):
+def get_tide_prediction_json(lat, lon, beach_name):
     try:
-        # 1. Get beach coordinates
-        lat, lon, beach_address = get_beach_coordinates(beach_name)
-
         # 2. Find nearest NOAA station
         station_info = find_nearest_station(lat, lon)
         station_id = station_info["id"]
@@ -86,7 +83,6 @@ def get_tide_prediction_json(beach_name):
 
         return {
             "beach_name": beach_name,
-            "beach_address": beach_address,
             "station_id": station_id,
             "station_name": station_info["name"],
             "low_tide": {"time": low_tide["t"], "height": float(low_tide["v"])} if low_tide else None,

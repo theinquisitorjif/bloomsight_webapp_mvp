@@ -99,9 +99,25 @@ def beach_parking(beach_id):
         return jsonify({"error": str(e)}), 500
 
 #Endpoint for getting tide predictions
-@app.route("/beaches/<beach_name>/tide-prediction", methods=["GET"])
-def tide_prediction(beach_name):
-    data = get_tide_prediction_json(beach_name)
+@app.route("/beaches/<int:beach_id>/tide-prediction", methods=["GET"])
+def tide_prediction(beach_id):
+    # Retrieve the beach info from Supabase
+    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+
+    if not beach_data.data:
+        return jsonify({'error': 'Beach not found'}), 404
+
+    beach = beach_data.data
+    location = beach.get('location')
+    name = beach.get('name')
+    lat_str, lon_str = location.split(",")
+    lat = float(lat_str.strip())
+    lon = float(lon_str.strip())
+
+    if lat is None or lon is None:
+        return jsonify({'error': 'Beach coordinates missing'}), 400
+
+    data = get_tide_prediction_json(lat, lon, name)
     return jsonify(data), 200
 
 #For getting weather forecast data
