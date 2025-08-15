@@ -10,7 +10,7 @@ import { Skeleton } from "../ui/skeleton";
 export const BeachNearby = () => {
   return (
     <section id="nearby">
-      <h2 className="text-2xl font-semibold tracking-tight">Nearby Beaches</h2>
+      <h3 className="text-2xl font-semibold tracking-tight">Nearby Beaches</h3>
       <p>Explore other beaches near this one</p>
 
       <Carousel className="mt-4">

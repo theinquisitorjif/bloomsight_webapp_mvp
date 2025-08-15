@@ -8,9 +8,9 @@ export const BeachSafety = () => {
       className="flex flex-wrap gap-4 items-center justify-between"
     >
       <div>
-        <h2 className="text-2xl font-semibold tracking-tight">
+        <h3 className="text-2xl font-semibold tracking-tight">
           Safety Guidance
-        </h2>
+        </h3>
         <p>How to keep yourself and Florida safe anywhere and all the time</p>
       </div>
 

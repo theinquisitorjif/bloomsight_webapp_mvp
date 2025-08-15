@@ -1,35 +1,9 @@
+import { Check } from "lucide-react";
 import WeatherForecast from "../weather/weather-forecast";
-
-import "mapbox-gl/dist/mapbox-gl.css";
-import mapboxgl from "mapbox-gl";
-import { useEffect, useRef } from "react";
 import { useSectionInView } from "@/hooks/use-section-in-view";
 
 export const BeachOverview = () => {
-  const mapRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
   const { ref } = useSectionInView("overview", 0.5);
-
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
-
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.remove();
-    }
-
-    mapInstanceRef.current = new mapboxgl.Map({
-      container: mapRef.current,
-      center: [-117.3201, 33.1026],
-      zoom: 13,
-      style: "mapbox://styles/mapbox/satellite-v9",
-    });
-
-    // return () => {
-    //   if (mapInstanceRef.current) mapInstanceRef.current.remove();
-    // };
-  }, []);
 
   return (
     <section
@@ -37,25 +11,49 @@ export const BeachOverview = () => {
       id="overview"
       className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10"
     >
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <div className="flex justify-between">
-          <h2 className="text-2xl font-semibold tracking-tight">Overview</h2>
+          <h3 className="text-2xl font-semibold tracking-tight">Overview</h3>
         </div>
         <div className="p-2 rounded-lg border border-border mt-2">
           <p className="text-muted-foreground text-sm">Current Conditions</p>
           <div className="flex items-center gap-1">
             <p className="font-semibold text-green-800 text-xl mr-2">Good</p>
 
-            <span className="w-9 h-3 rounded-lg bg-green-800"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-800"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-800"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-800"></span>
+            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
+            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
+            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
+            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
             <span className="w-9 h-3 rounded-lg bg-neutral-300"></span>
           </div>
         </div>
 
-        <div className="rounded-lg overflow-hidden mt-6">
-          <div ref={mapRef} style={{ width: "100%", height: "320px" }} />
+        <div className="rounded-lg overflow-hidden border border-border h-full mt-6 p-4 bg-background">
+          <div className="flex items-center gap-2 border border-border text-green-800 bg-gradient-to-r from-green-100 to-blue-50 p-4 rounded-md">
+            <p className="font-medium">Recommended visit</p>
+            <Check size={16} />
+          </div>
+          <div className="mt-5">
+            <div className="border-l-4 border-border pl-4">
+              <p>Best Times</p>
+              <p className="text-sm text-muted-foreground">
+                Early Morning (7-10am) to Late Afternoon (4-7pm)
+              </p>
+            </div>
+            <div className="mt-5 border-l-4 border-border pl-4">
+              <p>What to bring</p>
+              <p className="text-sm text-muted-foreground">
+                Sunscreen (SPF 30+), umbrellas, plenty of water, and light rain
+                jacket
+              </p>
+            </div>
+            <div className="mt-5 border-l-4 border-border pl-4">
+              <p>Activities</p>
+              <p className="text-sm text-muted-foreground">
+                Swimming, surfing, beach volleyball, and fishing
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <WeatherForecast />
