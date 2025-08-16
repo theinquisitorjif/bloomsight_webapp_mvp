@@ -1,10 +1,12 @@
-import { Loader2 } from "lucide-react";
 import WeatherForecast from "../weather/weather-forecast";
 import { useSectionInView } from "@/hooks/use-section-in-view";
 import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
-import { BeachRecommendation } from "./visit-recommendation";
+import { BeachRecommendation } from "./beach-recommendation";
+import WeatherForecastSkeleton from "../weather/weather-forecast-skeleton";
+import { ConditionsScore } from "./conditions-score";
+import { ConditionsScoreSkeleton } from "./conditions-score-skeleton";
+import { BeachRecommendationSkeleton } from "./beach-recommendation-skeleton";
 
 export const BeachOverview = ({
   weatherForecastQuery,
@@ -13,40 +15,12 @@ export const BeachOverview = ({
 }) => {
   const { ref } = useSectionInView("overview", 0.5);
 
-  const scores: {
-    [key: number]: { label: string; color: string; textColor: string };
-  } = {
-    0: {
-      label: "Bad",
-      color: "bg-red-200",
-      textColor: "text-red-300",
-    },
-    1: {
-      label: "Poor",
-      color: "bg-orange-200",
-      textColor: "text-orange-300",
-    },
-    2: {
-      label: "Okay",
-      color: "bg-yellow-200",
-      textColor: "text-yellow-400",
-    },
-    3: {
-      label: "Good",
-      color: "bg-blue-400",
-      textColor: "text-blue-800",
-    },
-    4: {
-      label: "Great",
-      color: "bg-green-600",
-      textColor: "text-green-800",
-    },
-  };
-
-  if (weatherForecastQuery.isPending)
-    return <Loader2 className="animate-spin" />;
-
-  if (!weatherForecastQuery.data) return null;
+  if (!weatherForecastQuery.isPending && !weatherForecastQuery.data)
+    return (
+      <div className="border border-border p-4 flex items-center justify-center rounded-lg">
+        <p>Could not fetch weather forecast... </p>
+      </div>
+    );
 
   return (
     <section
@@ -58,50 +32,28 @@ export const BeachOverview = ({
         <div className="flex justify-between">
           <h3 className="text-2xl font-semibold tracking-tight">Overview</h3>
         </div>
-        <div className="p-2 rounded-lg border border-border mt-2">
-          <p className="text-muted-foreground text-sm">Current Conditions</p>
-          <div className="flex items-center gap-1">
-            <p
-              className={cn(
-                "font-semibold text-xl mr-2",
-                scores[weatherForecastQuery.data[0].recommendation_score - 1]
-                  .textColor
-              )}
-            >
-              {
-                scores[weatherForecastQuery.data[0].recommendation_score - 1]
-                  .label
-              }
-            </p>
-            {Array.from({
-              length: weatherForecastQuery.data[0].recommendation_score,
-            }).map((_, i) => (
-              <span
-                key={i}
-                className={cn(
-                  "w-9 h-3 rounded-lg",
-                  scores[weatherForecastQuery.data[0].recommendation_score - 1]
-                    .color
-                )}
-              ></span>
-            ))}
 
-            {Array.from({
-              length: 5 - weatherForecastQuery.data[0].recommendation_score,
-            }).map((_, i) => (
-              <span
-                key={i}
-                className="w-9 h-3 rounded-lg bg-neutral-300"
-              ></span>
-            ))}
-          </div>
-        </div>
+        {weatherForecastQuery.isPending ? (
+          <ConditionsScoreSkeleton />
+        ) : (
+          <ConditionsScore
+            score={weatherForecastQuery.data[0].recommendation_score}
+          />
+        )}
 
-        <BeachRecommendation
-          score={weatherForecastQuery.data[0].recommendation_score}
-        />
+        {weatherForecastQuery.isPending ? (
+          <BeachRecommendationSkeleton />
+        ) : (
+          <BeachRecommendation
+            score={weatherForecastQuery.data[0].recommendation_score}
+          />
+        )}
       </div>
-      <WeatherForecast weather={weatherForecastQuery.data} />
+      {weatherForecastQuery.isPending ? (
+        <WeatherForecastSkeleton />
+      ) : (
+        <WeatherForecast weather={weatherForecastQuery.data} />
+      )}
     </section>
   );
 };
