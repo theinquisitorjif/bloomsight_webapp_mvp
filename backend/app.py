@@ -23,7 +23,6 @@ CORS(app, supports_credentials=True, origins="http://localhost:5173")  # allows 
 def index():
     return "BloomSight API is running!"
 
-
 # Retrieve all beaches from Supabase
 @app.route('/beaches', methods=['GET'])
 def get_beaches():
