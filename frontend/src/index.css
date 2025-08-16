@@ -130,11 +130,12 @@ html {
 
 .weather-section {
   color: #ffffff;
-  font-size: 30px;
-  padding: 2px 20px 13px 4px;
+  padding: 2px 15px 10px 10px;
   text-align: right;
   margin-bottom: 17px;
-  margin-top: 0;
+  position: relative; 
+  min-height: 85px;
+  overflow: auto;
 }
 
 

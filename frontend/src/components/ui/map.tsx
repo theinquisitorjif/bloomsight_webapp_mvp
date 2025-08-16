@@ -102,19 +102,19 @@ const Map = () => {
       } else if (cloudCover == "Cloudy") {
           return "linear-gradient(to bottom right, #778899, #217ebf)"; // Light slate gray for cloudy
       } else { //overcast
-          return "linear-gradient(to bottom right, #696969, #8A8A8A)"; // Dim gray for overcast
+          return "linear-gradient(to bottom right, #E0E0E0, #8A8A8A)"; // Dim gray for overcast
       }
     }
   
   function getCardImg(cloudCover: string){
     if (cloudCover == "Mostly Clear") {
-        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 56px; height: 56px; display: flex;">';
+        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 50px; padding-right: 20px;">';
       } else if (cloudCover == "Partly Cloudy") {
-        return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 56px; height: 56px; display: flex;">';
+        return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 50px; padding-right: 20px;">';
       } else if (cloudCover == "Cloudy") {
-        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 56px; height: 56px; display: flex;">';
+        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 50px; padding-right: 20px;">';
       } else { //overcast
-        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 56px; height: 56px; display: flex;">';
+        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 50px; padding-right: 20px;">';
       }
   }
 
@@ -259,14 +259,23 @@ const Map = () => {
               const forecast = beachData;
 
               popupContent = `
-                <h4 class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}">
-                  <div style="font-size: 15px; padding: 5px;">
-                    ${getCardImg(forecast['Cloud Cover'])}
-                    ${forecast['Cloud Cover']}
+                <div class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}">
+                  <div style="display: flex; float: right; align-items: center; font-size: 15px; padding: 5px; padding-right: 0px;">
+                    <!-- Image on the left -->
+                      ${getCardImg(forecast['Cloud Cover'])}
+                    <div style="display: flex; flex-direction: column">
+                      <div style="margin-bottom: 8px; font-size: 15px;">
+                        ${forecast['Cloud Cover']}
+                      </div>
+                      <div style="margin-bottom: 8px; font-size: 28px;">
+                        ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
+                      </div>
+                    </div>
+                    <div style="font-size: 15px; margin: 0; position: absolute; bottom: 5px; right: 15px;">
+                      ${beachName}
+                    </div>
                   </div>
-                  ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
-                  <p style="font-size: 12px; padding: 5 5 0 0">${beachName}</p>
-                </h4>
+                </div>
                 <div class="weather-row">
                   <div class="weather-category">Tides</div>
                   <div class="weather-rating">${forecast.tides || 'N/A'}</div>
