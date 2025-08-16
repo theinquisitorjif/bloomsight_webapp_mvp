@@ -7,7 +7,7 @@ export const BasicDetails = ({
   sunset,
   precipitation,
 }: {
-  temperature: number;
+  temperature: number | string;
   description: string;
   sunrise: string;
   sunset: string;

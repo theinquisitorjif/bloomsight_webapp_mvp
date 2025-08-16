@@ -1,9 +1,26 @@
-import { Check } from "lucide-react";
 import WeatherForecast from "../weather/weather-forecast";
 import { useSectionInView } from "@/hooks/use-section-in-view";
+import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { BeachRecommendation } from "./beach-recommendation";
+import WeatherForecastSkeleton from "../weather/weather-forecast-skeleton";
+import { ConditionsScore } from "./conditions-score";
+import { ConditionsScoreSkeleton } from "./conditions-score-skeleton";
+import { BeachRecommendationSkeleton } from "./beach-recommendation-skeleton";
 
-export const BeachOverview = () => {
+export const BeachOverview = ({
+  weatherForecastQuery,
+}: {
+  weatherForecastQuery: UseQueryResult<WeatherForecastAPIResponse[], Error>;
+}) => {
   const { ref } = useSectionInView("overview", 0.5);
+
+  if (!weatherForecastQuery.isPending && !weatherForecastQuery.data)
+    return (
+      <div className="border border-border p-4 flex items-center justify-center rounded-lg">
+        <p>Could not fetch weather forecast... </p>
+      </div>
+    );
 
   return (
     <section
@@ -15,48 +32,28 @@ export const BeachOverview = () => {
         <div className="flex justify-between">
           <h3 className="text-2xl font-semibold tracking-tight">Overview</h3>
         </div>
-        <div className="p-2 rounded-lg border border-border mt-2">
-          <p className="text-muted-foreground text-sm">Current Conditions</p>
-          <div className="flex items-center gap-1">
-            <p className="font-semibold text-green-800 text-xl mr-2">Good</p>
 
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-neutral-300"></span>
-          </div>
-        </div>
+        {weatherForecastQuery.isPending ? (
+          <ConditionsScoreSkeleton />
+        ) : (
+          <ConditionsScore
+            score={weatherForecastQuery.data[0].recommendation_score}
+          />
+        )}
 
-        <div className="rounded-lg overflow-hidden border border-border h-full mt-6 p-4 bg-background">
-          <div className="flex items-center gap-2 border border-border text-green-800 bg-gradient-to-r from-green-100 to-blue-50 p-4 rounded-md">
-            <p className="font-medium">Recommended visit</p>
-            <Check size={16} />
-          </div>
-          <div className="mt-5">
-            <div className="border-l-4 border-border pl-4">
-              <p>Best Times</p>
-              <p className="text-sm text-muted-foreground">
-                Early Morning (7-10am) to Late Afternoon (4-7pm)
-              </p>
-            </div>
-            <div className="mt-5 border-l-4 border-border pl-4">
-              <p>What to bring</p>
-              <p className="text-sm text-muted-foreground">
-                Sunscreen (SPF 30+), umbrellas, plenty of water, and light rain
-                jacket
-              </p>
-            </div>
-            <div className="mt-5 border-l-4 border-border pl-4">
-              <p>Activities</p>
-              <p className="text-sm text-muted-foreground">
-                Swimming, surfing, beach volleyball, and fishing
-              </p>
-            </div>
-          </div>
-        </div>
+        {weatherForecastQuery.isPending ? (
+          <BeachRecommendationSkeleton />
+        ) : (
+          <BeachRecommendation
+            score={weatherForecastQuery.data[0].recommendation_score}
+          />
+        )}
       </div>
-      <WeatherForecast />
+      {weatherForecastQuery.isPending ? (
+        <WeatherForecastSkeleton />
+      ) : (
+        <WeatherForecast weather={weatherForecastQuery.data} />
+      )}
     </section>
   );
 };
