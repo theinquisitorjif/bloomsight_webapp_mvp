@@ -1,4 +1,3 @@
-import { Cloud, CloudRain, CloudSun, Sun } from "lucide-react";
 import { SimpleDayHeader } from "./day-header";
 import {
   Accordion,

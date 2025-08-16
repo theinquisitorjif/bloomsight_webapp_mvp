@@ -38,10 +38,23 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
   );
 
   const now = new Date();
-  const currentHours = now.getHours();
-  const currentAmpm = currentHours >= 12 ? "pm" : "am";
-  const currentDisplayHour = ((currentHours + 11) % 12) + 1;
-  const currentTimeLabel = `${currentDisplayHour}${currentAmpm}`;
+  let closestTide = formattedChartData[0];
+  let smallestDiff = Infinity;
+
+  data.tides.forEach((t) => {
+    const tDate = new Date(t.time.replace(" ", "T"));
+    const diff = Math.abs(tDate.getTime() - now.getTime());
+    if (diff < smallestDiff) {
+      smallestDiff = diff;
+      closestTide = {
+        time: formatTimeLabel(t.time),
+        height: Number(t.height.toFixed(2)),
+      };
+    }
+  });
+
+  const currentTimeLabel = closestTide.time;
+  const currentTideHeight = closestTide.height;
 
   if (!data.tides) {
     return (
@@ -108,12 +121,13 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
               x={formattedChartData[highTideIndex].time}
               stroke="black"
               strokeDasharray="3 3"
-              label={
+              label={(props) => (
                 <TwoLineLabel
+                  {...props}
                   time={formatTimeLabel(data.high_tide.time)}
                   height={data.high_tide.height}
                 />
-              }
+              )}
             />
           )}
 
@@ -122,12 +136,13 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
               x={formattedChartData[lowTideIndex].time}
               stroke="gray"
               strokeDasharray="3 3"
-              label={
+              label={(props) => (
                 <TwoLineLabel
+                  {...props}
                   time={formatTimeLabel(data.low_tide.time)}
                   height={data.low_tide.height}
                 />
-              }
+              )}
             />
           )}
 
@@ -140,7 +155,7 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
         <p className="text-sm font-medium text-muted-foreground">Tide</p>
         <div className="flex items-center gap-2">
           <p className="text-xl font-semibold">
-            {data.low_tide.height.toFixed(2)} ft
+            {currentTideHeight.toFixed(2)} ft
           </p>
         </div>
       </div>
@@ -156,11 +171,21 @@ function formatTimeLabel(dateTime: string) {
   return `${displayHour}${ampm}`;
 }
 
-const TwoLineLabel = ({ time, height }: { time: string; height: number }) => {
+const TwoLineLabel = ({
+  time,
+  height,
+  viewBox,
+}: {
+  time: string;
+  height: number;
+  viewBox: { x: number; y: number; width: number; height: number };
+}) => {
+  const { x, y } = viewBox;
   return (
     <g>
       <text
-        y={-24}
+        x={x}
+        y={y - 25} // offset above line
         textAnchor="middle"
         fontWeight="bold"
         fontSize={12}
@@ -168,7 +193,13 @@ const TwoLineLabel = ({ time, height }: { time: string; height: number }) => {
       >
         {time}
       </text>
-      <text y={-10} textAnchor="middle" fontSize={11} fill="black">
+      <text
+        x={x}
+        y={y - 10} // offset below line
+        textAnchor="middle"
+        fontSize={11}
+        fill="black"
+      >
         {height.toFixed(2)} ft
       </text>
     </g>

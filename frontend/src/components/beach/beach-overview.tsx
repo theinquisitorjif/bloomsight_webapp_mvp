@@ -1,9 +1,10 @@
-import { Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import WeatherForecast from "../weather/weather-forecast";
 import { useSectionInView } from "@/hooks/use-section-in-view";
 import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { BeachRecommendation } from "./visit-recommendation";
 
 export const BeachOverview = ({
   weatherForecastQuery,
@@ -12,31 +13,33 @@ export const BeachOverview = ({
 }) => {
   const { ref } = useSectionInView("overview", 0.5);
 
-  const scores = {
+  const scores: {
+    [key: number]: { label: string; color: string; textColor: string };
+  } = {
     0: {
-      label: "Very Bad",
+      label: "Bad",
       color: "bg-red-200",
       textColor: "text-red-300",
     },
     1: {
-      label: "Bad",
+      label: "Poor",
       color: "bg-orange-200",
       textColor: "text-orange-300",
     },
     2: {
-      label: "Good",
-      color: "bg-green-200",
-      text: "text-green-800",
+      label: "Okay",
+      color: "bg-yellow-200",
+      textColor: "text-yellow-400",
     },
     3: {
-      label: "Very Good",
-      color: "bg-green-400",
-      text: "text-green-800",
+      label: "Good",
+      color: "bg-blue-400",
+      textColor: "text-blue-800",
     },
     4: {
-      label: "Excellent",
+      label: "Great",
       color: "bg-green-600",
-      text: "text-green-800",
+      textColor: "text-green-800",
     },
   };
 
@@ -94,33 +97,9 @@ export const BeachOverview = ({
           </div>
         </div>
 
-        <div className="rounded-lg overflow-hidden border border-border h-full mt-6 p-4 bg-background">
-          <div className="flex items-center gap-2 border border-border text-green-800 bg-gradient-to-r from-green-100 to-blue-50 p-4 rounded-md">
-            <p className="font-medium">Recommended visit</p>
-            <Check size={16} />
-          </div>
-          <div className="mt-5">
-            <div className="border-l-4 border-border pl-4">
-              <p>Best Times</p>
-              <p className="text-sm text-muted-foreground">
-                Early Morning (7-10am) to Late Afternoon (4-7pm)
-              </p>
-            </div>
-            <div className="mt-5 border-l-4 border-border pl-4">
-              <p>What to bring</p>
-              <p className="text-sm text-muted-foreground">
-                Sunscreen (SPF 30+), umbrellas, plenty of water, and light rain
-                jacket
-              </p>
-            </div>
-            <div className="mt-5 border-l-4 border-border pl-4">
-              <p>Activities</p>
-              <p className="text-sm text-muted-foreground">
-                Swimming, surfing, beach volleyball, and fishing
-              </p>
-            </div>
-          </div>
-        </div>
+        <BeachRecommendation
+          score={weatherForecastQuery.data[0].recommendation_score}
+        />
       </div>
       <WeatherForecast weather={weatherForecastQuery.data} />
     </section>
