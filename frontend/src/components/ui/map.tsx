@@ -108,13 +108,13 @@ const Map = () => {
   
   function getCardImg(cloudCover: string){
     if (cloudCover == "Mostly Clear") {
-        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 36px; height: 36px; display: flex;">';
+        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 56px; height: 56px; display: flex;">';
       } else if (cloudCover == "Partly Cloudy") {
-        return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 36px; height: 36px; display: flex;">';
+        return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 56px; height: 56px; display: flex;">';
       } else if (cloudCover == "Cloudy") {
-        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 36px; height: 36px; display: flex;">';
+        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 56px; height: 56px; display: flex;">';
       } else { //overcast
-        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 36px; height: 36px; display: flex;">';
+        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 56px; height: 56px; display: flex;">';
       }
   }
 
@@ -260,8 +260,10 @@ const Map = () => {
 
               popupContent = `
                 <h4 class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}">
-                ${getCardImg(forecast['Cloud Cover'])}
-                  <p style="font-size: 12px; padding: 5px">${forecast['Cloud Cover']}</p>
+                  <div style="font-size: 15px; padding: 5px;">
+                    ${getCardImg(forecast['Cloud Cover'])}
+                    ${forecast['Cloud Cover']}
+                  </div>
                   ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
                   <p style="font-size: 12px; padding: 5 5 0 0">${beachName}</p>
                 </h4>
