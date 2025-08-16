@@ -1,7 +1,6 @@
 import {
   Droplet,
   Droplets,
-  Loader2,
   Sun,
   Thermometer,
   Wind,
@@ -14,7 +13,7 @@ import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
 import { FaLocationArrow } from "react-icons/fa";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
-import { useGetTidePredictionByBeachID } from "@/api/tide";
+import { useGetTidePredictionByBeachID } from "@/api/beach";
 import { Skeleton } from "../ui/skeleton";
 
 const windData = [

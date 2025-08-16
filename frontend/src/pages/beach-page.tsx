@@ -12,7 +12,7 @@ import { BeachAlgae } from "@/components/beach/beach-algae";
 import { BeachConditions } from "@/components/beach/beach-conditions";
 import { useState } from "react";
 import { ActiveSectionContext } from "@/hooks/use-section-in-view";
-import { useGetWeatherForecastByBeachID } from "@/api/weather";
+import { useGetWeatherForecastByBeachID } from "@/api/beach";
 
 const ExampleBeach = {
   name: "Palm Beach",
