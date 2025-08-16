@@ -21,6 +21,21 @@ export type ReportType = {
   description: string;
 };
 
+export const ReportsIconMap: Record<string, LucideIcon> = {
+  "alert-triangle": AlertTriangle,
+  dog: Dog,
+  droplet: Droplet,
+  fish: Fish,
+  leaf: Leaf,
+  "stop-circle": StopCircle,
+  toilet: Toilet,
+  trash: Trash,
+  turtle: Turtle,
+  users: Users,
+  waves: Waves,
+  "wind-arrow-down": WindArrowDown,
+};
+
 export const reportsExamples: ReportType[] = [
   {
     icon: Users,
