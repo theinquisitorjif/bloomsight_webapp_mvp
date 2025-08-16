@@ -30,4 +30,4 @@ venv
 __pycache__
 .venv
 
-backend/.cache.sqlite
+.cache.sqlite
