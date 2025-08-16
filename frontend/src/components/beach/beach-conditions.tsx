@@ -15,6 +15,7 @@ import { FaLocationArrow } from "react-icons/fa";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
 import { useGetTidePredictionByBeachID } from "@/api/tide";
+import { Skeleton } from "../ui/skeleton";
 
 const windData = [
   { direction: "N", speed: 8 },
@@ -62,10 +63,7 @@ export const BeachConditions = ({
     return directions[index];
   }
 
-  if (weatherForecastQuery.isPending)
-    return <Loader2 className="animate-spin" />;
-
-  if (!weatherForecastQuery.data) {
+  if (!weatherForecastQuery.isPending && !weatherForecastQuery.data) {
     return null;
   }
 
@@ -77,98 +75,62 @@ export const BeachConditions = ({
       <p>What to expect when visiting {beachName}</p>
 
       <div className="mt-4 relative rounded-lg border border-border flex-1 h-40 overflow-hidden">
-        {tidePredictionQuery.data && (
+        {tidePredictionQuery.data ? (
           <TideChart data={tidePredictionQuery.data} />
+        ) : tidePredictionQuery.isPending ? (
+          <Skeleton className="w-full h-62 rounded-lg" />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground">No Tide Data</p>
+          </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mt-4">
-        <div className="p-4 rounded-lg border lg:col-span-3 border-border h-40 bg-white">
-          <div className="grid grid-cols-2 gap-3 h-full">
-            <dl>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">
-                <Sun size={14} /> UV Index
-              </dt>
-              <dd className="text-xl font-medium flex items-center gap-2">
-                {weatherForecastQuery.data[0].uv_index.toFixed(1)}{" "}
-                <SeverityBadge severity="warning" />
-              </dd>
-            </dl>
-            <dl>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">
-                <Droplets size={14} />
-                Precipitation
-              </dt>
-              <dd className="text-xl font-medium">
-                {weatherForecastQuery.data[0].precipitation}%
-              </dd>
-            </dl>
-            <dl>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">
-                <Droplet size={14} /> Humidity
-              </dt>
-              <dd className="text-xl font-medium">
-                {weatherForecastQuery.data[0].humidity}%
-              </dd>
-            </dl>
-            <dl>
-              <dt className="text-sm text-muted-foreground flex items-center gap-1">
-                <WindArrowDown size={14} /> Air Quality
-              </dt>
-              <dd className="text-xl font-medium">
-                {weatherForecastQuery.data[0].air_quality.toFixed(1)}
-              </dd>
-            </dl>
-          </div>
-        </div>
-        <div className="rounded-lg flex gap-6 items-start lg:col-span-4 justify-between border border-border h-40 p-4">
-          <div>
-            <span className="flex items-center gap-1">
-              <Wind size={14} />
-              <p className="text-sm text-muted-foreground">Wind</p>
-            </span>
-            <p className="text-2xl font-medium">
-              {(weatherForecastQuery.data[0].wind_speed * 2.23694).toFixed(1)}
-              <span className="text-lg font-normal">
-                mph {degreesToDirection(weatherForecastQuery.data[0].wind_dir)}
-              </span>
-            </p>
-            <p className="text-lg font-medium">
-              {(weatherForecastQuery.data[0].gust_speed * 2.23694).toFixed(1)}
-              <span className="font-normal text-sm text-muted-foreground">
-                mph gusts
-              </span>
-            </p>
-          </div>
+        {weatherForecastQuery.isPending ? (
+          <Skeleton className="rounded-lg lg:col-span-3 h-40" />
+        ) : (
+          <AtmosphereData
+            uv_index={
+              weatherForecastQuery.data?.[0]?.uv_index != null
+                ? weatherForecastQuery.data[0].uv_index.toFixed(1)
+                : "N/A"
+            }
+            precipitation={
+              weatherForecastQuery.data?.[0]?.precipitation ?? "N/A"
+            }
+            humidity={weatherForecastQuery.data?.[0]?.humidity ?? "N/A"}
+            air_quality={
+              weatherForecastQuery.data?.[0]?.air_quality != null
+                ? weatherForecastQuery.data[0].air_quality.toFixed(1)
+                : "N/A"
+            }
+          />
+        )}
 
-          <div className="overflow-hidden relative rounded-lg h-full">
-            <RadarChart
-              cx={100}
-              cy={70}
-              outerRadius={45}
-              width={200}
-              height={200}
-              data={windData}
-            >
-              <PolarGrid />
-              <PolarAngleAxis dataKey="direction" fontSize={12} />
-              <Radar
-                name="Wind Speed"
-                dataKey="speed"
-                fill="#8884d8"
-                fillOpacity={0}
-              />
-            </RadarChart>
+        {weatherForecastQuery.isPending ? (
+          <Skeleton className="rounded-lg lg:col-span-4 h-40" />
+        ) : (
+          <WindSpeeds
+            wind_speeds={
+              weatherForecastQuery.data?.[0]?.wind_speed != null
+                ? (weatherForecastQuery.data[0].wind_speed * 2.23694).toFixed(1)
+                : "N/A"
+            }
+            direction={
+              weatherForecastQuery.data?.[0]?.wind_dir != null
+                ? degreesToDirection(weatherForecastQuery.data[0].wind_dir)
+                : "N/A"
+            }
+            degrees={weatherForecastQuery.data?.[0]?.wind_dir ?? 0}
+            gust_speeds={
+              weatherForecastQuery.data?.[0]?.gust_speed != null
+                ? (weatherForecastQuery.data[0].gust_speed * 2.23694).toFixed(1)
+                : "N/A"
+            }
+          />
+        )}
 
-            <FaLocationArrow
-              size={20}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 text-primary/80 transition-transform duration-500"
-              style={{
-                transform: `rotate(${weatherForecastQuery.data[0].wind_dir}deg)`,
-              }}
-            />
-          </div>
-        </div>
         <div className="rounded-lg border border-border lg:col-span-3 flex-1 h-40 p-4">
           <span className="flex items-center gap-1">
             <Thermometer size={14} />
@@ -193,5 +155,113 @@ export const BeachConditions = ({
         </div>
       </div>
     </section>
+  );
+};
+
+const AtmosphereData = ({
+  uv_index,
+  precipitation,
+  humidity,
+  air_quality,
+}: {
+  uv_index: string | number;
+  precipitation: string | number;
+  humidity: string | number;
+  air_quality: string | number;
+}) => {
+  return (
+    <div className="p-4 rounded-lg border lg:col-span-3 border-border h-40 bg-white">
+      <div className="grid grid-cols-2 gap-3 h-full">
+        <dl>
+          <dt className="text-sm text-muted-foreground flex items-center gap-1">
+            <Sun size={14} /> UV Index
+          </dt>
+          <dd className="text-xl font-medium flex items-center gap-2">
+            {uv_index ?? "N/A"}
+            <SeverityBadge severity="warning" />
+          </dd>
+        </dl>
+        <dl>
+          <dt className="text-sm text-muted-foreground flex items-center gap-1">
+            <Droplets size={14} />
+            Precipitation
+          </dt>
+          <dd className="text-xl font-medium">{precipitation ?? "N/A"}%</dd>
+        </dl>
+        <dl>
+          <dt className="text-sm text-muted-foreground flex items-center gap-1">
+            <Droplet size={14} /> Humidity
+          </dt>
+          <dd className="text-xl font-medium">{humidity ?? "N/A"}%</dd>
+        </dl>
+        <dl>
+          <dt className="text-sm text-muted-foreground flex items-center gap-1">
+            <WindArrowDown size={14} /> Air Quality
+          </dt>
+          <dd className="text-xl font-medium">{air_quality ?? "N/A"}</dd>
+        </dl>
+      </div>
+    </div>
+  );
+};
+
+const WindSpeeds = ({
+  wind_speeds,
+  gust_speeds,
+  degrees,
+  direction,
+}: {
+  wind_speeds: string | number;
+  gust_speeds: string | number;
+  degrees: string | number;
+  direction: string | number;
+}) => {
+  return (
+    <div className="rounded-lg flex gap-6 items-start lg:col-span-4 justify-between border border-border h-40 p-4">
+      <div>
+        <span className="flex items-center gap-1">
+          <Wind size={14} />
+          <p className="text-sm text-muted-foreground">Wind</p>
+        </span>
+        <p className="text-2xl font-medium">
+          {wind_speeds ?? "N/A"}
+          <span className="text-lg font-normal">mph {direction ?? "N/A"}</span>
+        </p>
+        <p className="text-lg font-medium">
+          {gust_speeds ?? "N/A"}
+          <span className="font-normal text-sm text-muted-foreground">
+            mph gusts
+          </span>
+        </p>
+      </div>
+
+      <div className="overflow-hidden relative rounded-lg h-full">
+        <RadarChart
+          cx={100}
+          cy={70}
+          outerRadius={45}
+          width={200}
+          height={200}
+          data={windData}
+        >
+          <PolarGrid />
+          <PolarAngleAxis dataKey="direction" fontSize={12} />
+          <Radar
+            name="Wind Speed"
+            dataKey="speed"
+            fill="#8884d8"
+            fillOpacity={0}
+          />
+        </RadarChart>
+
+        <FaLocationArrow
+          size={20}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 text-primary/80 transition-transform duration-500"
+          style={{
+            transform: `rotate(${degrees ?? 0}deg)`,
+          }}
+        />
+      </div>
+    </div>
   );
 };
