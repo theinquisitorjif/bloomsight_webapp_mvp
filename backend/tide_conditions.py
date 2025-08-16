@@ -37,58 +37,98 @@ def get_beach_coordinates(beach_name):
 
 # Fetch tide predictions
 def get_tide_prediction_json(lat, lon, beach_name):
-    try:
-        # 2. Find nearest NOAA station
-        station_info = find_nearest_station(lat, lon)
-        station_id = station_info["id"]
+    # Find nearest NOAA station
+    station_info = find_nearest_station(lat, lon)
+    station_id = station_info["id"]
 
-        url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter"
+    url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter"
 
-        # 3. Hourly predictions
-        params_hourly = {
-            "station": station_id,
-            "product": "predictions",
-            "datum": "MLLW",
-            "units": "english",
-            "time_zone": "gmt",
-            "format": "json",
-            "interval": "h",
-            "date": "today"
-        }
+    now = datetime.now(timezone.utc)
+    start_filter = now - timedelta(hours=4)
+    end_filter = now + timedelta(hours=8)
 
-        resp_hourly = requests.get(url, params=params_hourly)
-        resp_hourly.raise_for_status()
-        hourly_preds = resp_hourly.json().get("predictions", [])
+    begin_date = start_filter.strftime("%Y%m%d")
+    end_date = end_filter.strftime("%Y%m%d")
 
-        # Filter prev 4h / next 8h
-        now = datetime.now(timezone.utc)
-        start_filter = now - timedelta(hours=4)
-        end_filter = now + timedelta(hours=8)
+    # --- Hourly predictions ---
+    params_hourly = {
+        "station": station_id,
+        "product": "predictions",
+        "datum": "MLLW",
+        "units": "english",
+        "time_zone": "gmt",
+        "format": "json",
+        "interval": "h",
+        "begin_date": begin_date,
+        "end_date": end_date
+    }
 
-        filtered_hourly = []
-        for p in hourly_preds:
-            t = datetime.strptime(p["t"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-            if start_filter <= t <= end_filter:
-                filtered_hourly.append({"time": p["t"], "height": float(p["v"])})
+    resp_hourly = requests.get(url, params=params_hourly)
+    resp_hourly.raise_for_status()
+    hourly_preds = resp_hourly.json().get("predictions", [])
 
-        # 4. High/Low tides
-        params_hilo = params_hourly.copy()
-        params_hilo["interval"] = "hilo"
-        resp_hilo = requests.get(url, params=params_hilo)
-        resp_hilo.raise_for_status()
-        hilo_preds = resp_hilo.json().get("predictions", [])
+    filtered_hourly = [
+        {"time": p["t"], "height": float(p["v"])}
+        for p in hourly_preds
+        if start_filter <= datetime.strptime(p["t"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc) <= end_filter
+    ]
 
-        low_tide = next((p for p in hilo_preds if p["type"].lower() == "l"), None)
-        high_tide = next((p for p in hilo_preds if p["type"].lower() == "h"), None)
+    # --- Generate synthetic past values ---
+    if len(filtered_hourly) >= 2:
+        first_val = filtered_hourly[0]["height"]
+        second_val = filtered_hourly[1]["height"]
+        rising = second_val > first_val
 
-        return {
-            "beach_name": beach_name,
-            "station_id": station_id,
-            "station_name": station_info["name"],
-            "low_tide": {"time": low_tide["t"], "height": float(low_tide["v"])} if low_tide else None,
-            "high_tide": {"time": high_tide["t"], "height": float(high_tide["v"])} if high_tide else None,
-            "tides": filtered_hourly
-        }
+        step = abs(second_val - first_val)  # change per hour
+        # If change is too small, give a small default
+        step = step if step > 0.01 else 0.05
 
-    except Exception as e:
-        return {"error": str(e)}
+        synthetic_points = []
+        for i in range(4, 0, -1):
+            ts = (datetime.strptime(filtered_hourly[0]["time"], "%Y-%m-%d %H:%M") - timedelta(hours=i))
+            if rising:
+                # Go backwards, so values decrease as we move earlier
+                val = first_val - step * (4 - i + 1)
+            else:
+                # Go backwards, so values increase as we move earlier
+                val = first_val + step * (4 - i + 1)
+            synthetic_points.append({
+                "time": ts.strftime("%Y-%m-%d %H:%M"),
+                "height": round(val, 3)
+            })
+
+        filtered_hourly = synthetic_points + filtered_hourly
+
+    # --- High/Low tides ---
+    params_hilo = {
+        "station": station_id,
+        "product": "predictions",
+        "datum": "MLLW",
+        "units": "english",
+        "time_zone": "gmt",
+        "format": "json",
+        "interval": "hilo",
+        "begin_date": begin_date,
+        "end_date": end_date
+    }
+    resp_hilo = requests.get(url, params=params_hilo)
+    resp_hilo.raise_for_status()
+    hilo_preds = resp_hilo.json().get("predictions", [])
+
+    high_tide = next(
+        (p for p in hilo_preds if datetime.strptime(p["t"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc) >= now and p["type"].lower() == "h"),
+        None
+    )
+    low_tide = next(
+        (p for p in hilo_preds if datetime.strptime(p["t"], "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc) >= now and p["type"].lower() == "l"),
+        None
+    )
+
+    return {
+        "beach_name": beach_name,
+        "station_id": station_id,
+        "station_name": station_info["name"],
+        "low_tide": {"time": low_tide["t"], "height": float(low_tide["v"])} if low_tide else None,
+        "high_tide": {"time": high_tide["t"], "height": float(high_tide["v"])} if high_tide else None,
+        "tides": filtered_hourly
+    }
