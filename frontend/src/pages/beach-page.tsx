@@ -12,6 +12,8 @@ import { BeachAlgae } from "@/components/beach/beach-algae";
 import { BeachConditions } from "@/components/beach/beach-conditions";
 import { useState } from "react";
 import { ActiveSectionContext } from "@/hooks/use-section-in-view";
+import { useGetWeatherForecastByBeachID } from "@/api/weather";
+import { useGetTidePredictionByBeachID } from "@/api/tide";
 
 const ExampleBeach = {
   name: "Palm Beach",
@@ -23,6 +25,8 @@ const ExampleBeach = {
 export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
   const [timeOfLastClick, setTimeOfLastClick] = useState(0); // Used to disable the observer temporarily when user clicks on a link
+
+  const weatherForecastQuery = useGetWeatherForecastByBeachID(7);
 
   return (
     <ActiveSectionContext.Provider
@@ -43,9 +47,12 @@ export const BeachPage = () => {
             lng={ExampleBeach.lng}
           />
           <BeachNavigation />
-          <BeachOverview />
+          <BeachOverview weatherForecastQuery={weatherForecastQuery} />
           <Separator className="my-10" />
-          <BeachConditions />
+          <BeachConditions
+            beachName={ExampleBeach.name}
+            weatherForecastQuery={weatherForecastQuery}
+          />
           <Separator className="my-10" />
           <BeachAlgae />
           <Separator className="my-10" />

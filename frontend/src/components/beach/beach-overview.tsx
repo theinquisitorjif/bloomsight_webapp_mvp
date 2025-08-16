@@ -1,9 +1,49 @@
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import WeatherForecast from "../weather/weather-forecast";
 import { useSectionInView } from "@/hooks/use-section-in-view";
+import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
-export const BeachOverview = () => {
+export const BeachOverview = ({
+  weatherForecastQuery,
+}: {
+  weatherForecastQuery: UseQueryResult<WeatherForecastAPIResponse[], Error>;
+}) => {
   const { ref } = useSectionInView("overview", 0.5);
+
+  const scores = {
+    0: {
+      label: "Very Bad",
+      color: "bg-red-200",
+      textColor: "text-red-300",
+    },
+    1: {
+      label: "Bad",
+      color: "bg-orange-200",
+      textColor: "text-orange-300",
+    },
+    2: {
+      label: "Good",
+      color: "bg-green-200",
+      text: "text-green-800",
+    },
+    3: {
+      label: "Very Good",
+      color: "bg-green-400",
+      text: "text-green-800",
+    },
+    4: {
+      label: "Excellent",
+      color: "bg-green-600",
+      text: "text-green-800",
+    },
+  };
+
+  if (weatherForecastQuery.isPending)
+    return <Loader2 className="animate-spin" />;
+
+  if (!weatherForecastQuery.data) return null;
 
   return (
     <section
@@ -18,13 +58,39 @@ export const BeachOverview = () => {
         <div className="p-2 rounded-lg border border-border mt-2">
           <p className="text-muted-foreground text-sm">Current Conditions</p>
           <div className="flex items-center gap-1">
-            <p className="font-semibold text-green-800 text-xl mr-2">Good</p>
+            <p
+              className={cn(
+                "font-semibold text-xl mr-2",
+                scores[weatherForecastQuery.data[0].recommendation_score - 1]
+                  .textColor
+              )}
+            >
+              {
+                scores[weatherForecastQuery.data[0].recommendation_score - 1]
+                  .label
+              }
+            </p>
+            {Array.from({
+              length: weatherForecastQuery.data[0].recommendation_score,
+            }).map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "w-9 h-3 rounded-lg",
+                  scores[weatherForecastQuery.data[0].recommendation_score - 1]
+                    .color
+                )}
+              ></span>
+            ))}
 
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-green-200"></span>
-            <span className="w-9 h-3 rounded-lg bg-neutral-300"></span>
+            {Array.from({
+              length: 5 - weatherForecastQuery.data[0].recommendation_score,
+            }).map((_, i) => (
+              <span
+                key={i}
+                className="w-9 h-3 rounded-lg bg-neutral-300"
+              ></span>
+            ))}
           </div>
         </div>
 
@@ -56,7 +122,7 @@ export const BeachOverview = () => {
           </div>
         </div>
       </div>
-      <WeatherForecast />
+      <WeatherForecast weather={weatherForecastQuery.data} />
     </section>
   );
 };
