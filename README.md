@@ -1,27 +1,11 @@
 # bloomsight_webapp_mvp
+
 MVP for BloomSight Aug-Sept Launch
 
-
 # to run backend
- make sure python is installed:
 
-``` python3 --version ```
-
-create a venv one time
-
-``` python3 -m venv venv ```
-
-after that, activate it
-
-``` venv\Scripts\activate ```
-
-install stuff
-
-``` pip install -r requirements.txt 
-beach_api.py
-```
+Read the readme inside [the backend directory](/backend/README.md)
 
 # to run frontend
 
-``` cd frontend/src
-npm run dev ```
+Read the readme inside [the frontend directory](/frontend/README.md)
