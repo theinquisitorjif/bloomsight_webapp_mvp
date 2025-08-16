@@ -6,23 +6,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { ChevronUp } from "lucide-react";
 
-const chartData = [
-  { time: "", height: 1 },
-  { time: "", height: 2 },
-  { time: "3pm", height: 3 },
-  { time: "", height: 3 },
-  { time: "5pm", height: 3 },
-  { time: "", height: 2 },
-  { time: "7pm", height: 3 },
-  { time: "", height: 4 },
-  { time: "9pm", height: 3 },
-  { time: "", height: 2 },
-  { time: "11pm", height: 3 },
-  { time: "", height: 2 },
-  { time: "", height: 1 },
-];
+import { type TidePredictionAPIResponse } from "@/types/tide-prediction";
 
 const chartConfig = {
   height: {
@@ -31,13 +16,60 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function TideChart() {
+export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
+  // Convert API times into a short display format
+  const formattedChartData = data.tides.map((t) => {
+    const date = new Date(t.time.replace(" ", "T")); // ensure it's valid ISO
+    const hours = date.getHours();
+    const ampm = hours >= 12 ? "pm" : "am";
+    const displayHour = ((hours + 11) % 12) + 1; // 0 → 12, 13 → 1
+    return {
+      time: `${displayHour}${ampm}`,
+      height: Number(t.height.toFixed(2)), // rounding for display
+    };
+  });
+
+  // Reference markers for high/low tide
+  const highTideIndex = formattedChartData.findIndex(
+    (p) => p.time === formatTimeLabel(data.high_tide.time)
+  );
+  const lowTideIndex = formattedChartData.findIndex(
+    (p) => p.time === formatTimeLabel(data.low_tide.time)
+  );
+
+  const now = new Date();
+  let closestTide = formattedChartData[0];
+  let smallestDiff = Infinity;
+
+  data.tides.forEach((t) => {
+    const tDate = new Date(t.time.replace(" ", "T"));
+    const diff = Math.abs(tDate.getTime() - now.getTime());
+    if (diff < smallestDiff) {
+      smallestDiff = diff;
+      closestTide = {
+        time: formatTimeLabel(t.time),
+        height: Number(t.height.toFixed(2)),
+      };
+    }
+  });
+
+  const currentTimeLabel = closestTide.time;
+  const currentTideHeight = closestTide.height;
+
+  if (!data.tides) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-muted-foreground">No tide data found</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <ChartContainer className="h-full w-full" config={chartConfig}>
         <AreaChart
           accessibilityLayer
-          data={chartData}
+          data={formattedChartData}
           margin={{
             top: 60,
             bottom: 10,
@@ -47,7 +79,21 @@ export function TideChart() {
             dataKey="time"
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 4)}
+            tick={({ x, y, payload, index }) =>
+              index % 2 === 0 ? (
+                <text
+                  x={x}
+                  y={y + 15}
+                  textAnchor="middle"
+                  fill="#666"
+                  fontSize={12}
+                >
+                  {payload.value}
+                </text>
+              ) : (
+                <></>
+              )
+            }
           />
           <ChartTooltip
             cursor={false}
@@ -60,6 +106,7 @@ export function TideChart() {
               <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
             </linearGradient>
           </defs>
+
           <Area
             dataKey="height"
             type="monotone"
@@ -69,53 +116,91 @@ export function TideChart() {
             strokeWidth={2}
           />
 
-          <ReferenceLine x={3} stroke="black" strokeWidth={1} />
+          {highTideIndex >= 0 && (
+            <ReferenceLine
+              x={formattedChartData[highTideIndex].time}
+              stroke="black"
+              strokeDasharray="3 3"
+              label={(props) => (
+                <TwoLineLabel
+                  {...props}
+                  time={formatTimeLabel(data.high_tide.time)}
+                  height={data.high_tide.height}
+                />
+              )}
+            />
+          )}
 
-          <ReferenceLine
-            x={7}
-            stroke="gray"
-            strokeWidth={1}
-            label={<TwoLineLabel viewBox={{ x: 0, y: 0 }} />}
-          />
+          {lowTideIndex >= 0 && (
+            <ReferenceLine
+              x={formattedChartData[lowTideIndex].time}
+              stroke="gray"
+              strokeDasharray="3 3"
+              label={(props) => (
+                <TwoLineLabel
+                  {...props}
+                  time={formatTimeLabel(data.low_tide.time)}
+                  height={data.low_tide.height}
+                />
+              )}
+            />
+          )}
+
+          {/** Current time line */}
+          <ReferenceLine x={currentTimeLabel} stroke="black" strokeWidth={1} />
         </AreaChart>
       </ChartContainer>
 
       <div className="absolute top-4 left-4 ">
         <p className="text-sm font-medium text-muted-foreground">Tide</p>
         <div className="flex items-center gap-2">
-          <p className="text-xl font-semibold">3.8 ft</p>
-          <ChevronUp />
+          <p className="text-xl font-semibold">
+            {currentTideHeight.toFixed(2)} ft
+          </p>
         </div>
       </div>
     </>
   );
 }
 
-const TwoLineLabel = ({ viewBox }: { viewBox: { x: number; y: number } }) => {
+function formatTimeLabel(dateTime: string) {
+  const date = new Date(dateTime.replace(" ", "T"));
+  const hours = date.getHours();
+  const ampm = hours >= 12 ? "pm" : "am";
+  const displayHour = ((hours + 11) % 12) + 1;
+  return `${displayHour}${ampm}`;
+}
+
+const TwoLineLabel = ({
+  time,
+  height,
+  viewBox,
+}: {
+  time: string;
+  height: number;
+  viewBox: { x: number; y: number; width: number; height: number };
+}) => {
   const { x, y } = viewBox;
   return (
     <g>
-      {/* Top line (bold) */}
       <text
         x={x}
-        y={y - 24} // adjust vertical position
+        y={y - 25} // offset above line
         textAnchor="middle"
         fontWeight="bold"
         fontSize={12}
         fill="black"
       >
-        8:00pm
+        {time}
       </text>
-
-      {/* Bottom line (normal weight) */}
       <text
         x={x}
-        y={y - 10} // adjust vertical position
+        y={y - 10} // offset below line
         textAnchor="middle"
         fontSize={11}
         fill="black"
       >
-        4.5ft
+        {height.toFixed(2)} ft
       </text>
     </g>
   );

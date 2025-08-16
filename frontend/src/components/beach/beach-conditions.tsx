@@ -1,6 +1,7 @@
 import {
   Droplet,
   Droplets,
+  Loader2,
   Sun,
   Thermometer,
   Wind,
@@ -10,8 +11,10 @@ import { useSectionInView } from "@/hooks/use-section-in-view";
 import { SeverityBadge } from "../severity-badge";
 import { TideChart } from "./tide-chart";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
-import { useEffect, useState } from "react";
 import { FaLocationArrow } from "react-icons/fa";
+import type { UseQueryResult } from "@tanstack/react-query";
+import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
+import { useGetTidePredictionByBeachID } from "@/api/tide";
 
 const windData = [
   { direction: "N", speed: 8 },
@@ -24,28 +27,59 @@ const windData = [
   { direction: "NW", speed: 11 },
 ];
 
-export const BeachConditions = () => {
+export const BeachConditions = ({
+  beachName = "No Name",
+  weatherForecastQuery,
+}: {
+  beachName: string;
+  weatherForecastQuery: UseQueryResult<WeatherForecastAPIResponse[], Error>;
+}) => {
   const { ref } = useSectionInView("conditions", 0.5);
 
-  const [windDirection, setWindDirection] = useState(90);
+  const tidePredictionQuery = useGetTidePredictionByBeachID(12);
 
-  useEffect(() => {
-    // Simulate direction change
-    const interval = setInterval(() => {
-      setWindDirection(Math.floor(Math.random() * 360));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  function degreesToDirection(deg: number): string {
+    const directions = [
+      "N",
+      "NNE",
+      "NE",
+      "ENE",
+      "E",
+      "ESE",
+      "SE",
+      "SSE",
+      "S",
+      "SSW",
+      "SW",
+      "WSW",
+      "W",
+      "WNW",
+      "NW",
+      "NNW",
+    ];
+    // Each direction covers 360/16 = 22.5 degrees
+    const index = Math.round(deg / 22.5) % 16;
+    return directions[index];
+  }
+
+  if (weatherForecastQuery.isPending)
+    return <Loader2 className="animate-spin" />;
+
+  if (!weatherForecastQuery.data) {
+    return null;
+  }
 
   return (
     <section ref={ref} id="conditions">
       <h3 className="text-2xl font-semibold tracking-tight">
         Current Conditions
       </h3>
-      <p>What to expect when visiting Carlsbad Beach</p>
+      <p>What to expect when visiting {beachName}</p>
 
       <div className="mt-4 relative rounded-lg border border-border flex-1 h-40 overflow-hidden">
-        <TideChart />
+        {tidePredictionQuery.data && (
+          <TideChart data={tidePredictionQuery.data} />
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 mt-4">
@@ -56,7 +90,8 @@ export const BeachConditions = () => {
                 <Sun size={14} /> UV Index
               </dt>
               <dd className="text-xl font-medium flex items-center gap-2">
-                6 <SeverityBadge severity="warning" />
+                {weatherForecastQuery.data[0].uv_index.toFixed(1)}{" "}
+                <SeverityBadge severity="warning" />
               </dd>
             </dl>
             <dl>
@@ -64,19 +99,25 @@ export const BeachConditions = () => {
                 <Droplets size={14} />
                 Precipitation
               </dt>
-              <dd className="text-xl font-medium">12%</dd>
+              <dd className="text-xl font-medium">
+                {weatherForecastQuery.data[0].precipitation}%
+              </dd>
             </dl>
             <dl>
               <dt className="text-sm text-muted-foreground flex items-center gap-1">
                 <Droplet size={14} /> Humidity
               </dt>
-              <dd className="text-xl font-medium">63%</dd>
+              <dd className="text-xl font-medium">
+                {weatherForecastQuery.data[0].humidity}%
+              </dd>
             </dl>
             <dl>
               <dt className="text-sm text-muted-foreground flex items-center gap-1">
                 <WindArrowDown size={14} /> Air Quality
               </dt>
-              <dd className="text-xl font-medium">920</dd>
+              <dd className="text-xl font-medium">
+                {weatherForecastQuery.data[0].air_quality.toFixed(1)}
+              </dd>
             </dl>
           </div>
         </div>
@@ -87,10 +128,13 @@ export const BeachConditions = () => {
               <p className="text-sm text-muted-foreground">Wind</p>
             </span>
             <p className="text-2xl font-medium">
-              8<span className="text-lg font-normal">mph E</span>
+              {(weatherForecastQuery.data[0].wind_speed * 2.23694).toFixed(1)}
+              <span className="text-lg font-normal">
+                mph {degreesToDirection(weatherForecastQuery.data[0].wind_dir)}
+              </span>
             </p>
             <p className="text-lg font-medium">
-              3-5
+              {(weatherForecastQuery.data[0].gust_speed * 2.23694).toFixed(1)}
               <span className="font-normal text-sm text-muted-foreground">
                 mph gusts
               </span>
@@ -119,7 +163,9 @@ export const BeachConditions = () => {
             <FaLocationArrow
               size={20}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 text-primary/80 transition-transform duration-500"
-              style={{ transform: `rotate(${windDirection}deg)` }}
+              style={{
+                transform: `rotate(${weatherForecastQuery.data[0].wind_dir}deg)`,
+              }}
             />
           </div>
         </div>
@@ -128,7 +174,10 @@ export const BeachConditions = () => {
             <Thermometer size={14} />
             <p className="text-sm text-muted-foreground">Water Temperature</p>
           </span>
-          <p className="text-2xl font-medium">
+          <p className="text-2xl font-medium text-muted-foreground">
+            Coming soon
+          </p>
+          {/* <p className="text-2xl font-medium">
             23 <span className="text-base text-muted-foreground">°F</span>
           </p>
 
@@ -140,7 +189,7 @@ export const BeachConditions = () => {
               </div>
             </div>
             <p className="text-muted-foreground text-xs">73°</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
