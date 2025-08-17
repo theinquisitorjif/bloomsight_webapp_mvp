@@ -18,7 +18,7 @@ export const Footer = () => {
                 alt="FlowBite Logo"
               />
               <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                Bloomsight
+                BloomSight
               </span>
             </a>
           </div>
@@ -47,7 +47,7 @@ export const Footer = () => {
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-4">
                   <a
-                    href="https://github.com/themesberg/flowbite"
+                    href="https://www.bloomsight.net/"
                     className="hover:underline "
                   >
                     Instagram
@@ -55,7 +55,7 @@ export const Footer = () => {
                 </li>
                 <li>
                   <a
-                    href="https://discord.gg/4eeurUVvTy"
+                    href="https://www.linkedin.com/company/a-l-a-r-e-x/posts/?feedView=all"
                     className="hover:underline"
                   >
                     Linkedin

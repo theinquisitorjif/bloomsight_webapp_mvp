@@ -41,11 +41,11 @@ const Map = () => {
   
   function getCardImg(cloudCover: string){
     if (cloudCover == "Mostly Clear") {
-        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 50px;">';
+        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 40px;">';
       } else if (cloudCover == "Partly Cloudy") {
         return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 50px;">';
       } else if (cloudCover == "Cloudy") {
-        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 50px;">';
+        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 50px; padding-bottom: 10px; padding-left: 10px;">';
       } else { //overcast
         return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 50px; padding-bottom: 10px; padding-left: 10px;">';
       }
@@ -260,13 +260,13 @@ const Map = () => {
                   ${redTideData?.abundance || 'Unknown'}
                 </div>
               </div>
+              <div style="display: flex; justify-content: center; align-items: center; height: 20px; margin-top: 5px;">
+              <a href="/" 
+                style=" color: rgb(106, 106, 106); padding: 0px 8px; font-size: 11px; border-radius: 8px; text-align: center; text-decoration: underline; ">
+                More Info
+              </a>
+            </div>
 
-              ${forecast.overall_rating || forecast.recommendation ? `
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-                  ${forecast.overall_rating ? `<strong style="color: #007cbf;">${forecast.overall_rating}</strong>` : ''}
-                  ${forecast.recommendation ? `<p style="font-size: 14px; margin-top: 5px; color: #555;">${forecast.recommendation}</p>` : ''}
-                </div>
-              ` : ''}
             `;
 
             } else {

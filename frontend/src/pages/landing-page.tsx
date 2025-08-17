@@ -1,13 +1,6 @@
-import React, { useState } from 'react';
-import { Search, MapPin } from 'lucide-react';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import React, { useState, useEffect } from 'react';
+import { Search } from 'lucide-react';
+import redTideData from '../../../fwc_redtide.json'; // Make sure this path is correct
 
 const LandingPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,43 +9,78 @@ const LandingPage = () => {
     { name: 'Loading...', description: 'Finding beaches near you', distance: '...' }
   ]);
 
-  // Get user's location on component mount
-  React.useEffect(() => {
+  interface Beach {
+    name: string;
+    lat: number;
+    long: number;
+    description?: string;
+  }
+
+  // Calculate distance between two points in miles
+    const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const toRad = (deg: number) => deg * (Math.PI / 180);
+    const R = 6371; // Earth's radius in km
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distanceKm = R * c;
+    const distanceMi = distanceKm * 0.621371; // convert to miles
+    return distanceMi;
+    };
+
+
+  // Get closest beaches
+  const getClosestBeaches = (userLat: number, userLng: number, allBeaches: Beach[], count = 4) => {
+    return allBeaches
+      .map((beach) => ({
+        ...beach,
+        distanceValue: getDistance(userLat, userLng, beach.lat, beach.long)
+      }))
+      .sort((a, b) => a.distanceValue - b.distanceValue)
+      .slice(0, count)
+      .map((beach) => ({
+        name: beach.name,
+        description: beach.description || 'Beautiful coastal area',
+        distance: `${beach.distanceValue.toFixed(1)} mi away`,
+      }));
+  };
+
+  useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          
+
           try {
-            // Use reverse geocoding to get city name
+            // Reverse geocode to get city name
             const response = await fetch(
               `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
             );
             const data = await response.json();
             const city = data.city || data.locality || 'your area';
             setUserLocation(city);
-            
-            // Simulate nearby beaches based on location
-            setNearbyBeaches([
-              { name: 'Nearby Beach 1', description: 'Beautiful coastal area', distance: '10 miles away' },
-              { name: 'Nearby Beach 2', description: 'Perfect for swimming', distance: '15 miles away' },
-              { name: 'Nearby Beach 3', description: 'Great for surfing', distance: '20 miles away' },
-              { name: 'Nearby Beach 4', description: 'Family-friendly spot', distance: '25 miles away' }
-            ]);
+
+            // Get closest 4 beaches
+            const closestBeaches = getClosestBeaches(latitude, longitude, redTideData as Beach[]);
+            setNearbyBeaches(closestBeaches);
           } catch (error) {
-            console.error('Error getting city name:', error);
+            console.error('Error getting city name or beaches:', error);
             setUserLocation('your area');
           }
         },
         (error) => {
           console.log('Location access denied');
           setUserLocation('your area');
-          setNearbyBeaches([
-            { name: 'Popular Beach 1', description: 'Great for families', distance: 'Distance varies' },
-            { name: 'Popular Beach 2', description: 'Excellent surfing', distance: 'Distance varies' },
-            { name: 'Popular Beach 3', description: 'Crystal clear water', distance: 'Distance varies' },
-            { name: 'Popular Beach 4', description: 'Scenic coastline', distance: 'Distance varies' }
-          ]);
+          // Fallback: show any 4 beaches from redTideData
+          const fallbackBeaches = (redTideData as Beach[]).slice(0, 4).map((beach) => ({
+            name: beach.name,
+            description: beach.description || 'Beautiful coastal area',
+            distance: 'Distance varies',
+          }));
+          setNearbyBeaches(fallbackBeaches);
         }
       );
     }
@@ -60,25 +88,24 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-    
+
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row items-center justify-center px-6 py-12 gap-12 max-w-6xl mx-auto">
         {/* Beach Video */}
         <div className="w-full lg:w-1/2">
-        <video
+          <video
             src="/BS_intro.mp4"
             autoPlay
             loop
             playsInline
             className="w-full h-full md:h-90 object-cover rounded-2xl shadow-xl"
-        >
+          >
             Your browser does not support the video tag.
-        </video>
+          </video>
         </div>
 
         {/* Right Side Content */}
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start">
-          {/* Slogan */}
           <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-8 text-center lg:text-left">
             Know Before You Go
           </h1>
