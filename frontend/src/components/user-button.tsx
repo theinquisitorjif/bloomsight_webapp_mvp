@@ -30,7 +30,7 @@ const UserButton = () => {
           </Avatar>
         ) : (
           <GeneratedAvatar
-            seed={session.user.user_metadata.name}
+            seed={session.user.user_metadata.name || "B"}
             className="size-9 mr-3"
           />
         )}
@@ -40,10 +40,10 @@ const UserButton = () => {
         <DropdownMenuLabel>
           <div className="flex flex-col gap-1">
             <span className="font-medium truncate">
-              {session.user.user_metadata.name}
+              {session.user.user_metadata.name || "User"}
             </span>
             <span className="font-normal text-sm text-muted-foreground truncate">
-              {session.user.email}
+              {session.user.email || "Email"}
             </span>
           </div>
         </DropdownMenuLabel>

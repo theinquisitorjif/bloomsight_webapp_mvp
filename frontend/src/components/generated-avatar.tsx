@@ -10,7 +10,10 @@ interface GeneratedAvatarProps {
   className?: string;
 }
 
-export const GeneratedAvatar = ({ seed, className }: GeneratedAvatarProps) => {
+export const GeneratedAvatar = ({
+  seed = "B",
+  className,
+}: GeneratedAvatarProps) => {
   const avatar = createAvatar(initials, {
     seed,
   });
