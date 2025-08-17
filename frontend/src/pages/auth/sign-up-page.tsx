@@ -160,7 +160,7 @@ export const SignUpPage = () => {
                             <FormLabel>Email</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="m@example.com"
+                                placeholder="hello@example.com"
                                 type="email"
                                 {...field}
                               />
