@@ -35,6 +35,8 @@ def get_current_user():
 
     token = auth_header.split(" ")[1]
 
+    print("Got token auth header:", token)
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload  # contains "sub" (user_id), "email", etc.
@@ -293,6 +295,7 @@ def add_comment(beach_id):
     content = data.get("content")
     rating = data.get("rating")
     conditions = data.get("conditions")
+    reports = data.get("reports") # Array of report IDs (i.e. 4, 5, 6...)
 
     if (rating < 1) or (rating > 5):
         return jsonify({"error": "Rating must be between 1 and 5"}), 400
@@ -309,6 +312,15 @@ def add_comment(beach_id):
         "likes": 0,
         "timestamp": datetime.datetime.utcnow().isoformat()
     }).execute()
+
+    # Insert reports if they exist
+    if reports:
+        for report_id in reports:
+            supabase.table("comments_conditions").insert({
+                "comment_id": res.data[0]["id"],
+                "condition_id": report_id,
+                "beach_id": beach_id
+            }).execute()
 
     return jsonify(res.data[0]) if res.data else (jsonify({"error": "Insert failed"}), 400)
 
@@ -328,11 +340,43 @@ def delete_comment(beach_id, comment_id):
     return jsonify({"deleted": True}) if res.data else (jsonify({"error": "Not found"}), 404)
 
 @app.route("/beaches/<int:beach_id>/reports", methods=["GET"])
-def get_reports():
-    # Return all reports within threshold of comment posted
-    # Should also return all basic user info (name & picture) for each reports
-    pass
+def get_reports(beach_id):
+    # Fetch all reports for this beach
+    reports_res = supabase.table("comments_conditions").select("*").eq("beach_id", beach_id).execute()
 
+    current_time = datetime.utcnow()
+    valid_reports = []
+
+    for report in reports_res.data:
+        # Fetch user info
+        user_res = supabase.table("users").select("id, picture").eq("id", report["user_id"]).execute()
+        if user_res.data:
+            report["user"] = user_res.data[0]
+
+        # Fetch condition (for threshold)
+        condition_res = supabase.table("conditions").select("threshold").eq("id", report["condition_id"]).execute()
+        if not condition_res.data:
+            continue
+        threshold = condition_res.data[0]["threshold"]
+
+        # Fetch comment timestamp
+        comment_res = supabase.table("comments").select("timestamp").eq("id", report["comment_id"]).execute()
+        if not comment_res.data:
+            continue
+
+        ts = comment_res.data[0]["timestamp"].replace("Z", "")
+        comment_timestamp = datetime.fromisoformat(ts)
+
+        # Keep report only if within threshold
+        if (comment_timestamp + datetime.timedelta(hours=threshold)) >= current_time:
+            valid_reports.append(report)
+        # else:
+        #     # Clean up expired reports in DB
+        #     supabase.table("comments_conditions").delete().eq("id", report["id"]).execute()
+
+    return jsonify(valid_reports)
+
+   
 @app.route("/beaches/<int:beach_id>/pictures", methods=["GET"])
 def get_beach_pictures(beach_id):
     res = supabase.table("pictures").select("*").eq("beach_id", beach_id).order("timestamp", desc=True).execute()
