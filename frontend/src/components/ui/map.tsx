@@ -4,8 +4,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import Papa from 'papaparse';
 import type { FeatureCollection, Point } from 'geojson';
 import { createClient } from '@supabase/supabase-js';
-
-// Import the red tide data
 import redTideData from '../../../../fwc_redtide.json';
 
 type MapRef = mapboxgl.Map | null;
@@ -128,7 +126,6 @@ const Map = () => {
       }
   }
 
-
   const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number) => {
     try {
       if (lat && lng) {
@@ -173,7 +170,6 @@ const Map = () => {
     return null;
   };
 
-  // Updated function to get red tide data from local file
   const getRedTideData = (beachName: string, lat: number, lng: number) => {
     try {
       // First try exact name match
@@ -195,8 +191,8 @@ const Map = () => {
         return partialMatch;
       }
       
-      // If no name match, find closest by coordinates (within reasonable distance)
-      const tolerance = 1; // ~1km tolerance
+      // If no name match, find closest by coordinates
+      const tolerance = 1;
       const nearbyBeach = redTideData.find((beach: RedTideBeach) => 
         Math.abs(beach.lat - lat) < tolerance && 
         Math.abs(beach.long - lng) < tolerance
@@ -237,8 +233,6 @@ const Map = () => {
         console.log('Map loaded');
         setMapLoaded(true);
 
-        //  your vector source & base points layer (beaches)
-        // if your style already contains the source/layer this will create a new source named 'my-points' and a new layer 'points-layer'
         if (!mapRef.current!.getSource('my-points')) {
           mapRef.current?.addSource('my-points', {
             type: 'vector',
@@ -246,7 +240,6 @@ const Map = () => {
           });
         }
 
-        // add the layer that shows beach points (keeps your paint expression but highlight handled separately)
         if (!mapRef.current!.getLayer('points-layer')) {
           mapRef.current?.addLayer({
             id: 'points-layer',
@@ -265,8 +258,6 @@ const Map = () => {
           });
         }
 
-        // --- Add a client-side GeoJSON "hover-point" source + a hover layer that paints black ---
-        // This avoids depending on vector tile feature IDs / feature-state.
         if (!mapRef.current!.getSource('hover-point')) {
           mapRef.current?.addSource('hover-point', {
             type: 'geojson',
@@ -299,12 +290,13 @@ const Map = () => {
           const coords = feature.geometry.coordinates as [number, number];
           const [lng, lat] = coords;
           const beachName = feature.properties?.name || 'Unknown Beach';
+          const beachId = feature.properties?.id;
 
           try {
             // Fetch weather data and get red tide data from local file
             const [beachData, redTideData] = await Promise.all([
               fetchBeachForecast(beachName, lat, lng),
-              getRedTideData(beachName, lat, lng)
+              getRedTideData(beachName, lat, lng),
             ]);
 
             let popupContent;
@@ -335,7 +327,7 @@ const Map = () => {
               </div>
               <div class="weather-row">
                 <div class="weather-category">Air Quality</div>
-                <div class="weather-rating">${forecast.air_quality || 'N/A'}</div>
+                <div class="weather-rating">${beachId}</div>
               </div>
               <div class="weather-row">
                 <div class="weather-category">UV Index</div>
@@ -466,29 +458,6 @@ const Map = () => {
       if (mapRef.current) mapRef.current.remove();
     };
   }, [lng, lat, zoom]);
-
-  // Add heatmap layer when BOTH data and map are available
-  useEffect(() => {
-    console.log('Heatmap useEffect triggered', {
-      mapExists: !!mapRef.current,
-      mapLoaded: mapLoaded,
-      dataExists: !!heatmapData,
-      dataLength: heatmapData?.features.length
-    });
-
-    if (!mapRef.current || !heatmapData || !mapLoaded) {
-      console.log('Map, data, or load state not ready');
-      return;
-    }
-
-    // Heatmap code commented out as in original
-    // const addHeatmapLayer = () => {
-    //   console.log('Adding heatmap layer...');
-    //   // ... heatmap implementation
-    // };
-
-    // addHeatmapLayer();
-  }, [heatmapData, mapLoaded]);
 
   return <div ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />;
 };
