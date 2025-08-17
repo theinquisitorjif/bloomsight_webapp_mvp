@@ -394,7 +394,13 @@ const DateInputForm = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-2" align="start">
-            <Calendar mode="single" selected={date} onSelect={setDate} />
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              numberOfMonths={2}
+              disabled={(date) => date > new Date()}
+            />
           </PopoverContent>
         </Popover>
       </div>

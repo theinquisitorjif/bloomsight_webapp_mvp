@@ -66,10 +66,10 @@ export const SignInPage = () => {
     if (error) {
       setIsLoading(false);
       setError(error.message);
+    } else {
+      setIsLoading(false);
+      navigate("/");
     }
-
-    setIsLoading(false);
-    navigate("/");
   };
 
   return (
