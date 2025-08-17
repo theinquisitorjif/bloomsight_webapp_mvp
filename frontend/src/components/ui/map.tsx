@@ -1,8 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import mapboxgl, { type LngLatLike } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import Papa from 'papaparse';
-import type { FeatureCollection, Point } from 'geojson';
 import { createClient } from '@supabase/supabase-js';
 import redTideData from '../../../../fwc_redtide.json';
 
@@ -22,16 +20,6 @@ const Map = () => {
   const [lat] = useState<number>(28.5383);
   const [zoom] = useState<number>(7);
 
-  const [heatmapData, setHeatmapData] = useState<FeatureCollection<Point, { intensity: number }> | null>(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
-
-  interface Row {
-    chlor_a: string;  // First column
-    lat: string;      // Latitude column
-    lon: string;      // Longitude column
-    palette: string;  // Palette/intensity column
-  }
-
   interface RedTideBeach {
     name: string;
     lat: number;
@@ -39,78 +27,15 @@ const Map = () => {
     abundance: string;
   }
 
-  const fetchAlgaeDataFromCSV = async () => {
-    try {
-      const res = await fetch('/output_florida.csv');
-      const csvText = await res.text();
-
-      const parsed = Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        transformHeader: (header) => header.trim()
-      });
-
-      const rows = parsed.data as Row[];
-
-      const geojson: FeatureCollection<Point, { intensity: number }> = {
-        type: 'FeatureCollection',
-        features: rows
-          .filter((row) => {
-            const hasLat = row.lat && row.lat !== '';
-            const hasLon = row.lon && row.lon !== '';
-            const hasPalette = row.palette && row.palette !== '';
-
-            if (!hasLat || !hasLon || !hasPalette) {
-              console.log('Filtered out row:', row);
-            }
-
-            return hasLat && hasLon && hasPalette;
-          })
-          .map((row) => {
-            const lat = parseFloat(row.lat);
-            const lon = parseFloat(row.lon);
-            const intensity = parseFloat(row.palette);
-
-            if (isNaN(lat) || isNaN(lon) || isNaN(intensity)) {
-              return null;
-            }
-
-            if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-              console.warn('Out of range:', { lat, lon });
-              return null;
-            }
-
-            return {
-              type: "Feature" as const,
-              geometry: {
-                type: "Point" as const,
-                coordinates: [lon, lat],
-              },
-              properties: {
-                intensity: intensity,
-              },
-            };
-          })
-          .filter((feature): feature is NonNullable<typeof feature> => feature !== null),
-      };
-
-      console.log('Final GeoJSON features:', geojson.features.length);
-
-      setHeatmapData(geojson);
-    } catch (err) {
-      console.error('Error fetching algae CSV:', err);
-    }
-  };
-
     function getCloudCoverColor(cloudCover: string) {
       if (cloudCover == "Mostly Clear") {
-          return "linear-gradient(to bottom right, #7EB2F5, #217ebf)"; // Sky blue for mostly clear
+          return "linear-gradient(to bottom right, #B8DCFF, #38A2FF)"; // mostly clear
       } else if (cloudCover == "Partly Cloudy") {
-          return "linear-gradient(to bottom right, #B0C4DE, #217ebf)"; // Light steel blue for partly cloudy
+          return "linear-gradient(to bottom right, #C9E8FF, #60A3D6)"; // partly cloudy
       } else if (cloudCover == "Cloudy") {
-          return "linear-gradient(to bottom right, #778899, #217ebf)"; // Light slate gray for cloudy
-      } else { //overcast
-          return "linear-gradient(to bottom right, #E0E0E0, #8A8A8A)"; // Dim gray for overcast
+          return "linear-gradient(to bottom right, #DEEDFF, #6696CC)"; // cloudy
+      } else { 
+          return "linear-gradient(to bottom right, #E0E0E0, #8A8A8A)"; // overcast
       }
     }
   
@@ -122,7 +47,7 @@ const Map = () => {
       } else if (cloudCover == "Cloudy") {
         return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 50px;">';
       } else { //overcast
-        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 50px;">';
+        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 50px; padding-bottom: 10px; padding-left: 10px;">';
       }
   }
 
@@ -147,16 +72,16 @@ const Map = () => {
 
         if (forecasts && forecasts.length > 0) {
 
-          if (forecasts[0].current['Cloud Cover'] >= 0 && forecasts[0].current['Cloud Cover'] < 20) {
+          if (forecasts[0].current['cloud_cover'] >= 0 && forecasts[0].current['cloud_cover'] < 20) {
                 forecasts[0].current['Cloud Cover'] = "Mostly Clear";
-            } else if (forecasts[0].current['Cloud Cover'] >= 20 && forecasts[0].current['Cloud Cover'] < 50) {
+            } else if (forecasts[0].current['cloud_cover'] >= 20 && forecasts[0].current['cloud_cover'] < 50) {
                 forecasts[0].current['Cloud Cover'] = "Partly Cloudy";
-            } else if (forecasts[0].current['Cloud Cover'] >= 50 && forecasts[0].current['Cloud Cover'] < 80) {
+            } else if (forecasts[0].current['cloud_cover'] >= 50 && forecasts[0].current['cloud_cover'] < 80) {
                 forecasts[0].current['Cloud Cover'] = "Cloudy";
             } else {
                 forecasts[0].current['Cloud Cover'] = "Overcast";
             }
-
+          console.log('Forecast found:', forecasts[0].current);
           return forecasts[0].current;
         }
 
@@ -209,9 +134,6 @@ const Map = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAlgaeDataFromCSV();
-  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -231,7 +153,6 @@ const Map = () => {
 
       mapRef.current.on('load', () => {
         console.log('Map loaded');
-        setMapLoaded(true);
 
         if (!mapRef.current!.getSource('my-points')) {
           mapRef.current?.addSource('my-points', {
@@ -309,10 +230,10 @@ const Map = () => {
                 ${getCardImg(forecast['Cloud Cover'])}
                 <!-- Text section aligned to the right -->
                 <div style="display: flex; flex-direction: column; align-items: flex-end; min-width: 0; margin-left: auto;">
-                  <div style="font-size: 15px; margin-bottom: 5px;">
+                  <div style="font-size: 15px; margin-bottom: 9px;">
                     ${forecast['Cloud Cover']}
                   </div>
-                  <div style="font-size: 28px; margin-bottom: 5px;">
+                  <div style="font-size: 28px; margin-bottom: 7px;">
                     ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
                   </div>
                   <div style="font-size: 15px; max-width: 150px; word-break: break-word; text-align: right;">
