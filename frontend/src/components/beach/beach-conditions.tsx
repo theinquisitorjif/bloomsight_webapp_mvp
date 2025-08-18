@@ -28,15 +28,17 @@ const windData = [
 ];
 
 export const BeachConditions = ({
+  beachId,
   beachName = "No Name",
   weatherForecastQuery,
 }: {
+  beachId: number;
   beachName: string;
   weatherForecastQuery: UseQueryResult<WeatherForecastAPIResponse[], Error>;
 }) => {
   const { ref } = useSectionInView("conditions", 0.5);
 
-  const tidePredictionQuery = useGetTidePredictionByBeachID(12);
+  const tidePredictionQuery = useGetTidePredictionByBeachID(beachId);
 
   function degreesToDirection(deg: number): string {
     const directions = [

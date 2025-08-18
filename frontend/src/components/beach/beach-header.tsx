@@ -66,7 +66,7 @@ export const BeachHeader = ({
             </TooltipTrigger>
           </Tooltip> */}
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
                 target="_blank"

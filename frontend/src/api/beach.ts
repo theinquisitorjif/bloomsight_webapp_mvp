@@ -1,5 +1,5 @@
 import type { ParkingSpotsAPIResponse } from "@/types/parking-spots";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api-client";
 import type { TidePredictionAPIResponse } from "@/types/tide-prediction";
 import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
@@ -7,6 +7,14 @@ import type {
   RedtideRiskAPIResponse,
   RiptideRiskAPIResponse,
 } from "@/types/risk-scores";
+import {
+  type BeachReportsAPIResponse,
+  type ReportAPIResponse,
+} from "@/types/report";
+import {
+  type ReviewAPIResponse,
+  type CommentAPIResponse,
+} from "@/types/comment";
 
 export function useGetParkingSpotsByBeachID(id: number) {
   return useQuery<ParkingSpotsAPIResponse>({
@@ -54,6 +62,142 @@ export function useGetRedtideRiskByBeachID(id: number) {
     queryFn: async () => {
       const { data } = await api.get(`/beaches/${id}/water-quality`);
       return data;
+    },
+  });
+}
+
+export function useGetCommentReports() {
+  return useQuery<ReportAPIResponse[]>({
+    queryKey: ["comment-reports"],
+    queryFn: async () => {
+      const { data } = await api.get(`/beaches/reports`);
+      return data;
+    },
+  });
+}
+
+export function useGetBeachReportsByBeachID(id: number) {
+  return useQuery<BeachReportsAPIResponse[]>({
+    queryKey: ["beach-reports", id],
+    queryFn: async () => {
+      const { data } = await api.get(`/beaches/${id}/reports`);
+      return data;
+    },
+  });
+}
+
+export function useUploadCommentByBeachID(id: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (comment: {
+      rating: number;
+      conditions: string;
+      reports: number[];
+      content: string;
+      timestamp: string; // ISO String
+    }) => {
+      const { data } = await api.post(`/beaches/${id}/comments`, comment);
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["beach-reports", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pictures", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["reviews", id],
+      });
+      return data;
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+export function useUploadPictureByBeachID(id: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      file,
+      comment_id,
+    }: {
+      file: File;
+      comment_id: number;
+    }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("comment_id", comment_id.toString());
+      const { data } = await api.post(`/beaches/${id}/pictures`, formData);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["pictures", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["comments", id],
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+export function useGetCommentsByBeachID(id: number, page: number = 1) {
+  return useQuery<CommentAPIResponse>({
+    queryKey: ["comments", id],
+    queryFn: async () => {
+      const { data } = await api.get(`/beaches/${id}/comments?page=${page}`);
+      return data;
+    },
+  });
+}
+
+export function useGetReviewsByBeachID(id: number) {
+  return useQuery<ReviewAPIResponse>({
+    queryKey: ["reviews", id],
+    queryFn: async () => {
+      const { data } = await api.get(`/beaches/${id}/reviews`);
+      return data;
+    },
+  });
+}
+
+export function useDeleteCommentByBeachID(id: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (comment_id: number) => {
+      const { data } = await api.delete(
+        `/beaches/${id}/comments/${comment_id}`
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["beach-reports", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pictures", id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["reviews", id],
+      });
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
 }

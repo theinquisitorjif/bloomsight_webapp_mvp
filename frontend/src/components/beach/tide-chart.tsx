@@ -17,6 +17,14 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
+  if (!data || data.tides.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-muted-foreground">No tide data found</p>
+      </div>
+    );
+  }
+
   // Convert API times into a short display format
   const formattedChartData = data.tides.map((t) => {
     const date = new Date(t.time.replace(" ", "T")); // ensure it's valid ISO
@@ -41,6 +49,9 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
   let closestTide = formattedChartData[0];
   let smallestDiff = Infinity;
 
+  const currentTimeLabel = closestTide.time;
+  const currentTideHeight = closestTide.height;
+
   data.tides.forEach((t) => {
     const tDate = new Date(t.time.replace(" ", "T"));
     const diff = Math.abs(tDate.getTime() - now.getTime());
@@ -52,17 +63,6 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
       };
     }
   });
-
-  const currentTimeLabel = closestTide.time;
-  const currentTideHeight = closestTide.height;
-
-  if (!data.tides) {
-    return (
-      <div className="flex items-center justify-center w-full h-full">
-        <p className="text-muted-foreground">No tide data found</p>
-      </div>
-    );
-  }
 
   return (
     <>

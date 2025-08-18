@@ -13,6 +13,7 @@ import { BeachConditions } from "@/components/beach/beach-conditions";
 import { useState } from "react";
 import { ActiveSectionContext } from "@/hooks/use-section-in-view";
 import { useGetWeatherForecastByBeachID } from "@/api/beach";
+import { useLocation } from "react-router-dom";
 
 const ExampleBeach = {
   name: "Palm Beach",
@@ -25,7 +26,9 @@ export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
   const [timeOfLastClick, setTimeOfLastClick] = useState(0); // Used to disable the observer temporarily when user clicks on a link
 
-  const weatherForecastQuery = useGetWeatherForecastByBeachID(7);
+  const id = parseInt(useLocation().pathname.split("/")[2]);
+
+  const weatherForecastQuery = useGetWeatherForecastByBeachID(id);
 
   return (
     <ActiveSectionContext.Provider
@@ -49,17 +52,18 @@ export const BeachPage = () => {
           <BeachOverview weatherForecastQuery={weatherForecastQuery} />
           <Separator className="my-10" />
           <BeachConditions
+            beachId={id}
             beachName={ExampleBeach.name}
             weatherForecastQuery={weatherForecastQuery}
           />
           <Separator className="my-10" />
-          <BeachAlgae />
+          <BeachAlgae beachId={id} />
           <Separator className="my-10" />
           <BeachParking />
           <Separator className="my-10" />
-          <BeachReports />
+          <BeachReports beachId={id} />
           <Separator className="my-10" />
-          <BeachComments />
+          <BeachComments beachId={id} />
           <Separator className="my-10" />
           <BeachSafety />
           {/* <Separator className="my-10" />
