@@ -3,23 +3,28 @@ import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { BeachPhotos } from "./beach-photos";
+import { useGetReviewsByBeachID } from "@/api/beach";
 
 interface BeachHeaderProps {
   name: string;
   location: string;
   lat: number;
   lng: number;
+  beachId: number;
 }
 
 export const BeachHeader = ({
+  beachId,
   name = "No Name",
   location = "Unknown",
   lat,
   lng,
 }: BeachHeaderProps) => {
+  const reviewsQuery = useGetReviewsByBeachID(beachId);
+
   return (
     <section id="beach-header">
-      <BeachPhotos name={name} />
+      <BeachPhotos name={name} beachId={beachId} />
 
       <div className="flex justify-between mt-4">
         <div className="space-y-2">
@@ -27,13 +32,15 @@ export const BeachHeader = ({
             {name}
           </h1>
           <div className="flex-col sm:flex-row flex sm:items-center gap-4">
-            <div className="flex items-center gap-2">
-              4.6
-              <Star fill="black" size={18} />
-              <Link to="#" className="underline underline-offset-2">
-                336 reviews
-              </Link>
-            </div>
+            {reviewsQuery.data && (
+              <div className="flex items-center gap-2">
+                {reviewsQuery.data.overall_rating}
+                <Star fill="black" size={18} />
+                <Link to="#" className="underline underline-offset-2">
+                  {reviewsQuery.data.number_of_reviews} reviews
+                </Link>
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <MapPin size={18} />

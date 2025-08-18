@@ -22,7 +22,7 @@ const UserButton = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="cursor-pointer">
+      <DropdownMenuTrigger className="cursor-pointer">
         {session.user.user_metadata.picture ? (
           <Avatar className="size-9">
             <AvatarImage src={session.user.user_metadata.picture} />
@@ -31,7 +31,7 @@ const UserButton = () => {
         ) : (
           <GeneratedAvatar
             seed={session.user.user_metadata.name || "B"}
-            className="size-9 mr-3"
+            className="size-9"
           />
         )}
       </DropdownMenuTrigger>

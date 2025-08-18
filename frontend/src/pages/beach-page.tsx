@@ -12,15 +12,11 @@ import { BeachAlgae } from "@/components/beach/beach-algae";
 import { BeachConditions } from "@/components/beach/beach-conditions";
 import { useState } from "react";
 import { ActiveSectionContext } from "@/hooks/use-section-in-view";
-import { useGetWeatherForecastByBeachID } from "@/api/beach";
+import {
+  useGetBeachByBeachID,
+  useGetWeatherForecastByBeachID,
+} from "@/api/beach";
 import { useLocation } from "react-router-dom";
-
-const ExampleBeach = {
-  name: "Palm Beach",
-  location: "Palm Beach, FL",
-  lat: 26.7,
-  lng: -80.1,
-};
 
 export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
@@ -29,6 +25,13 @@ export const BeachPage = () => {
   const id = parseInt(useLocation().pathname.split("/")[2]);
 
   const weatherForecastQuery = useGetWeatherForecastByBeachID(id);
+  const beachQuery = useGetBeachByBeachID(id);
+
+  if (beachQuery.isPending) {
+    return <p>Loading...</p>;
+  } else if (!beachQuery.data) {
+    return <p>Beach not found</p>;
+  }
 
   return (
     <ActiveSectionContext.Provider
@@ -43,17 +46,20 @@ export const BeachPage = () => {
         <main className="container p-2 xl:max-w-[1000px] space-y-4">
           {/* <BeachBreadcrumb /> */}
           <BeachHeader
-            name={ExampleBeach.name}
-            location={ExampleBeach.location}
-            lat={ExampleBeach.lat}
-            lng={ExampleBeach.lng}
+            name={beachQuery.data.name}
+            location={"Florida, USA"}
+            lat={parseFloat(beachQuery.data.location.split(",")[0])}
+            lng={parseFloat(beachQuery.data.location.split(",")[1])}
+            beachId={id}
           />
-          <BeachNavigation />
+        </main>
+        <BeachNavigation />
+        <main className="container p-2 xl:max-w-[1000px] space-y-4">
           <BeachOverview weatherForecastQuery={weatherForecastQuery} />
           <Separator className="my-10" />
           <BeachConditions
             beachId={id}
-            beachName={ExampleBeach.name}
+            beachName={beachQuery.data.name}
             weatherForecastQuery={weatherForecastQuery}
           />
           <Separator className="my-10" />

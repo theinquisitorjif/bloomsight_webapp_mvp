@@ -44,6 +44,19 @@ def get_beaches():
     response = supabase.table('beaches').select('*').execute()
     return jsonify(response.data), 200
 
+# Get a beach by ID
+@app.route('/beaches/<int:id>', methods=['GET'])
+def get_beach(id):
+    response = supabase.table('beaches').select('*').eq('mapbox_id', id).execute()
+
+    if not response.data:
+        return jsonify({"error": "Beach not found"}), 404
+    
+    if len(response.data) > 1:
+        return jsonify({"error": "Multiple beaches found"}), 400
+
+    return jsonify(response.data[0]), 200
+
 
 # Manually add a beach to Supabase
 @app.route('/beaches', methods=['POST'])

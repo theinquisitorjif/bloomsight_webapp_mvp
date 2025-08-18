@@ -61,12 +61,14 @@ export const NewCommentSchema = z.object({
 
 export const CommentForm = ({
   setCommentOpen,
+  beachId,
 }: {
   setCommentOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  beachId: number;
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const useUploadPicture = useUploadPictureByBeachID(358691843);
-  const useUploadComment = useUploadCommentByBeachID(358691843);
+  const useUploadPicture = useUploadPictureByBeachID(beachId);
+  const useUploadComment = useUploadCommentByBeachID(beachId);
 
   const form = useForm<z.infer<typeof NewCommentSchema>>({
     resolver: zodResolver(NewCommentSchema),
@@ -81,8 +83,6 @@ export const CommentForm = ({
   });
 
   const onSubmit = (data: z.infer<typeof NewCommentSchema>) => {
-    console.log(data);
-
     // Submit comment
     useUploadComment
       .mutateAsync({

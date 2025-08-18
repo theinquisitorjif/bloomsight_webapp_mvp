@@ -35,7 +35,7 @@ import { toast } from "sonner";
 export const BeachComments = ({ beachId }: { beachId: number }) => {
   const { ref } = useSectionInView("comments", 0.5);
   const page = useParams().page;
-  const session = useSession();
+  const { session } = useSession();
   const navigate = useNavigate();
   const commentsQuery = useGetCommentsByBeachID(beachId, parseInt(page || "1"));
   const reviewsQuery = useGetReviewsByBeachID(beachId);
@@ -72,20 +72,21 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
             )}
 
             <Dialog open={commentOpen} onOpenChange={setCommentOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  className="px-10 rounded-full"
-                  variant="brand"
-                  size="sm"
-                  onClick={() => {
-                    if (!session) {
-                      navigate("/sign-in");
-                    }
-                  }}
-                >
-                  Add a review
-                </Button>
-              </DialogTrigger>
+              <Button
+                className="px-10 rounded-full"
+                variant="brand"
+                size="sm"
+                onClick={() => {
+                  if (!session) {
+                    navigate("/auth/sign-in");
+                  } else {
+                    setCommentOpen(true);
+                  }
+                }}
+              >
+                Add a review
+              </Button>
+
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle className="sr-only">Add a review</DialogTitle>
@@ -93,7 +94,10 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
                     Add a review for this beach
                   </DialogDescription>
                 </DialogHeader>
-                <CommentForm setCommentOpen={setCommentOpen} />
+                <CommentForm
+                  beachId={beachId}
+                  setCommentOpen={setCommentOpen}
+                />
               </DialogContent>
             </Dialog>
           </div>
@@ -111,7 +115,7 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
             return (
               <div key={key}>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-2">
                     {comment.user.picture ? (
                       <Avatar className="size-12">
                         <AvatarImage src={comment.user.picture || ""} />
@@ -192,7 +196,7 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent align="end" className="w-72">
-                        {session?.session?.user.id === comment.user.id && (
+                        {session?.user.id === comment.user.id && (
                           <DialogTrigger asChild>
                             <DropdownMenuItem className="cursor-pointer flex items-center justify-between">
                               Delete <Trash />

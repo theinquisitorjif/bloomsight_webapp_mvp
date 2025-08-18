@@ -15,6 +15,20 @@ import {
   type ReviewAPIResponse,
   type CommentAPIResponse,
 } from "@/types/comment";
+import {
+  type BeachAPIResponse,
+  type BeachPicturesAPIResponse,
+} from "@/types/beach";
+
+export function useGetBeachByBeachID(id: number) {
+  return useQuery<BeachAPIResponse>({
+    queryKey: ["beach", id],
+    queryFn: async () => {
+      const { data } = await api.get(`/beaches/${id}`);
+      return data;
+    },
+  });
+}
 
 export function useGetParkingSpotsByBeachID(id: number) {
   return useQuery<ParkingSpotsAPIResponse>({
@@ -148,6 +162,16 @@ export function useUploadPictureByBeachID(id: number) {
     },
     onError: (error) => {
       console.error(error);
+    },
+  });
+}
+
+export function useGetPicturesByBeachID(id: number) {
+  return useQuery<BeachPicturesAPIResponse[]>({
+    queryKey: ["pictures", id],
+    queryFn: async () => {
+      const { data } = await api.get(`/beaches/${id}/pictures`);
+      return data;
     },
   });
 }
