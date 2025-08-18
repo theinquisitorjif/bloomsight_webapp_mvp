@@ -106,7 +106,7 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
       id="parking"
       className="grid grid-cols-1 lg:grid-cols-3 gap-10"
     >
-      <div className="lg:col-span-1">
+      {/* <div className="lg:col-span-1">
         <h3 className="text-2xl font-semibold tracking-tight">
           Plan your visit
         </h3>
@@ -154,8 +154,8 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
             </Button>
           </ul>
         </div>
-      </div>
-      <div className="lg:col-span-2">
+      </div> */}
+      <div className="lg:col-span-3">
         <h3 className="text-2xl font-semibold tracking-tight">Parking Spots</h3>
 
         <div

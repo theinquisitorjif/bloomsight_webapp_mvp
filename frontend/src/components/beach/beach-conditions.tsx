@@ -10,7 +10,7 @@ import { useSectionInView } from "@/hooks/use-section-in-view";
 import { SeverityBadge } from "../severity-badge";
 import { TideChart } from "./tide-chart";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
-import { FaLocationArrow } from "react-icons/fa";
+import { FaLongArrowAltRight } from "react-icons/fa";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { WeatherForecastAPIResponse } from "@/types/weather-forecast";
 import { useGetTidePredictionByBeachID } from "@/api/beach";
@@ -255,11 +255,11 @@ const WindSpeeds = ({
           />
         </RadarChart>
 
-        <FaLocationArrow
+        <FaLongArrowAltRight
           size={20}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 text-primary/80 transition-transform duration-500"
           style={{
-            transform: `rotate(${degrees ?? 0}deg)`,
+            transform: `rotate(-${degrees ?? 0}deg)`,
           }}
         />
       </div>
