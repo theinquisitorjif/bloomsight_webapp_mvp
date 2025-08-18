@@ -7,6 +7,7 @@ import { SeverityBadge } from "../severity-badge";
 import { useGetBeachReportsByBeachID, useGetCommentReports } from "@/api/beach";
 import { Loader2 } from "lucide-react";
 import { ReportsIconMap, SeverityNumberToString } from "@/types/report";
+import { cn } from "@/lib/utils";
 
 export const BeachReports = ({ beachId }: { beachId: number }) => {
   const { ref } = useSectionInView("parking", 0.5);
@@ -36,6 +37,30 @@ export const BeachReports = ({ beachId }: { beachId: number }) => {
     );
   }
 
+  const reportCounts = reportTypes.data
+    .map((report) => {
+      const combinedReports = beachReports.data.filter(
+        (r) => r.condition_id === report.id
+      );
+
+      if (combinedReports.length === 0) return null;
+
+      return {
+        report,
+        count: combinedReports.length,
+      };
+    })
+    .filter(Boolean);
+
+  const reportContainerHeight =
+    reportCounts.length < 2
+      ? "max-h-[50px] h-[50px]"
+      : reportCounts.length < 3
+      ? "max-h-[120px] h-[120px]"
+      : reportCounts.length < 4
+      ? "max-h-[175px] h-[175px]"
+      : "max-h-[330px] h-[330px]";
+
   return (
     <section ref={ref} id="reports">
       <h3 className="text-2xl font-semibold tracking-tight">
@@ -45,7 +70,7 @@ export const BeachReports = ({ beachId }: { beachId: number }) => {
         </span>
       </h3>
 
-      <ScrollArea className="max-h-[400px] h-[400px] mt-4">
+      <ScrollArea className={cn("mt-4", reportContainerHeight)}>
         <div className="flex flex-col gap-7">
           {reportTypes.data.map((report) => {
             const combinedReports = beachReports.data.filter(
