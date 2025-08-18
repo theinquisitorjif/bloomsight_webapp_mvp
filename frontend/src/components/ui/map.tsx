@@ -280,8 +280,6 @@ const Map = () => {
                   More Info
                 </button>
               </div>
-
-
             `;
 
             } else {
