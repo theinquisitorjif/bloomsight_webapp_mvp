@@ -51,7 +51,7 @@ const Map = () => {
       }
   }
 
-  const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number) => {
+  const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number, id?: string) => {
     try {
       if (lat && lng) {
         const tolerance = 0.005;
@@ -71,7 +71,6 @@ const Map = () => {
         }
 
         if (forecasts && forecasts.length > 0) {
-
           if (forecasts[0].current['cloud_cover'] >= 0 && forecasts[0].current['cloud_cover'] < 20) {
                 forecasts[0].current['Cloud Cover'] = "Mostly Clear";
             } else if (forecasts[0].current['cloud_cover'] >= 20 && forecasts[0].current['cloud_cover'] < 50) {
@@ -82,6 +81,10 @@ const Map = () => {
                 forecasts[0].current['Cloud Cover'] = "Overcast";
             }
           console.log('Forecast found:', forecasts[0].current);
+          const response = await fetch(`http://localhost:5002/beaches/${id}/weather-forecast`);
+          const data = await response.json();
+          console.log('Data from API:', data);
+
           return forecasts[0].current;
         }
 
@@ -207,16 +210,15 @@ const Map = () => {
         mapRef.current?.on('click', 'points-layer', async (e) => {
           const feature = e.features?.[0];
           if (!feature || feature.geometry.type !== 'Point') return;
-
           const coords = feature.geometry.coordinates as [number, number];
           const [lng, lat] = coords;
           const beachName = feature.properties?.name || 'Unknown Beach';
-          const beachId = feature.properties?.id;
+          const beachId = feature.properties? feature.properties['@id'].slice(5): null;
 
           try {
             // Fetch weather data and get red tide data from local file
             const [beachData, redTideData] = await Promise.all([
-              fetchBeachForecast(beachName, lat, lng),
+              fetchBeachForecast(beachName, lat, lng, beachId),
               getRedTideData(beachName, lat, lng),
             ]);
 
@@ -248,7 +250,7 @@ const Map = () => {
               </div>
               <div class="weather-row">
                 <div class="weather-category">Air Quality</div>
-                <div class="weather-rating">${beachId}</div>
+                <div class="weather-rating">N/A</div>
               </div>
               <div class="weather-row">
                 <div class="weather-category">UV Index</div>
@@ -281,9 +283,6 @@ const Map = () => {
                     </div>
                   </div>
                 ` : ''}
-                <div style="font-size: 12px; color: #666; margin-top: 10px;">
-                  Beach not found in database
-                </div>
               `;
             }
 
@@ -347,15 +346,6 @@ const Map = () => {
           if (!hoverSource) return;
           hoverSource.setData({ type: 'FeatureCollection', features: [] });
         });
-
-        try {
-          const style = mapRef.current?.getStyle();
-          if (style?.layers) {
-            console.log('Style layer IDs:', style.layers.map(l => l.id));
-          }
-        } catch (err) {
-          // ignore
-        }
       });
 
       // Add a small marker for debugging/center marker
