@@ -32,7 +32,7 @@ export function useGetBeachByBeachID(id: number) {
 
 export function useGetParkingSpotsByBeachID(id: number) {
   return useQuery<ParkingSpotsAPIResponse>({
-    queryKey: ["parking-spots"],
+    queryKey: ["parking-spots", id],
     queryFn: async () => {
       const { data } = await api.get(`/beaches/${id}/parking-spots`);
       return data;

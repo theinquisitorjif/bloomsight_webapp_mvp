@@ -65,7 +65,7 @@ export const BeachPage = () => {
           <Separator className="my-10" />
           <BeachAlgae beachId={id} />
           <Separator className="my-10" />
-          <BeachParking />
+          <BeachParking beachId={id} />
           <Separator className="my-10" />
           <BeachReports beachId={id} />
           <Separator className="my-10" />
