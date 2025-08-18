@@ -47,7 +47,7 @@ export const Footer = () => {
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
                 <li className="mb-4">
                   <a
-                    href="https://www.bloomsight.net/"
+                    href="https://www.instagram.com/bloom.sght/"
                     className="hover:underline "
                   >
                     Instagram

@@ -81,11 +81,18 @@ const Map = () => {
                 forecasts[0].current['Cloud Cover'] = "Overcast";
             }
           console.log('Forecast found:', forecasts[0].current);
+          // get air quality
           const response = await fetch(`http://localhost:5002/beaches/${id}/weather-forecast`);
           const data = await response.json();
-          console.log('Data from API:', data);
+          const airQ = Math.round(data[0]["air_quality"]);
 
-          return forecasts[0].current;
+          // get tides
+          const tidesres = await fetch(`http://localhost:5002/beaches/${id}/tide-prediction`);
+          const tidesData = await tidesres.json();
+          console.log(tidesData);
+
+
+          return { forecast: forecasts[0].current, airQ };
         }
 
         console.log('No forecast found for coordinates:', lat, lng);
@@ -216,16 +223,17 @@ const Map = () => {
           const beachId = feature.properties? feature.properties['@id'].slice(5): null;
 
           try {
-            // Fetch weather data and get red tide data from local file
             const [beachData, redTideData] = await Promise.all([
-              fetchBeachForecast(beachName, lat, lng, beachId),
+              fetchBeachForecast(beachName, lat, lng, beachId), // returns { forecast, airQ }
               getRedTideData(beachName, lat, lng),
             ]);
+            
+            console.log(beachData?.forecast, beachData?.airQ, redTideData);
 
             let popupContent;
 
             if (beachData) {
-              const forecast = beachData;
+              const forecast = beachData.forecast;
 
               popupContent = `
               <div class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
@@ -250,7 +258,7 @@ const Map = () => {
               </div>
               <div class="weather-row">
                 <div class="weather-category">Air Quality</div>
-                <div class="weather-rating">N/A</div>
+                <div class="weather-rating">${beachData.airQ}</div>
               </div>
               <div class="weather-row">
                 <div class="weather-category">UV Index</div>
