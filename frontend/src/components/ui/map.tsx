@@ -89,10 +89,10 @@ const Map = () => {
           // get tides
           const tidesres = await fetch(`http://localhost:5002/beaches/${id}/tide-prediction`);
           const tidesData = await tidesres.json();
-          console.log(tidesData);
+          const cTide = tidesData.tides[4];
 
 
-          return { forecast: forecasts[0].current, airQ };
+          return { forecast: forecasts[0].current, airQ, cTide };
         }
 
         console.log('No forecast found for coordinates:', lat, lng);
@@ -224,11 +224,11 @@ const Map = () => {
 
           try {
             const [beachData, redTideData] = await Promise.all([
-              fetchBeachForecast(beachName, lat, lng, beachId), // returns { forecast, airQ }
+              fetchBeachForecast(beachName, lat, lng, beachId), // returns { forecast, airQ, cTide }
               getRedTideData(beachName, lat, lng),
             ]);
             
-            console.log(beachData?.forecast, beachData?.airQ, redTideData);
+            console.log(beachData?.cTide);
 
             let popupContent;
 
@@ -254,7 +254,7 @@ const Map = () => {
 
               <div class="weather-row">
                 <div class="weather-category">Tides</div>
-                <div class="weather-rating">${forecast.tides || 'N/A'}</div>
+                <div class="weather-rating"> ${beachData.cTide.height >= 0.5 ? 'High' : 'Low'} </div>
               </div>
               <div class="weather-row">
                 <div class="weather-category">Air Quality</div>
@@ -271,11 +271,14 @@ const Map = () => {
                 </div>
               </div>
               <div style="display: flex; justify-content: center; align-items: center; height: 20px; margin-top: 5px;">
-              <a href="/" 
-                style=" color: rgb(106, 106, 106); padding: 0px 8px; font-size: 11px; border-radius: 8px; text-align: center; text-decoration: underline; ">
-                More Info
-              </a>
-            </div>
+                <button 
+                  data-beach-id="${beachId}"
+                  style="background: none; border: none; color: rgb(106, 106, 106); padding: 0px 8px; font-size: 11px; border-radius: 8px; text-align: center; text-decoration: underline; cursor: pointer;"
+                  onClick="console.log('${beachId}'); window.location.href='/'">
+                  More Info
+                </button>
+              </div>
+
 
             `;
 
