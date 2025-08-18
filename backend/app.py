@@ -64,21 +64,21 @@ def add_beach():
 @app.route('/beaches/<int:id>', methods=['PUT'])
 def update_beach(id):
     data = request.json
-    result = supabase.table("beaches").update(data).eq('id', id).execute()
+    result = supabase.table("beaches").update(data).eq('mapbox_id', id).execute()
     return jsonify(result.data), 200
 
 
 # Delete a beach from Supabase
 @app.route('/beaches/<int:id>', methods=['DELETE'])
 def delete_beach(id):
-    result = supabase.table("beaches").delete().eq('id', id).execute()
+    result = supabase.table("beaches").delete().eq('mapbox_id', id).execute()
     return jsonify({"message": "Deleted"}), 204
 
 # Beach Conditions Endpoint
 @app.route('/beaches/<int:beach_id>/riptide-risk', methods=['GET'])
 def beach_conditions(beach_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -104,7 +104,7 @@ def beach_conditions(beach_id):
 @app.route('/beaches/<int:beach_id>/parking-spots', methods=['GET'])
 def beach_parking(beach_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -123,7 +123,7 @@ def beach_parking(beach_id):
 @app.route("/beaches/<int:beach_id>/tide-prediction", methods=["GET"])
 def tide_prediction(beach_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -145,7 +145,7 @@ def tide_prediction(beach_id):
 @app.route('/beaches/<int:beach_id>/weather-forecast', methods=['GET'])
 def beach_weather_forecast(beach_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -169,7 +169,7 @@ def beach_weather_forecast(beach_id):
 @app.route('/beaches/<int:beach_id>/water-quality', methods=['GET'])
 def beach_water_quality(beach_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -214,10 +214,13 @@ def add_picture(beach_id):
         return jsonify({"error": "Not authenticated"}), 401
     user_id = user["id"]
     file = request.files.get("file")
-    comment_id = request.form.get("comment_id")
+    comment_id = int(comment_id) if comment_id else None
 
     if not file:
         return jsonify({"error": "No file provided"}), 400
+    
+    if not comment_id:
+        return jsonify({"error": "No comment ID provided"}), 400
 
     # Create unique filename
     file_ext = file.filename.split(".")[-1]
@@ -291,17 +294,21 @@ def add_comment(beach_id):
         return jsonify({"error": "Not authenticated"}), 401
     user_id = user["id"]
 
+    if not user_id:
+        return jsonify({"error": "Not authenticated. User ID not found."}), 401
+
     data = request.json
     content = data.get("content")
     rating = data.get("rating")
-    conditions = data.get("conditions")
+    conditions = data.get("conditions") # Just a string seperated by commas
     reports = data.get("reports") # Array of report IDs (i.e. 4, 5, 6...)
+    timestamp = data.get("timestamp")
 
     if (rating < 1) or (rating > 5):
         return jsonify({"error": "Rating must be between 1 and 5"}), 400
     
-    if (not user_id) or (not content):
-        return jsonify({"error": "Missing required fields"}), 400
+    if (not rating) or (not timestamp):
+        return jsonify({"error": "Missing required fields: rating, timestamp"}), 400
 
     res = supabase.table("comments").insert({
         "user_id": user_id,
@@ -310,7 +317,7 @@ def add_comment(beach_id):
         "rating": rating,
         "conditions": conditions,
         "likes": 0,
-        "timestamp": datetime.datetime.utcnow().isoformat()
+        "timestamp": timestamp
     }).execute()
 
     # Insert reports if they exist
@@ -376,7 +383,11 @@ def get_reports(beach_id):
 
     return jsonify(valid_reports)
 
-   
+@app.route("/beaches/reports", methods=["GET"])
+def get_beach_reports():
+    res = supabase.table("conditions").select("*").eq("type", 1).execute()
+    return jsonify(res.data)
+ 
 @app.route("/beaches/<int:beach_id>/pictures", methods=["GET"])
 def get_beach_pictures(beach_id):
     res = supabase.table("pictures").select("*").eq("beach_id", beach_id).order("timestamp", desc=True).execute()
