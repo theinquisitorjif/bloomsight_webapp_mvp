@@ -28,6 +28,7 @@ const Map = () => {
   }
 
     function getCloudCoverColor(cloudCover: string) {
+      //add in checking for rain and nighttime
       if (cloudCover == "Mostly Clear") {
           return "linear-gradient(to bottom right, #B8DCFF, #38A2FF)"; // mostly clear
       } else if (cloudCover == "Partly Cloudy") {
@@ -40,6 +41,7 @@ const Map = () => {
     }
   
   function getCardImg(cloudCover: string){
+    //add in checking for rain and nighttime
     if (cloudCover == "Mostly Clear") {
         return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 40px;">';
       } else if (cloudCover == "Partly Cloudy") {
@@ -274,7 +276,7 @@ const Map = () => {
                 <button 
                   data-beach-id="${beachId}"
                   style="background: none; border: none; color: rgb(106, 106, 106); padding: 0px 8px; font-size: 11px; border-radius: 8px; text-align: center; text-decoration: underline; cursor: pointer;"
-                  onClick="console.log('${beachId}'); window.location.href='/'">
+                  onClick="window.location.href='/beaches/${beachId}';">
                   More Info
                 </button>
               </div>
