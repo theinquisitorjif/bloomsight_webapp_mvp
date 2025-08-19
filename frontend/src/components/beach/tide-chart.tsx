@@ -17,6 +17,14 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
+  if (!data || data.tides.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-muted-foreground">No tide data found</p>
+      </div>
+    );
+  }
+
   // Convert API times into a short display format
   const formattedChartData = data.tides.map((t) => {
     const date = new Date(t.time.replace(" ", "T")); // ensure it's valid ISO
@@ -29,40 +37,31 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
     };
   });
 
-  // Reference markers for high/low tide
-  const highTideIndex = formattedChartData.findIndex(
-    (p) => p.time === formatTimeLabel(data.high_tide.time)
-  );
-  const lowTideIndex = formattedChartData.findIndex(
-    (p) => p.time === formatTimeLabel(data.low_tide.time)
-  );
-
-  const now = new Date();
-  let closestTide = formattedChartData[0];
-  let smallestDiff = Infinity;
-
-  data.tides.forEach((t) => {
-    const tDate = new Date(t.time.replace(" ", "T"));
-    const diff = Math.abs(tDate.getTime() - now.getTime());
-    if (diff < smallestDiff) {
-      smallestDiff = diff;
-      closestTide = {
-        time: formatTimeLabel(t.time),
-        height: Number(t.height.toFixed(2)),
-      };
-    }
-  });
-
-  const currentTimeLabel = closestTide.time;
-  const currentTideHeight = closestTide.height;
-
-  if (!data.tides) {
+  if (formattedChartData.length === 0) {
     return (
       <div className="flex items-center justify-center w-full h-full">
         <p className="text-muted-foreground">No tide data found</p>
       </div>
     );
   }
+
+  // Reference markers for high/low tide
+  const highTideIndex =
+    data.high_tide && data.high_tide.time
+      ? formattedChartData.findIndex(
+          (p) => p.time === formatTimeLabel(data.high_tide.time)
+        )
+      : -1;
+
+  const lowTideIndex =
+    data.low_tide && data.low_tide.time
+      ? formattedChartData.findIndex(
+          (p) => p.time === formatTimeLabel(data.low_tide.time)
+        )
+      : -1;
+
+  const currentTimeLabel = formattedChartData[4].time;
+  const currentTideHeight = formattedChartData[4].height;
 
   return (
     <>
@@ -116,7 +115,7 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
             strokeWidth={2}
           />
 
-          {highTideIndex >= 0 && (
+          {highTideIndex >= 0 && data.high_tide && (
             <ReferenceLine
               x={formattedChartData[highTideIndex].time}
               stroke="black"
@@ -131,7 +130,7 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
             />
           )}
 
-          {lowTideIndex >= 0 && (
+          {lowTideIndex >= 0 && data.low_tide && (
             <ReferenceLine
               x={formattedChartData[lowTideIndex].time}
               stroke="gray"

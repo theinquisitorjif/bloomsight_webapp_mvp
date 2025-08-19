@@ -16,7 +16,6 @@ import {
   POOR_RATING_CONDITIONS,
   type ConditionType,
 } from "@/types/conditions";
-import { reportsExamples } from "@/types/report";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -24,78 +23,169 @@ import {
   CalendarIcon,
   Check,
   ImageIcon,
+  Loader2,
   UploadIcon,
   XIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import z from "zod";
+import { useForm, useFormContext } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormField } from "../ui/form";
+import {
+  useGetCommentReports,
+  useUploadCommentByBeachID,
+  useUploadPictureByBeachID,
+} from "@/api/beach";
+import { ReportsIconMap, type ReportAPIResponse } from "@/types/report";
+import { toast } from "sonner";
 
 const steps = [1, 2, 3, 4, 5];
 
-export const CommentForm = () => {
+export const NewCommentSchema = z.object({
+  rating: z.number(),
+  rating_conditions: z.array(z.string()), // Condition strings
+  reports: z.array(z.number()), // Report IDs
+  content: z.string().optional(),
+  photos: z.array(
+    z.object({
+      file: z.instanceof(File),
+      id: z.string(),
+      preview: z.string().optional(),
+    })
+  ),
+  date: z.date(),
+});
+
+export const CommentForm = ({
+  setCommentOpen,
+  beachId,
+}: {
+  setCommentOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  beachId: number;
+}) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const useUploadPicture = useUploadPictureByBeachID(beachId);
+  const useUploadComment = useUploadCommentByBeachID(beachId);
+
+  const form = useForm<z.infer<typeof NewCommentSchema>>({
+    resolver: zodResolver(NewCommentSchema),
+    defaultValues: {
+      rating: 0,
+      rating_conditions: [],
+      reports: [],
+      content: "",
+      photos: [],
+      date: new Date(),
+    },
+  });
+
+  const onSubmit = (data: z.infer<typeof NewCommentSchema>) => {
+    // Submit comment
+    useUploadComment
+      .mutateAsync({
+        rating: data.rating,
+        conditions: data.rating_conditions.join(","),
+        reports: data.reports,
+        content: data.content || "",
+        timestamp: data.date.toISOString(),
+      })
+      .then((comment_data) => {
+        // Submit photos
+        data.photos.forEach((photo) => {
+          useUploadPicture.mutateAsync({
+            file: photo.file,
+            comment_id: comment_data.id,
+          });
+        });
+      })
+      .then(() => {
+        setCommentOpen(false);
+        toast.success("Comment submitted successfully!");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   return (
-    <div>
-      <div className="min-h-[425px]">
-        {currentStep === 1 && <RatingSelectForm />}
-        {currentStep === 2 && <ReportsSelectForm />}
-        {currentStep === 3 && <CommentInputForm />}
-        {currentStep === 4 && <PhotosInputForm />}
-        {currentStep === 5 && <DateInputForm />}
-      </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="min-h-[425px]">
+          {currentStep === 1 && <RatingSelectForm />}
+          {currentStep === 2 && <ReportsSelectForm />}
+          {currentStep === 3 && <CommentInputForm />}
+          {currentStep === 4 && <PhotosInputForm />}
+          {currentStep === 5 && <DateInputForm />}
+        </div>
 
-      <Stepper
-        value={currentStep}
-        onValueChange={setCurrentStep}
-        className="gap-1 mt-20"
-      >
-        {steps.map((step) => (
-          <StepperItem key={step} step={step} className="flex-1">
-            <StepperTrigger
-              className="w-full flex-col items-start gap-2"
-              asChild
-            >
-              <StepperIndicator asChild className="bg-border h-1 w-full">
-                <span className="sr-only">{step}</span>
-              </StepperIndicator>
-            </StepperTrigger>
-          </StepperItem>
-        ))}
-      </Stepper>
+        <Stepper
+          value={currentStep}
+          onValueChange={setCurrentStep}
+          className="gap-1 mt-20"
+        >
+          {steps.map((step) => (
+            <StepperItem key={step} step={step} className="flex-1">
+              <StepperTrigger
+                className="w-full flex-col items-start gap-2"
+                asChild
+              >
+                <StepperIndicator asChild className="bg-border h-1 w-full">
+                  <span className="sr-only">{step}</span>
+                </StepperIndicator>
+              </StepperTrigger>
+            </StepperItem>
+          ))}
+        </Stepper>
 
-      <div className="flex items-center gap-2 justify-end mt-4">
-        <Button
-          className="shrink-0 select-none w-20 rounded-full cursor-pointer"
-          variant="ghost"
-          size="icon"
-          onClick={() => setCurrentStep((prev) => prev - 1)}
-          disabled={currentStep === 1}
-          aria-label="Prev step"
-        >
-          Back
-        </Button>
-        <Button
-          className="shrink-0 select-none w-20 rounded-full cursor-pointer"
-          variant={currentStep === steps.length ? "brand" : "outline"}
-          onClick={() => {
-            if (currentStep === steps.length) return;
-            setCurrentStep((prev) => prev + 1);
-          }}
-          aria-label="Next step"
-        >
-          {currentStep === steps.length ? "Submit" : "Next"}
-        </Button>
-      </div>
-    </div>
+        <div className="flex items-center gap-2 justify-end mt-4">
+          <Button
+            className="shrink-0 select-none w-20 rounded-full cursor-pointer"
+            variant="ghost"
+            size="icon"
+            onClick={() => setCurrentStep((prev) => prev - 1)}
+            disabled={
+              currentStep === 1 ||
+              useUploadComment.isPending ||
+              useUploadPicture.isPending
+            }
+            aria-label="Prev step"
+            type="button"
+          >
+            Back
+          </Button>
+          <Button
+            className="shrink-0 select-none w-20 rounded-full cursor-pointer"
+            variant={currentStep === steps.length ? "brand" : "outline"}
+            onClick={() => {
+              if (currentStep === steps.length) {
+                form.handleSubmit(onSubmit)();
+                return;
+              }
+              setCurrentStep((prev) => prev + 1);
+            }}
+            type="button" // Prevent form submission because clicking the last next button causes submit
+            aria-label="Next step"
+            disabled={useUploadComment.isPending || useUploadPicture.isPending}
+          >
+            {currentStep === steps.length ? "Submit" : "Next"}
+            {(useUploadComment.isPending || useUploadPicture.isPending) && (
+              <Loader2 className="animate-spin" />
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 
 const RatingSelectForm = () => {
-  const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [conditions, setConditions] = useState<ConditionType[]>([]);
+  const form = useFormContext<z.infer<typeof NewCommentSchema>>();
 
   const RATING_CONDITIONS: Record<number, ConditionType[]> = {
+    0: [],
     1: POOR_RATING_CONDITIONS,
     2: POOR_RATING_CONDITIONS,
     3: OKAY_RATING_CONDITIONS,
@@ -104,10 +194,13 @@ const RatingSelectForm = () => {
   };
 
   const toggleCondition = (condition: ConditionType) => {
-    setConditions((prev) =>
-      prev.includes(condition)
-        ? prev.filter((c) => c !== condition)
-        : [...prev, condition]
+    const conditions = form.getValues("rating_conditions");
+
+    form.setValue(
+      "rating_conditions",
+      conditions.includes(condition)
+        ? conditions.filter((c) => c !== condition)
+        : [...conditions, condition]
     );
   };
 
@@ -118,40 +211,48 @@ const RatingSelectForm = () => {
         {[1, 2, 3, 4, 5].map((order) => (
           <RatingStar
             key={order}
-            selectedRating={selectedRating}
-            setSelectedRating={setSelectedRating}
+            selectedRating={form.watch("rating")}
+            setSelectedRating={(rating) => {
+              if (rating === form.watch("rating")) {
+                form.setValue("rating", 0);
+              }
+              form.setValue("rating", rating);
+            }}
             order={order}
           />
         ))}
       </div>
 
-      {selectedRating && (
+      {form.watch("rating") ? (
         <div>
           <p className="mt-10 mb-2 text-lg font-medium">Tell us about it</p>
           <div className="flex flex-wrap gap-2">
-            {(RATING_CONDITIONS[selectedRating] || []).map((condition) => (
-              <Button
-                key={condition}
-                variant="outline"
-                className={clsx(
-                  conditions.includes(condition)
-                    ? "border-primary transition-colors focus:ring-1 focus:ring-offset-1 focus:ring-primary/80"
-                    : "",
-                  "cursor-pointer hover:border-primary/50 py-6 px-5"
-                )}
-                onClick={() => {
-                  toggleCondition(condition);
-                }}
-              >
-                {condition}{" "}
-                {conditions.includes(condition) && (
-                  <Check size={30} className="ml-2" />
-                )}
-              </Button>
-            ))}
+            {(RATING_CONDITIONS[form.watch("rating")] || []).map(
+              (condition) => (
+                <Button
+                  key={condition}
+                  variant="outline"
+                  type="button"
+                  className={clsx(
+                    form.watch("rating_conditions").includes(condition)
+                      ? "border-primary transition-colors focus:ring-1 focus:ring-offset-1 focus:ring-primary/80"
+                      : "",
+                    "cursor-pointer hover:border-primary/50 py-6 px-5"
+                  )}
+                  onClick={() => {
+                    toggleCondition(condition);
+                  }}
+                >
+                  {condition}{" "}
+                  {form.watch("rating_conditions").includes(condition) && (
+                    <Check size={30} className="ml-2" />
+                  )}
+                </Button>
+              )
+            )}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
@@ -161,8 +262,8 @@ const RatingStar = ({
   setSelectedRating,
   order,
 }: {
-  selectedRating: number | null;
-  setSelectedRating: (number: number | null) => void;
+  selectedRating: number;
+  setSelectedRating: (number: number) => void;
   order: number;
 }) => {
   return (
@@ -172,9 +273,10 @@ const RatingStar = ({
         selectedRating && selectedRating >= order ? "text-primary" : "",
         "cursor-pointer text-muted-foreground/30 hover:text-primary hover:scale-120"
       )}
+      type="button"
       onClick={() => {
         if (selectedRating === order) {
-          setSelectedRating(null);
+          setSelectedRating(0);
         } else {
           setSelectedRating(order);
         }
@@ -184,15 +286,24 @@ const RatingStar = ({
 };
 
 const ReportsSelectForm = () => {
-  const [reports, setReports] = useState<string[]>([]);
+  const form = useFormContext<z.infer<typeof NewCommentSchema>>();
+  const reportsQuery = useGetCommentReports();
+  const selectedReports = form.watch("reports");
 
-  const toggleReport = (condition: string) => {
-    setReports((prev) =>
-      prev.includes(condition)
-        ? prev.filter((c) => c !== condition)
-        : [...prev, condition]
+  const toggleReport = (condition: ReportAPIResponse) => {
+    form.setValue(
+      "reports",
+      selectedReports.includes(condition.id)
+        ? selectedReports.filter((c) => c !== condition.id)
+        : [...selectedReports, condition.id]
     );
   };
+
+  if (reportsQuery.isLoading) return <Loader2 className="animate-spin" />;
+
+  if (!reportsQuery.data)
+    return <div>Could not load reports... move to next step or try again</div>;
+
   return (
     <div>
       <h1 className="text-2xl mb-2">Any conditions to report?</h1>
@@ -200,26 +311,30 @@ const ReportsSelectForm = () => {
 
       <div className="mt-4">
         <div className="flex flex-wrap gap-2">
-          {reportsExamples.map((report) => (
-            <Button
-              key={report.title}
-              variant="outline"
-              className={clsx(
-                reports.includes(report.title)
-                  ? "border-primary transition-colors focus:ring-1 focus:ring-offset-1 focus:ring-primary/80"
-                  : "",
-                "cursor-pointer hover:border-primary/50 py-5 px-5"
-              )}
-              onClick={() => {
-                toggleReport(report.title);
-              }}
-            >
-              <report.icon size={30} className="mr-2" /> {report.title}{" "}
-              {reports.includes(report.title) && (
-                <Check size={30} className="ml-2" />
-              )}
-            </Button>
-          ))}
+          {reportsQuery.data.map((report) => {
+            const Icon = ReportsIconMap[report.icon_name];
+
+            return (
+              <Button
+                key={report.name}
+                variant="outline"
+                type="button"
+                className={clsx(
+                  selectedReports.includes(report.id)
+                    ? "border-primary transition-colors focus:ring-1 focus:ring-offset-1 focus:ring-primary/80"
+                    : "",
+                  "cursor-pointer hover:border-primary/50 py-5 px-5"
+                )}
+                onClick={() => toggleReport(report)}
+              >
+                <Icon className="mr-2" size={30} />
+                {report.name}
+                {selectedReports.includes(report.id) && (
+                  <Check size={30} className="ml-2" />
+                )}
+              </Button>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -227,15 +342,24 @@ const ReportsSelectForm = () => {
 };
 
 const CommentInputForm = () => {
+  const form = useFormContext<z.infer<typeof NewCommentSchema>>();
   return (
     <div>
       <h1 className="text-2xl mb-2">Tell others about the beach</h1>
       <p className="text-muted-foreground">
         Share helpful details with the community
       </p>
-      <Textarea
-        className="[resize:none] mt-10 h-[300px] !text-base placeholder:text-base"
-        placeholder="Consider including cool features, tips and advice"
+
+      <FormField
+        control={form.control}
+        name="content"
+        render={({ field }) => (
+          <Textarea
+            className="[resize:none] mt-10 h-[300px] !text-base placeholder:text-base"
+            placeholder="Consider including cool features, tips and advice"
+            {...field}
+          />
+        )}
       />
       <p></p>
     </div>
@@ -243,12 +367,13 @@ const CommentInputForm = () => {
 };
 
 const PhotosInputForm = () => {
+  const form = useFormContext<z.infer<typeof NewCommentSchema>>();
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024; // 5MB default
   const maxFiles = 6;
 
   const [
-    { files, isDragging, errors },
+    { isDragging, errors },
     {
       handleDragEnter,
       handleDragLeave,
@@ -263,6 +388,28 @@ const PhotosInputForm = () => {
     maxSize,
     multiple: true,
     maxFiles,
+    onFilesAdded(addedFiles) {
+      const files = addedFiles.map((file) => {
+        return {
+          file: file.file,
+          id: file.id,
+          preview: file.preview,
+        };
+      });
+      // @ts-expect-error Weird type match erorr
+      form.setValue("photos", [...form.watch("photos"), ...files]);
+    },
+    onFilesChange(files) {
+      form.setValue(
+        "photos",
+        // @ts-expect-error Weird type match erorr
+        files.map((file) => ({
+          file: file.file,
+          id: file.id,
+          preview: file.preview,
+        }))
+      );
+    },
   });
 
   return (
@@ -280,7 +427,7 @@ const PhotosInputForm = () => {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         data-dragging={isDragging || undefined}
-        data-files={files.length > 0 || undefined}
+        data-files={form.watch("photos").length > 0 || undefined}
         className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center has-[input:focus]:ring-[3px]"
       >
         <input
@@ -288,17 +435,18 @@ const PhotosInputForm = () => {
           className="sr-only"
           aria-label="Upload image file"
         />
-        {files.length > 0 ? (
+        {form.watch("photos").length > 0 ? (
           <div className="flex w-full flex-col gap-3">
             <div className="flex items-center justify-between gap-2">
               <h3 className="truncate text-sm font-medium">
-                Uploaded Files ({files.length})
+                Uploaded Files ({form.watch("photos").length})
               </h3>
               <Button
                 variant="outline"
                 size="sm"
+                type="button"
                 onClick={openFileDialog}
-                disabled={files.length >= maxFiles}
+                disabled={form.watch("photos").length >= maxFiles}
               >
                 <UploadIcon
                   className="-ms-0.5 size-3.5 opacity-60"
@@ -309,7 +457,7 @@ const PhotosInputForm = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {files.map((file) => (
+              {form.watch("photos").map((file) => (
                 <div
                   key={file.id}
                   className="bg-accent relative aspect-square rounded-md"
@@ -322,6 +470,7 @@ const PhotosInputForm = () => {
                   <Button
                     onClick={() => removeFile(file.id)}
                     size="icon"
+                    type="button"
                     className="border-background focus-visible:border-background absolute -top-2 -right-2 size-6 rounded-full border-2 shadow-none"
                     aria-label="Remove image"
                   >
@@ -343,7 +492,12 @@ const PhotosInputForm = () => {
             <p className="text-muted-foreground text-xs">
               SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
             </p>
-            <Button variant="outline" className="mt-4" onClick={openFileDialog}>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4"
+              onClick={openFileDialog}
+            >
               <UploadIcon className="-ms-1 opacity-60" aria-hidden="true" />
               Select images
             </Button>
@@ -365,8 +519,8 @@ const PhotosInputForm = () => {
 };
 
 const DateInputForm = () => {
-  const [date, setDate] = useState<Date | undefined>();
   const id = useId();
+  const form = useFormContext<z.infer<typeof NewCommentSchema>>();
   return (
     <div>
       <div className="mb-8">
@@ -378,13 +532,19 @@ const DateInputForm = () => {
           <PopoverTrigger asChild>
             <Button
               id={id}
+              type="button"
               variant={"outline"}
               className="group bg-background hover:bg-background border-input w-full justify-between px-3 py-6 font-normal outline-offset-0 outline-none focus-visible:outline-[3px]"
             >
               <span
-                className={cn("truncate", !date && "text-muted-foreground")}
+                className={cn(
+                  "truncate",
+                  !form.watch("date") && "text-muted-foreground"
+                )}
               >
-                {date ? format(date, "PPP") : "Pick a date"}
+                {form.watch("date")
+                  ? format(form.watch("date"), "PPP")
+                  : "Pick a date"}
               </span>
               <CalendarIcon
                 size={16}
@@ -396,8 +556,11 @@ const DateInputForm = () => {
           <PopoverContent className="w-auto p-2" align="start">
             <Calendar
               mode="single"
-              selected={date}
-              onSelect={setDate}
+              selected={form.watch("date")}
+              onSelect={(date) => {
+                if (!date) return;
+                form.setValue("date", date);
+              }}
               numberOfMonths={2}
               disabled={(date) => date > new Date()}
             />

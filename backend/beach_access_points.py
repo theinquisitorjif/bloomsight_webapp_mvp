@@ -72,7 +72,7 @@ def score_access_point(coord, dist, beach_access_points):
 # ----------------------
 # Ranking function
 # ----------------------
-def rank_access_points(beach_lat, beach_lon, beach_access_points):
+def rank_access_points(beach_lat, beach_lon, beach_access_points, max_distance_miles=2.0, expand_if_none=True):
     scores = {}
     beach_coord = (beach_lat, beach_lon)
 
@@ -84,8 +84,17 @@ def rank_access_points(beach_lat, beach_lon, beach_access_points):
             continue  # skip invalid coords
 
         distance_miles = geodesic(beach_coord, local_coord).miles
+
+        # ✅ Only keep access points within the distance limit
+        if distance_miles > max_distance_miles:
+            continue
+
         score, parking_fee = score_access_point(coord, distance_miles, beach_access_points)
         scores[coord] = (score, distance_miles, parking_fee)
+
+    # If none found and expand_if_none is True → expand radius
+    if not scores and expand_if_none:
+        return rank_access_points(beach_lat, beach_lon, beach_access_points, max_distance_miles * 2)
 
     # Sort by score (highest first), keep top 5
     sorted_scores = dict(sorted(scores.items(), key=lambda x: x[1][0], reverse=True)[:5])
@@ -108,8 +117,8 @@ def main(beach_name="Treasure Island Beach Florida"):
     # Get beach location
     beach_lat, beach_lon, beach_address = get_beach_location(beach_name)
 
-    # Rank recommendations
-    top_recommendations = rank_access_points(beach_lat, beach_lon, beach_access_points)
+    # Rank recommendations (default: only within 2 miles, expands if none found)
+    top_recommendations = rank_access_points(beach_lat, beach_lon, beach_access_points, max_distance_miles=2.0)
 
     # Build JSON result
     geolocator = Nominatim(user_agent="beach_name_locator")

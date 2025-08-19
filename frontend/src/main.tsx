@@ -63,7 +63,7 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/beach",
+        path: "/beaches/:id",
         element: <BeachPage />,
       },
       {
