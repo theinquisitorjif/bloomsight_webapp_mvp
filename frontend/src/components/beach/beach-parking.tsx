@@ -67,6 +67,8 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
       .map(parseFloat);
 
     parkingSpotsQuery.data.top_access_points.forEach((spot, index) => {
+      if (!spot.coordinates || !spot.address) return;
+
       const [lat, lng] = spot.coordinates.split(",").map(parseFloat);
 
       // Add marker
