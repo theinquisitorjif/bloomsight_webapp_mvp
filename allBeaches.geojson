@@ -1,0 +1,2108 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10174230392",
+        "lifeguard": "no",
+        "name": "Siesta Key Beach",
+        "natural": "beach",
+        "supervised": "no",
+        "surface": "sand"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.535721,
+          27.246381
+        ],
+        "type": "Point"
+      },
+      "id": "node/10174230392"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10232512918",
+        "name": "South Pointe Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.130998,
+          25.767391
+        ],
+        "type": "Point"
+      },
+      "id": "node/10232512918"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10311644965",
+        "name": "Lolly's Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.864795,
+          26.372701
+        ],
+        "type": "Point"
+      },
+      "id": "node/10311644965"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10824917821",
+        "name": "Seven Pines",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.663709,
+          27.522227
+        ],
+        "type": "Point"
+      },
+      "id": "node/10824917821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1109941373",
+        "name": "Alys Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.032019,
+          30.282953
+        ],
+        "type": "Point"
+      },
+      "id": "node/1109941373"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11492748104",
+        "name": "Sandy's Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.129787,
+          25.775318
+        ],
+        "type": "Point"
+      },
+      "id": "node/11492748104"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11761684736",
+        "name": "South Venice Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.429305,
+          27.036861
+        ],
+        "type": "Point"
+      },
+      "id": "node/11761684736"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11766208647",
+        "name": "Andy Rosse Lane Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.193451,
+          26.522167
+        ],
+        "type": "Point"
+      },
+      "id": "node/11766208647"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11766208648",
+        "name": "Allison Hagerup Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.194219,
+          26.526424
+        ],
+        "type": "Point"
+      },
+      "id": "node/11766208648"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11766208653",
+        "name": "Laika Lane Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.193737,
+          26.523777
+        ],
+        "type": "Point"
+      },
+      "id": "node/11766208653"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11766208654",
+        "name": "Wightman Lane Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.193593,
+          26.523057
+        ],
+        "type": "Point"
+      },
+      "id": "node/11766208654"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11766208655",
+        "name": "Turner Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.18389,
+          26.483035
+        ],
+        "type": "Point"
+      },
+      "id": "node/11766208655"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11781627571",
+        "name": "Lowdermilk Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.810978,
+          26.162935
+        ],
+        "type": "Point"
+      },
+      "id": "node/11781627571"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12118286390",
+        "description": "18 - As últimas sereias (Lamantim)",
+        "image": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.beauvalnature.org%2Fthumbnail%2FdNwruIPwmnXl_hnpw-5I4oDXwDrw4ursk7jl7JuoGQE%2Fex%3A1%3Aso%2Fh%3A904%2Ftrim%3A1%2Fw%3A904%2Fplain%2Fs3%3A%2Fbeauvalnature.org%2Fimages%2Fd4c77b8c-13e7-4da6-bf62",
+        "name": "Costa oriental da Flórida",
+        "natural": "beach",
+        "source": "18;As últimas sereias;Lamantim"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.401821,
+          27.800447
+        ],
+        "type": "Point"
+      },
+      "id": "node/12118286390"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12413181056",
+        "name": "Cresent Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.536413,
+          27.249042
+        ],
+        "type": "Point"
+      },
+      "id": "node/12413181056"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13033777112",
+        "name": "Clubhouse Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.038664,
+          25.129298
+        ],
+        "type": "Point"
+      },
+      "id": "node/13033777112"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "alt_name": "The Beach",
+        "internet_access": "no",
+        "natural": "beach",
+        "name": "Belleair Beach",
+        "addr:street": "Gulf Boulevard",
+        "addr:city": "Belleair Beach",
+        "addr:postcode": "33786",
+        "source": "local_knowledge",
+        "@id": "node/2403859827"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.842213,
+          27.932034
+        ],
+        "type": "Point"
+      },
+      "id": "node/2403859827"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2765978148",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.188439,
+          27.239738
+        ],
+        "type": "Point"
+      },
+      "id": "node/2765978148"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2917137675",
+        "name": "South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.414788,
+          25.111868
+        ],
+        "type": "Point"
+      },
+      "id": "node/2917137675"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3085141040",
+        "name": "Golden Beach Entrance",
+        "natural": "beach",
+        "surface": "sand"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.455094,
+          27.086517
+        ],
+        "type": "Point"
+      },
+      "id": "node/3085141040"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3549005479",
+        "name": "Mickler's Landing",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.355668,
+          30.162124
+        ],
+        "type": "Point"
+      },
+      "id": "node/3549005479"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358691843",
+        "ele": "4",
+        "gnis:feature_id": "278624",
+        "name": "Big Bear Beach",
+        "natural": "beach",
+        "wikidata": "Q49320175"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.034788,
+          27.008387
+        ],
+        "type": "Point"
+      },
+      "id": "node/358691843"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358692335",
+        "ele": "0",
+        "gnis:feature_id": "279196",
+        "name": "Bonair Beach",
+        "natural": "beach",
+        "wheelchair": "yes",
+        "wikidata": "Q49320213"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.121987,
+          27.081997
+        ],
+        "type": "Point"
+      },
+      "id": "node/358692335"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358692344",
+        "ele": "1",
+        "gnis:feature_id": "279204",
+        "name": "Bonita Beach",
+        "natural": "beach",
+        "wikidata": "Q49320214"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.855088,
+          26.351472
+        ],
+        "type": "Point"
+      },
+      "id": "node/358692344"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358692793",
+        "ele": "0",
+        "gnis:feature_id": "279669",
+        "name": "Bunche Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.967329,
+          26.476033
+        ],
+        "type": "Point"
+      },
+      "id": "node/358692793"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358693288",
+        "ele": "1",
+        "gnis:feature_id": "280115",
+        "name": "Caspersen Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.442034,
+          27.05506
+        ],
+        "type": "Point"
+      },
+      "id": "node/358693288"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358694330",
+        "ele": "1",
+        "gnis:feature_id": "281029",
+        "name": "Crescent Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.540375,
+          27.255604
+        ],
+        "type": "Point"
+      },
+      "id": "node/358694330"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358694785",
+        "ele": "0",
+        "gnis:feature_id": "281603",
+        "name": "Dixie Beach",
+        "natural": "beach",
+        "wikidata": "Q49320537"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.029536,
+          26.45258
+        ],
+        "type": "Point"
+      },
+      "id": "node/358694785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358695008",
+        "ele": "2",
+        "gnis:feature_id": "281861",
+        "name": "Dunedin Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.830155,
+          28.060591
+        ],
+        "type": "Point"
+      },
+      "id": "node/358695008"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358695171",
+        "ele": "1",
+        "gnis:feature_id": "282055",
+        "name": "Eau Gallie Beach",
+        "natural": "beach",
+        "wikidata": "Q49320609"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.579774,
+          28.138902
+        ],
+        "type": "Point"
+      },
+      "id": "node/358695171"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358696387",
+        "ele": "0",
+        "gnis:feature_id": "282936",
+        "name": "Gardenville Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.393426,
+          27.839192
+        ],
+        "type": "Point"
+      },
+      "id": "node/358696387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358697340",
+        "ele": "0",
+        "gnis:feature_id": "283998",
+        "name": "Highland Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.191743,
+          25.484558
+        ],
+        "type": "Point"
+      },
+      "id": "node/358697340"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358697553",
+        "ele": "0",
+        "gnis:feature_id": "284177",
+        "name": "Hollywood Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.114211,
+          26.028145
+        ],
+        "type": "Point"
+      },
+      "id": "node/358697553"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358699440",
+        "ele": "0",
+        "gnis:feature_id": "285950",
+        "name": "Long Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.345912,
+          24.636255
+        ],
+        "type": "Point"
+      },
+      "id": "node/358699440"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358699809",
+        "ele": "1",
+        "gnis:feature_id": "286353",
+        "name": "Manatee County Beach",
+        "natural": "beach",
+        "wikidata": "Q49321954"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.713988,
+          27.499759
+        ],
+        "type": "Point"
+      },
+      "id": "node/358699809"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358701412",
+        "ele": "1",
+        "gnis:feature_id": "287559",
+        "name": "Navarre Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.862182,
+          30.379366
+        ],
+        "type": "Point"
+      },
+      "id": "node/358701412"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358701722",
+        "ele": "0",
+        "gnis:feature_id": "287691",
+        "name": "New Smyrna Beach",
+        "natural": "beach",
+        "wikidata": "Q49322222"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.889497,
+          29.028874
+        ],
+        "type": "Point"
+      },
+      "id": "node/358701722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358705841",
+        "ele": "1",
+        "gnis:feature_id": "290678",
+        "name": "Sarasota Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.562042,
+          27.270603
+        ],
+        "type": "Point"
+      },
+      "id": "node/358705841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358706000",
+        "ele": "2",
+        "gnis:feature_id": "290828",
+        "name": "Seminole Beach",
+        "natural": "beach",
+        "wikidata": "Q49324691"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.395363,
+          30.390518
+        ],
+        "type": "Point"
+      },
+      "id": "node/358706000"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358707549",
+        "ele": "0",
+        "gnis:feature_id": "291993",
+        "name": "Tahiti Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.246716,
+          25.698157
+        ],
+        "type": "Point"
+      },
+      "id": "node/358707549"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358707859",
+        "ele": "0",
+        "gnis:feature_id": "292320",
+        "name": "Titusville Beach",
+        "natural": "beach",
+        "wikidata": "Q49325022"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.583382,
+          28.597773
+        ],
+        "type": "Point"
+      },
+      "id": "node/358707859"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358708551",
+        "ele": "3",
+        "gnis:feature_id": "292801",
+        "name": "Wabasso Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.399217,
+          27.768083
+        ],
+        "type": "Point"
+      },
+      "id": "node/358708551"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358710899",
+        "ele": "1",
+        "gnis:feature_id": "295082",
+        "name": "Indian Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.556486,
+          27.363933
+        ],
+        "type": "Point"
+      },
+      "id": "node/358710899"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358711832",
+        "ele": "1",
+        "gnis:feature_id": "297336",
+        "name": "Englewood Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.356762,
+          26.918396
+        ],
+        "type": "Point"
+      },
+      "id": "node/358711832"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358713570",
+        "ele": "1",
+        "gnis:feature_id": "297954",
+        "name": "Lido Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.742878,
+          27.724751
+        ],
+        "type": "Point"
+      },
+      "id": "node/358713570"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358713740",
+        "ele": "1",
+        "gnis:feature_id": "298057",
+        "name": "Money Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.281061,
+          29.683872
+        ],
+        "type": "Point"
+      },
+      "id": "node/358713740"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358716731",
+        "ele": "0",
+        "gnis:feature_id": "299048",
+        "name": "Hernando Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.66649,
+          28.492775
+        ],
+        "type": "Point"
+      },
+      "id": "node/358716731"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358716757",
+        "ele": "1",
+        "gnis:feature_id": "299070",
+        "name": "Apollo Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.406204,
+          27.771694
+        ],
+        "type": "Point"
+      },
+      "id": "node/358716757"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358721300",
+        "ele": "1",
+        "gnis:feature_id": "300845",
+        "name": "Bonita Beach",
+        "natural": "beach",
+        "wikidata": "Q49320216"
+      },
+      "geometry": {
+        "coordinates": [
+          -83.668759,
+          29.909382
+        ],
+        "type": "Point"
+      },
+      "id": "node/358721300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358721973",
+        "ele": "0",
+        "gnis:feature_id": "301482",
+        "name": "Bahama Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.633153,
+          27.71364
+        ],
+        "type": "Point"
+      },
+      "id": "node/358721973"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358729117",
+        "ele": "0",
+        "gnis:feature_id": "304163",
+        "name": "Bahia Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.476454,
+          27.728681
+        ],
+        "type": "Point"
+      },
+      "id": "node/358729117"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358734409",
+        "ele": "1",
+        "gnis:feature_id": "307678",
+        "name": "Sand Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -84.892963,
+          29.785488
+        ],
+        "type": "Point"
+      },
+      "id": "node/358734409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358734953",
+        "ele": "1",
+        "gnis:feature_id": "308280",
+        "name": "Jensen Beach Park",
+        "natural": "beach",
+        "wikidata": "Q49507473"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.196157,
+          27.254212
+        ],
+        "type": "Point"
+      },
+      "id": "node/358734953"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358735246",
+        "ele": "6",
+        "gnis:feature_id": "308420",
+        "name": "Wilson Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -84.445455,
+          29.930207
+        ],
+        "type": "Point"
+      },
+      "id": "node/358735246"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358740257",
+        "ele": "3",
+        "gnis:feature_id": "2071666",
+        "name": "Opal Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.9625,
+          30.36472
+        ],
+        "type": "Point"
+      },
+      "id": "node/358740257"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/358741727",
+        "ele": "0",
+        "gnis:feature_id": "2077487",
+        "name": "Ocean Terrace Public Beach",
+        "natural": "beach",
+        "wikidata": "Q49322334"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.119166,
+          25.860833
+        ],
+        "type": "Point"
+      },
+      "id": "node/358741727"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3808417385",
+        "material": "concrete",
+        "name": "North Beach",
+        "natural": "beach",
+        "power": "pole"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.422368,
+          25.113538
+        ],
+        "type": "Point"
+      },
+      "id": "node/3808417385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4314910908",
+        "name": "Gringo Beach",
+        "natural": "beach",
+        "surface": "sand"
+      },
+      "geometry": {
+        "coordinates": [
+          -65.475147,
+          18.141856
+        ],
+        "type": "Point"
+      },
+      "id": "node/4314910908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4541938570",
+        "name": "Vanderbilt Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.823435,
+          26.253771
+        ],
+        "type": "Point"
+      },
+      "id": "node/4541938570"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4852214661",
+        "name": "Tiger Tail Beach public",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.744021,
+          25.947897
+        ],
+        "type": "Point"
+      },
+      "id": "node/4852214661"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859579071",
+        "name": "Rebecca's Cove Landing",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.792445,
+          26.073002
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859579071"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630211",
+        "name": "33rd Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.803137,
+          26.108789
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630214",
+        "name": "32nd Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.803252,
+          26.109724
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630214"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630641",
+        "name": "21st Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.804819,
+          26.122237
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630641"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630646",
+        "name": "18th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.805161,
+          26.125089
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630646"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630654",
+        "name": "17th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.80533,
+          26.126267
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630654"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630658",
+        "name": "16th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.805502,
+          26.127307
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630658"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630663",
+        "name": "15th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.805695,
+          26.1284
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630663"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630665",
+        "name": "14th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.805848,
+          26.129458
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630665"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630669",
+        "name": "13th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.8061,
+          26.130601
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630669"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630672",
+        "name": "10th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.806658,
+          26.134949
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630672"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630676",
+        "name": "11th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.806511,
+          26.133801
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630676"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630681",
+        "name": "Broad Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.806426,
+          26.132664
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630681"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630684",
+        "name": "9th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.806811,
+          26.136039
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630711",
+        "name": "7th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807082,
+          26.138161
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630711"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630718",
+        "name": "6th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807274,
+          26.139315
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630718"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859630923",
+        "name": "5th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807408,
+          26.140341
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859630923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859645542",
+        "name": "Public Access",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.802716,
+          26.105555
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859645542"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859656721",
+        "name": "Marco Island Resident's Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.733757,
+          25.935135
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859656721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859656722",
+        "name": "Sand Dollar Spit Beach and Landing",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.746881,
+          25.94637
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859656722"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859656732",
+        "name": "Winterberry Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.729343,
+          25.920922
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859656732"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859656733",
+        "name": "South Marco Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.728925,
+          25.912427
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859656733"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4859762944",
+        "name": "Marriott Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.731743,
+          25.930153
+        ],
+        "type": "Point"
+      },
+      "id": "node/4859762944"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4860722983",
+        "name": "Clam Pass Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.817556,
+          26.21677
+        ],
+        "type": "Point"
+      },
+      "id": "node/4860722983"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4860722984",
+        "name": "Pelican Bay Commons Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.818347,
+          26.221474
+        ],
+        "type": "Point"
+      },
+      "id": "node/4860722984"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4860722985",
+        "name": "Pelican Bay North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.819994,
+          26.235751
+        ],
+        "type": "Point"
+      },
+      "id": "node/4860722985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4860746583",
+        "name": "Seagate Beach Club",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.815819,
+          26.207746
+        ],
+        "type": "Point"
+      },
+      "id": "node/4860746583"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069545",
+        "name": "4th Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807599,
+          26.14152
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069545"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069549",
+        "name": "3rd Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807763,
+          26.142622
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069549"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069554",
+        "name": "2nd Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807891,
+          26.143672
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069554"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069557",
+        "name": "1st Avenue South Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.807967,
+          26.144826
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069557"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069560",
+        "name": "Central Avenue Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.80804,
+          26.145919
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069560"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069565",
+        "name": "1st Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.808225,
+          26.147008
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069565"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069571",
+        "name": "2nd Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.808337,
+          26.148172
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069571"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069578",
+        "name": "4th Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.808596,
+          26.150278
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069578"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069583",
+        "name": "3rd Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.808448,
+          26.149187
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069583"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069587",
+        "name": "6th Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.808918,
+          26.152542
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069587"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069591",
+        "name": "North Lake Drive Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.809052,
+          26.15355
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069591"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069602",
+        "name": "7th Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.809297,
+          26.154657
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069602"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069607",
+        "name": "8th Avenue North Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.809566,
+          26.15571
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069607"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069841",
+        "name": "Via Miramar Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.814767,
+          26.177972
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069885",
+        "name": "Vedado Way Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.8153,
+          26.186401
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069891",
+        "name": "Horizon Way Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.815611,
+          26.189211
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069891"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069905",
+        "name": "Bayview Avenue Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.825205,
+          26.262699
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069912",
+        "name": "Channel Drive Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.825467,
+          26.263805
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069912"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069921",
+        "name": "Seabreeze Avenue Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.825633,
+          26.264821
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4890069941",
+        "name": "Bluebill Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.827703,
+          26.272222
+        ],
+        "type": "Point"
+      },
+      "id": "node/4890069941"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4993527967",
+        "name": "Vilano Point",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.293828,
+          29.909621
+        ],
+        "type": "Point"
+      },
+      "id": "node/4993527967"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5067211262",
+        "name": "Murray Point",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.479583,
+          30.031307
+        ],
+        "type": "Point"
+      },
+      "id": "node/5067211262"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5067234365",
+        "name": "Little Oyster Bar Point",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.510739,
+          30.051072
+        ],
+        "type": "Point"
+      },
+      "id": "node/5067234365"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5225533324",
+        "name": "Jensen Beach",
+        "natural": "beach",
+        "surface": "sand"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.19087,
+          27.244519
+        ],
+        "type": "Point"
+      },
+      "id": "node/5225533324"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5461991172",
+        "fee": "no",
+        "name": "14th Street Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.127657,
+          25.786157
+        ],
+        "type": "Point"
+      },
+      "id": "node/5461991172"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5462507225",
+        "name": "Clearwater Beach",
+        "natural": "beach",
+        "tourism": "yes",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.828687,
+          27.984974
+        ],
+        "type": "Point"
+      },
+      "id": "node/5462507225"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5487137022",
+        "description": "Public Beach Access via East Oakland Park Boulevard. ",
+        "natural": "beach",
+        "surface": "unpaved"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.098057,
+          26.167553
+        ],
+        "type": "Point"
+      },
+      "id": "node/5487137022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5662498017",
+        "natural": "beach",
+        "surface": "concrete"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.766044,
+          28.447307
+        ],
+        "type": "Point"
+      },
+      "id": "node/5662498017"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5898656288",
+        "name": "Public Beach Access 3",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.567659,
+          27.274523
+        ],
+        "type": "Point"
+      },
+      "id": "node/5898656288"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5898656290",
+        "name": "Public Beach Access 2",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.569097,
+          27.276055
+        ],
+        "type": "Point"
+      },
+      "id": "node/5898656290"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6240836245",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.438422,
+          30.494176
+        ],
+        "type": "Point"
+      },
+      "id": "node/6240836245"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6240836251",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.441013,
+          30.496643
+        ],
+        "type": "Point"
+      },
+      "id": "node/6240836251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6241587757",
+        "name": "Bone Yard Beach",
+        "natural": "beach",
+        "surface": "sand",
+        "wikidata": "Q17511037",
+        "wikipedia": "en:Boneyard Beach (Florida)"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.448813,
+          30.50217
+        ],
+        "type": "Point"
+      },
+      "id": "node/6241587757"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6415054917",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.353956,
+          27.650069
+        ],
+        "type": "Point"
+      },
+      "id": "node/6415054917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6748857338",
+        "name": "Princess Beach",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.539362,
+          30.389931
+        ],
+        "type": "Point"
+      },
+      "id": "node/6748857338"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7029159397",
+        "name": "Hubbard's Beach",
+        "natural": "beach",
+        "surface": "sand"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.782387,
+          27.784231
+        ],
+        "type": "Point"
+      },
+      "id": "node/7029159397"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9267318638",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.627362,
+          27.777438
+        ],
+        "type": "Point"
+      },
+      "id": "node/9267318638"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9890940108",
+        "name": "Calusa Point",
+        "natural": "beach"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.074451,
+          26.51413
+        ],
+        "type": "Point"
+      },
+      "id": "node/9890940108"
+    }
+  ],
+  "type": "FeatureCollection"
+}
