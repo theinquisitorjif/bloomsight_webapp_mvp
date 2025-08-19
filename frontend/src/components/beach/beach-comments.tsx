@@ -243,11 +243,18 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
                 </div>
 
                 <div className="flex items-center flex-wrap gap-2 my-2">
-                  {comment.conditions.split(",").map((tag, key) => (
-                    <Badge variant="outline" className="rounded-full" key={key}>
-                      {tag}
-                    </Badge>
-                  ))}
+                  {(comment.conditions ?? "")
+                    .split(",")
+                    .filter(Boolean)
+                    .map((tag, key) => (
+                      <Badge
+                        variant="outline"
+                        className="rounded-full"
+                        key={key}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
                 </div>
 
                 <p className="leading-relaxed">{comment.content}</p>

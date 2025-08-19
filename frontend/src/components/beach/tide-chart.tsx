@@ -37,13 +37,28 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
     };
   });
 
+  if (formattedChartData.length === 0) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p className="text-muted-foreground">No tide data found</p>
+      </div>
+    );
+  }
+
   // Reference markers for high/low tide
-  const highTideIndex = formattedChartData.findIndex(
-    (p) => p.time === formatTimeLabel(data.high_tide.time)
-  );
-  const lowTideIndex = formattedChartData.findIndex(
-    (p) => p.time === formatTimeLabel(data.low_tide.time)
-  );
+  const highTideIndex =
+    data.high_tide && data.high_tide.time
+      ? formattedChartData.findIndex(
+          (p) => p.time === formatTimeLabel(data.high_tide.time)
+        )
+      : -1;
+
+  const lowTideIndex =
+    data.low_tide && data.low_tide.time
+      ? formattedChartData.findIndex(
+          (p) => p.time === formatTimeLabel(data.low_tide.time)
+        )
+      : -1;
 
   const now = new Date();
   let closestTide = formattedChartData[0];
@@ -116,7 +131,7 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
             strokeWidth={2}
           />
 
-          {highTideIndex >= 0 && (
+          {highTideIndex >= 0 && data.high_tide && (
             <ReferenceLine
               x={formattedChartData[highTideIndex].time}
               stroke="black"
@@ -131,7 +146,7 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
             />
           )}
 
-          {lowTideIndex >= 0 && (
+          {lowTideIndex >= 0 && data.low_tide && (
             <ReferenceLine
               x={formattedChartData[lowTideIndex].time}
               stroke="gray"

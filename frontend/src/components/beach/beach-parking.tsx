@@ -1,5 +1,5 @@
-import { Bird, Car, Mountain, TreePine, Users } from "lucide-react";
-import { Button } from "../ui/button";
+// import { Bird, Car, Mountain, TreePine, Users } from "lucide-react";
+// import { Button } from "../ui/button";
 import { useSectionInView } from "@/hooks/use-section-in-view";
 import { useEffect, useRef } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -23,7 +23,21 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
       mapInstanceRef.current.remove();
     }
 
-    const [lat, lng] = beachQuery.data.location.split(",").map(parseFloat);
+    let lat = null;
+    let lng = null;
+
+    if (beachQuery?.data?.location) {
+      const parts = beachQuery.data.location.split(",");
+      if (parts.length === 2) {
+        lat = parseFloat(parts[0]);
+        lng = parseFloat(parts[1]);
+      }
+    }
+
+    if (!lat || !lng) {
+      console.error("Invalid beach location format:", beachQuery.data.location);
+      return;
+    }
 
     const map = new mapboxgl.Map({
       container: mapRef.current,
@@ -56,7 +70,7 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
       const [lat, lng] = spot.coordinates.split(",").map(parseFloat);
 
       // Add marker
-      const marker = new mapboxgl.Marker({ color: "red" })
+      new mapboxgl.Marker({ color: "red" })
         .setLngLat([lng, lat])
         .setPopup(
           new mapboxgl.Popup().setHTML(`
