@@ -37,7 +37,8 @@ export const BeachHeader = ({
                 {reviewsQuery.data.overall_rating}
                 <Star fill="black" size={18} />
                 <Link to="#" className="underline underline-offset-2">
-                  {reviewsQuery.data.number_of_reviews} reviews
+                  {reviewsQuery.data.number_of_reviews}{" "}
+                  {reviewsQuery.data?.number_of_reviews === 1 ? "review" : "reviews"}
                 </Link>
               </div>
             )}

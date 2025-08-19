@@ -359,7 +359,7 @@ const Map = () => {
         });
       });
 
-      // Add a small marker for debugging/center marker
+      // marker for user location
       new mapboxgl.Marker()
         .setLngLat([centerLng, centerLat])
         .addTo(mapRef.current);
