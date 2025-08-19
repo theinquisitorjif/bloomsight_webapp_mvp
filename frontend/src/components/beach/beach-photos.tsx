@@ -38,7 +38,7 @@ export const BeachPhotos = ({
       <img
         src={photosQuery.data[0].image_url}
         className={cn(
-          "w-full h-[340px] rounded-lg",
+          "w-full h-[340px] rounded-lg object-cover",
           photosQuery.data.length > 2
             ? "md:rounded-l-lg md:rounded-r-none col-span-6 md:col-span-4"
             : photosQuery.data.length == 2

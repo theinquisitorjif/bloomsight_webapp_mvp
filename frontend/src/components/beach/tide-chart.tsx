@@ -60,24 +60,8 @@ export function TideChart({ data }: { data: TidePredictionAPIResponse }) {
         )
       : -1;
 
-  const now = new Date();
-  let closestTide = formattedChartData[0];
-  let smallestDiff = Infinity;
-
-  const currentTimeLabel = closestTide.time;
-  const currentTideHeight = closestTide.height;
-
-  data.tides.forEach((t) => {
-    const tDate = new Date(t.time.replace(" ", "T"));
-    const diff = Math.abs(tDate.getTime() - now.getTime());
-    if (diff < smallestDiff) {
-      smallestDiff = diff;
-      closestTide = {
-        time: formatTimeLabel(t.time),
-        height: Number(t.height.toFixed(2)),
-      };
-    }
-  });
+  const currentTimeLabel = formattedChartData[4].time;
+  const currentTideHeight = formattedChartData[4].height;
 
   return (
     <>
