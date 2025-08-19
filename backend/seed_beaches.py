@@ -1,67 +1,63 @@
-import json
-import os
-import requests
+# seed_beaches.py
+import os, json
+from supabase import create_client
 from dotenv import load_dotenv
 
 load_dotenv()
+url = os.environ["SUPABASE_URL"]
+key = os.environ["SUPABASE_ANON_KEY"]  
+sb = create_client(url, key)
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_ANON_KEY")
+GEOJSON_PATH = r"C:\Users\asher\bloomsight_webapp_mvp\backend\allBeaches.geojson"  
 
-HEADERS = {
-    "apikey": SUPABASE_KEY,
-    "Authorization": f"Bearer {SUPABASE_KEY}",
-    "Content-Type": "application/json",
-    "Prefer": "return=representation"
-}
-
-def insert_row(table, payload):
-    url = f"{SUPABASE_URL}/rest/v1/{table}"
-    response = requests.post(url, headers=HEADERS, json=payload)
-    response.raise_for_status()
-    return response.json()
-
-def format_feature(feature):
+def lonlat_from_feature(f):
+    g = f.get("geometry", {})
+    t = g.get("type")
+    c = g.get("coordinates")
+    if t == "Point" and isinstance(c, list) and len(c) == 2:
+        lon, lat = c
+        return lat, lon
+    # fallback: center of first ring for Polygon/MultiPolygon
     try:
-        coords = feature["geometry"]["coordinates"]
-        if len(coords) < 2:
-            raise ValueError("Invalid coordinates")
-
-        lat = coords[1]
-        lon = coords[0]
-        name = feature["properties"].get("name", "Unnamed Beach")
-        location = f"{lat}, {lon}"
-
-        return {
-            "name": name,
-            "location": location,
-            "description": "Imported from GeoJSON"
-        }
-
-    except (KeyError, TypeError, ValueError) as e:
-        print(f"Skipping invalid feature: {e}")
+        if t == "Polygon": pts = c[0]
+        elif t == "MultiPolygon": pts = c[0][0]
+        else: return None
+        xs, ys = zip(*pts)
+        return (sum(ys)/len(ys), sum(xs)/len(xs))
+    except Exception:
         return None
 
+def main():
+    with open(GEOJSON_PATH, "r", encoding="utf-8") as f:
+        gj = json.load(f)
 
-def seed_beaches(geojson_path):
-    with open(geojson_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    features = data.get("features", [])
-    total = 0
-
-    for feature in features:
-        beach = format_feature(feature)
-        if not beach:
+    rows = []
+    for feat in gj.get("features", []):
+        props = feat.get("properties", {})
+        raw_id = props.get("@id")
+        name = props.get("name")
+        if not raw_id or not name: 
             continue
-        try:
-            insert_row("beaches", beach)
-            total += 1
-            print(f"Inserted: {beach['name']}")
-        except Exception as e:
-            print(f"Failed: {beach['name']}\n{e}")
 
-    print(f"\n Done! {total} beaches seeded.")
+        # keep numeric-only (or use raw_id.replace("/", "-") if you want type)
+        mapbox_id = raw_id.split("/", 1)[-1]
+
+        loc = lonlat_from_feature(feat)
+        payload = {
+            "name": name,
+            "description": "Imported from GeoJSON",
+            "mapbox_id": mapbox_id,          # matches your column
+        }
+        if loc:
+            lat, lon = loc
+            payload["location"] = f"{lat},{lon}"
+
+        rows.append(payload)
+
+    # bulk insert in chunks
+    CHUNK = 500
+    for i in range(0, len(rows), CHUNK):
+        sb.table("beaches").insert(rows[i:i+CHUNK]).execute()
 
 if __name__ == "__main__":
-    seed_beaches("backend/export.geojson")
+    main()
