@@ -202,7 +202,7 @@ const getClosestBeaches = (
                 />
                 <div className="p-4">
                   <h3 className="font-bold text-lg text-gray-800 mb-2">{beach.name}</h3>
-                  <p className="text-blue-600 text-sm mt-2">{beach.distance}</p>
+                  <p className="text-blue-900 text-sm mt-2">{beach.distance}</p>
                 </div>
               </div>
             ))}
