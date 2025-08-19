@@ -7,11 +7,11 @@ import {
 } from "@/api/beach";
 import { Loader2 } from "lucide-react";
 
-export const BeachAlgae = () => {
+export const BeachAlgae = ({ beachId }: { beachId: number }) => {
   const { ref } = useSectionInView("algae", 0.5);
 
-  const riptideRiskQuery = useGetRiptideRiskByBeachID(12);
-  const redtideRiskQuery = useGetRedtideRiskByBeachID(12);
+  const riptideRiskQuery = useGetRiptideRiskByBeachID(beachId);
+  const redtideRiskQuery = useGetRedtideRiskByBeachID(beachId);
 
   return (
     <section ref={ref} id="algae">

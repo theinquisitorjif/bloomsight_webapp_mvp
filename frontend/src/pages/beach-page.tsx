@@ -12,20 +12,26 @@ import { BeachAlgae } from "@/components/beach/beach-algae";
 import { BeachConditions } from "@/components/beach/beach-conditions";
 import { useState } from "react";
 import { ActiveSectionContext } from "@/hooks/use-section-in-view";
-import { useGetWeatherForecastByBeachID } from "@/api/beach";
-
-const ExampleBeach = {
-  name: "Palm Beach",
-  location: "Palm Beach, FL",
-  lat: 26.7,
-  lng: -80.1,
-};
+import {
+  useGetBeachByBeachID,
+  useGetWeatherForecastByBeachID,
+} from "@/api/beach";
+import { useLocation } from "react-router-dom";
 
 export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
   const [timeOfLastClick, setTimeOfLastClick] = useState(0); // Used to disable the observer temporarily when user clicks on a link
 
-  const weatherForecastQuery = useGetWeatherForecastByBeachID(7);
+  const id = parseInt(useLocation().pathname.split("/")[2]);
+
+  const weatherForecastQuery = useGetWeatherForecastByBeachID(id);
+  const beachQuery = useGetBeachByBeachID(id);
+
+  if (beachQuery.isPending) {
+    return <p>Loading...</p>;
+  } else if (!beachQuery.data) {
+    return <p>Beach not found</p>;
+  }
 
   return (
     <ActiveSectionContext.Provider
@@ -40,26 +46,30 @@ export const BeachPage = () => {
         <main className="container p-2 xl:max-w-[1000px] space-y-4">
           {/* <BeachBreadcrumb /> */}
           <BeachHeader
-            name={ExampleBeach.name}
-            location={ExampleBeach.location}
-            lat={ExampleBeach.lat}
-            lng={ExampleBeach.lng}
+            name={beachQuery.data.name}
+            location={"Florida, USA"}
+            lat={parseFloat(beachQuery.data.location.split(",")[0])}
+            lng={parseFloat(beachQuery.data.location.split(",")[1])}
+            beachId={id}
           />
-          <BeachNavigation />
+        </main>
+        <BeachNavigation />
+        <main className="container p-2 xl:max-w-[1000px] space-y-4">
           <BeachOverview weatherForecastQuery={weatherForecastQuery} />
           <Separator className="my-10" />
           <BeachConditions
-            beachName={ExampleBeach.name}
+            beachId={id}
+            beachName={beachQuery.data.name}
             weatherForecastQuery={weatherForecastQuery}
           />
           <Separator className="my-10" />
-          <BeachAlgae />
+          <BeachAlgae beachId={id} />
           <Separator className="my-10" />
-          <BeachParking />
+          <BeachParking beachId={id} />
           <Separator className="my-10" />
-          <BeachReports />
+          <BeachReports beachId={id} />
           <Separator className="my-10" />
-          <BeachComments />
+          <BeachComments beachId={id} />
           <Separator className="my-10" />
           <BeachSafety />
           {/* <Separator className="my-10" />

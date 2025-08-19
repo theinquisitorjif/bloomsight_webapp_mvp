@@ -32,27 +32,29 @@ export const BeachNavigation = () => {
     <nav
       ref={navRef}
       className={clsx(
-        "overflow-x-auto border-t flex gap-10 border-border w-full mt-10 pb-4 sticky top-0 bg-background z-10 transition-shadow",
+        "overflow-x-auto w-full mt-10 pb-4 sticky top-0 bg-background z-10 transition-shadow",
         isSticky && "shadow-lg border-b border-t-0 border-border"
       )}
     >
-      {NavLinks.map((link) => (
-        <a
-          key={link.name}
-          href={link.href}
-          className={clsx(
-            "pt-2 font-medium",
-            activeSection === link.href.slice(1) &&
-              "font-semibold border-t-3 border-primary"
-          )}
-          onClick={() => {
-            setActiveSection(link.href.slice(1));
-            setTimeOfLastClick(Date.now());
-          }}
-        >
-          {link.name}
-        </a>
-      ))}
+      <div className="xl:max-w-[1000px] container flex gap-10 mx-auto border-t border-border ">
+        {NavLinks.map((link) => (
+          <a
+            key={link.name}
+            href={link.href}
+            className={clsx(
+              "pt-2 font-medium",
+              activeSection === link.href.slice(1) &&
+                "font-semibold border-t-3 border-primary"
+            )}
+            onClick={() => {
+              setActiveSection(link.href.slice(1));
+              setTimeOfLastClick(Date.now());
+            }}
+          >
+            {link.name}
+          </a>
+        ))}
+      </div>
     </nav>
   );
 };

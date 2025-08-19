@@ -120,10 +120,18 @@
   }
 }
 
+@layer base {
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
-  
+
 .mapboxgl-popup-content {
   min-width: 190px;
 }
@@ -133,7 +141,7 @@ html {
   padding: 2px 15px 10px 10px;
   text-align: right;
   margin-bottom: 17px;
-  position: relative; 
+  position: relative;
   min-height: 85px;
   overflow: auto;
 }
