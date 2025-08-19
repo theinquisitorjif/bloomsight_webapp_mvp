@@ -29,7 +29,7 @@ export const BeachPage = () => {
 
   if (beachQuery.isPending) {
     return <p>Loading...</p>;
-  } else if (!beachQuery.data) {
+  } else if (!beachQuery.data || !beachQuery.data.location) {
     return <p>Beach not found</p>;
   }
 

@@ -58,7 +58,12 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
 
   // Add parking markers + directions
   useEffect(() => {
-    if (!mapInstanceRef.current || !beachQuery.data || !parkingSpotsQuery.data)
+    if (
+      !mapInstanceRef.current ||
+      !beachQuery.data ||
+      !parkingSpotsQuery.data ||
+      !beachQuery.data.location
+    )
       return;
 
     const map = mapInstanceRef.current;
