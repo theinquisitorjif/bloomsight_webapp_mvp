@@ -45,9 +45,9 @@ def get_beaches():
     return jsonify(response.data), 200
 
 # Get a beach by ID
-@app.route('/beaches/<int:id>', methods=['GET'])
-def get_beach(id):
-    response = supabase.table('beaches').select('*').eq('mapbox_id', id).execute()
+@app.route('/beaches/<string:mapbox_id>', methods=['GET'])
+def get_beach(mapbox_id):
+    response = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).execute()
 
     if not response.data:
         return jsonify({"error": "Beach not found"}), 404
@@ -67,24 +67,24 @@ def add_beach():
 
 
 # Update a beach in Supabase
-@app.route('/beaches/<int:id>', methods=['PUT'])
-def update_beach(id):
+@app.route('/beaches/<string:mapbox_id>', methods=['PUT'])
+def update_beach(mapbox_id):
     data = request.json
     result = supabase.table("beaches").update(data).eq('mapbox_id', id).execute()
     return jsonify(result.data), 200
 
 
 # Delete a beach from Supabase
-@app.route('/beaches/<int:id>', methods=['DELETE'])
-def delete_beach(id):
-    result = supabase.table("beaches").delete().eq('mapbox_id', id).execute()
+@app.route('/beaches/<string:mapbox_id>', methods=['DELETE'])
+def delete_beach(mapbox_id):
+    result = supabase.table("beaches").delete().eq('mapbox_id', mapbox_id).execute()
     return jsonify({"message": "Deleted"}), 204
 
 # Beach Conditions Endpoint
-@app.route('/beaches/<int:beach_id>/riptide-risk', methods=['GET'])
-def beach_conditions(beach_id):
+@app.route('/beaches/<string:mapbox_id>/riptide-risk', methods=['GET'])
+def beach_conditions(mapbox_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -107,10 +107,10 @@ def beach_conditions(beach_id):
         return jsonify({'error': str(e)}), 500
 
 # Endpoint to get top beach parking/access points
-@app.route('/beaches/<int:beach_id>/parking-spots', methods=['GET'])
-def beach_parking(beach_id):
+@app.route('/beaches/<string:mapbox_id>/parking-spots', methods=['GET'])
+def beach_parking(mapbox_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -126,10 +126,10 @@ def beach_parking(beach_id):
         return jsonify({"error": str(e)}), 500
 
 #Endpoint for getting tide predictions
-@app.route("/beaches/<int:beach_id>/tide-prediction", methods=["GET"])
-def tide_prediction(beach_id):
+@app.route("/beaches/<string:mapbox_id>/tide-prediction", methods=["GET"])
+def tide_prediction(mapbox_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -148,10 +148,10 @@ def tide_prediction(beach_id):
     return jsonify(data), 200
 
 #For getting weather forecast data
-@app.route('/beaches/<int:beach_id>/weather-forecast', methods=['GET'])
-def beach_weather_forecast(beach_id):
+@app.route('/beaches/<string:mapbox_id>/weather-forecast', methods=['GET'])
+def beach_weather_forecast(mapbox_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -172,10 +172,10 @@ def beach_weather_forecast(beach_id):
         return jsonify({'error': f'Failed to fetch forecast: {str(e)}'}), 500
 
 #get water quality/ red tide/ karena brevis abundance
-@app.route('/beaches/<int:beach_id>/water-quality', methods=['GET'])
-def beach_water_quality(beach_id):
+@app.route('/beaches/<string:mapbox_id>/water-quality', methods=['GET'])
+def beach_water_quality(mapbox_id):
     # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', beach_id).single().execute()
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
 
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
@@ -213,8 +213,8 @@ def beach_water_quality(beach_id):
 
     return jsonify(water_quality), 200
 
-@app.route("/beaches/<int:beach_id>/pictures", methods=["POST"])
-def add_picture(beach_id):
+@app.route("/beaches/<string:mapbox_id>/pictures", methods=["POST"])
+def add_picture(mapbox_id):
     user = get_current_user()
     if not user:
         return jsonify({"error": "Not authenticated"}), 401
@@ -244,18 +244,19 @@ def add_picture(beach_id):
         "comment_id": comment_id,
         "user_id": user_id,
         "image_url": public_url,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "mapbox_id": mapbox_id
     }).execute()
 
     return jsonify({"image_url": public_url})
 
-@app.route("/beaches/<int:beach_id>/comments", methods=["GET"])
-def get_comments(beach_id):
+@app.route("/beaches/<string:mapbox_id>/comments", methods=["GET"])
+def get_comments(mapbox_id):
     page = int(request.args.get("page", 1))
     page_size = 20
     offset = (page - 1) * page_size
 
-    res = supabase.table("comments").select("*").eq("beach_id", beach_id).order("timestamp", desc=True).range(offset, offset + page_size - 1).execute()
+    res = supabase.table("comments").select("*").eq("mapbox_id", mapbox_id).order("timestamp", desc=True).range(offset, offset + page_size - 1).execute()
 
     # Get basic user data for each user
     for comment in res.data:
@@ -285,10 +286,10 @@ def get_comments(beach_id):
         "comments": res.data
     })
 
-@app.route("/beaches/<int:beach_id>/reviews", methods=["GET"])
-def get_reviews(beach_id):    
-    comments = supabase.table("comments").select("rating").eq("beach_id", beach_id).execute()
-    
+@app.route("/beaches/<string:mapbox_id>/reviews", methods=["GET"])
+def get_reviews(mapbox_id):    
+    comments = supabase.table("comments").select("rating").eq("mapbox_id", mapbox_id).execute()
+
     ratings = [comment["rating"] for comment in comments.data]
 
     if not ratings:
@@ -315,8 +316,8 @@ def get_reviews(beach_id):
         "number_of_reviews_per_rating": breakdown
     })
 
-@app.route("/beaches/<int:beach_id>/comments", methods=["POST"])
-def add_comment(beach_id):
+@app.route("/beaches/<string:mapbox_id>/comments", methods=["POST"])
+def add_comment(mapbox_id):
     user = get_current_user()
     if not user:
         return jsonify({"error": "Not authenticated"}), 401
@@ -345,7 +346,8 @@ def add_comment(beach_id):
         "rating": rating,
         "conditions": conditions,
         "likes": 0,
-        "timestamp": timestamp
+        "timestamp": timestamp,
+        "mapbox_id": mapbox_id
     }).execute()
 
     # Insert reports if they exist
@@ -354,13 +356,13 @@ def add_comment(beach_id):
             supabase.table("comments_conditions").insert({
                 "comment_id": res.data[0]["id"],
                 "condition_id": report_id,
-                "beach_id": beach_id
+                "mapbox_id": mapbox_id
             }).execute()
 
     return jsonify(res.data[0]) if res.data else (jsonify({"error": "Insert failed"}), 400)
 
-@app.route("/beaches/<int:beach_id>/comments/<int:comment_id>", methods=["DELETE"])
-def delete_comment(beach_id, comment_id):
+@app.route("/beaches/<string:mapbox_id>/comments/<int:comment_id>", methods=["DELETE"])
+def delete_comment(mapbox_id, comment_id):
     user = get_current_user()
     if not user:
         return jsonify({"error": "Not authenticated"}), 401
@@ -371,13 +373,13 @@ def delete_comment(beach_id, comment_id):
     if not isUsersComment.data:
         return jsonify({"error": "Not authorized"}), 401
 
-    res = supabase.table("comments").delete().eq("id", comment_id).eq("beach_id", beach_id).execute()
+    res = supabase.table("comments").delete().eq("id", comment_id).eq("mapbox_id", mapbox_id).execute()
     return jsonify({"deleted": True}) if res.data else (jsonify({"error": "Not found"}), 404)
 
-@app.route("/beaches/<int:beach_id>/reports", methods=["GET"])
-def get_reports(beach_id):
+@app.route("/beaches/<string:mapbox_id>/reports", methods=["GET"])
+def get_reports(mapbox_id):
     # Fetch all reports for this beach
-    reports_res = supabase.table("comments_conditions").select("*").eq("beach_id", beach_id).execute()
+    reports_res = supabase.table("comments_conditions").select("*").eq("mapbox_id", mapbox_id).execute()
 
     current_time = datetime.utcnow()
     valid_reports = []
@@ -424,12 +426,19 @@ def get_reports(beach_id):
 def get_beach_reports():
     res = supabase.table("conditions").select("*").eq("type", 1).execute()
     return jsonify(res.data)
- 
-@app.route("/beaches/<int:beach_id>/pictures", methods=["GET"])
-def get_beach_pictures(beach_id):
-    res = supabase.table("pictures").select("*").eq("beach_id", beach_id).order("timestamp", desc=True).execute()
+
+@app.route("/beaches/<string:mapbox_id>/pictures", methods=["GET"])
+def get_beach_pictures(mapbox_id):
+    res = supabase.table("pictures").select("*").eq("mapbox_id", mapbox_id).order("timestamp", desc=True).execute()
     return jsonify(res.data)
 
+@app.route('/beaches/<string:mapbox_id>', methods=['GET'])
+def get_beach_by_id(mapbox_id):
+    res = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
+    if not res.data:
+        return jsonify({'error': 'Beach not found'}), 404
+    return jsonify(res.data), 200
+
 if __name__ == '__main__':
-    # Run on port 5000 to match vite.config.ts proxy
-    app.run(host='0.0.0.0', port=5002, debug=True, use_reloader=False)
+   # Run on port 5000 to match vite.config.ts proxy
+   app.run(host='0.0.0.0', port=5002, debug=True, use_reloader=False)
