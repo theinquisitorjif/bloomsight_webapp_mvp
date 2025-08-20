@@ -240,7 +240,6 @@ def add_picture(mapbox_id):
 
     # Insert into pictures table
     supabase.table("pictures").insert({
-        "beach_id": beach_id,
         "comment_id": comment_id,
         "user_id": user_id,
         "image_url": public_url,
@@ -341,7 +340,6 @@ def add_comment(mapbox_id):
 
     res = supabase.table("comments").insert({
         "user_id": user_id,
-        "beach_id": beach_id,
         "content": content,
         "rating": rating,
         "conditions": conditions,
