@@ -1,63 +1,56 @@
-import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { useGetPicturesByBeachID } from "@/api/beach";
+import { Skeleton } from "../ui/skeleton";
+import { ImageIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import { Link } from "react-router-dom";
 
 interface BeachCardProps {
   beachName: string;
   coords: [number, number];
+  beachId: number;
+  distance?: string;
 }
 
-interface BeachData {
-  id: number;
-  name: string;
-  description: string | null;
-  latitude: number;
-  longitude: number;
-}
+const BeachCard: React.FC<BeachCardProps> = ({
+  beachName,
+  beachId,
+  distance,
+}) => {
+  const picturesQuery = useGetPicturesByBeachID(beachId);
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-const BeachCard: React.FC<BeachCardProps> = ({ beachName, coords }) => {
-  const [beachData, setBeachData] = useState<BeachData | null>(null);
-
-  useEffect(() => {
-    const fetchBeach = async () => {
-      if (!beachName) return;
-
-      const { data, error } = await supabase
-        .from("beaches")
-        .select("*")
-        .ilike("name", beachName) // case-insensitive match
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching beach:", error.message);
-      } else {
-        setBeachData(data);
-      }
-    };
-
-    fetchBeach();
-  }, [beachName]);
+  let imgSrc = "";
+  if (picturesQuery.data?.length) {
+    imgSrc = picturesQuery.data[0].image_url;
+  }
 
   return (
-    <div className="p-4 rounded-2xl shadow-md bg-white border border-gray-200">
-      <h2 className="text-xl font-bold">{beachName}</h2>
-      <p className="text-sm text-gray-600">
-        Coords: {coords[0]}, {coords[1]}
-      </p>
-
-      {beachData ? (
-        <div className="mt-2">
-          <p className="text-gray-800">{beachData.description ?? "No description available"}</p>
-          <p className="text-xs text-gray-500">
-            DB coords: {beachData.latitude}, {beachData.longitude}
-          </p>
-        </div>
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-border">
+      {picturesQuery.isPending ? (
+        <Skeleton className="w-full h-48"/>
+      ) : imgSrc ? (
+        <img
+          src={imgSrc}
+          alt={beachName}
+          className="w-full h-48 object-cover"
+        />
       ) : (
-        <p className="text-red-500 mt-2">Beach data not available</p>
+        <div className="w-full h-48 flex items-center justify-center gap-2 bg-neutral-100">
+          <ImageIcon />
+          <p className="text-muted-foreground text-sm">No photos yet</p>
+        </div>
       )}
+      <div className="p-4">
+        <h3 className="font-bold text-lg text-gray-800 mb-2">{beachName}</h3>
+        <p className="text-blue-900 text-sm mt-2">{distance}</p>
+      </div>
+
+      <div className="px-4 pb-4">
+        <Link to={`/beaches/${beachId}`} onClick={(e) => e.stopPropagation()}>
+          <Button variant="brand" className="rounded-full w-full">
+            View
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

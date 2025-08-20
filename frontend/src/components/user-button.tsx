@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Skeleton } from "./ui/skeleton";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
 import supabase from "@/supabase";
 
 const UserButton = () => {
@@ -48,6 +48,9 @@ const UserButton = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer flex items-center justify-between">
+          Settings <SettingsIcon className="size-4" />
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             supabase.auth.signOut();

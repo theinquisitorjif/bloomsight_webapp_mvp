@@ -59,7 +59,7 @@ const router = createBrowserRouter([
     children: [
       /** Routes that can be accessed by both authenticated and non-authenticated users */
       {
-        path: "/",
+        path: "/beaches",
         element: <HomePage />,
       },
       {
@@ -67,7 +67,7 @@ const router = createBrowserRouter([
         element: <BeachPage />,
       },
       {
-        path: "/home",
+        path: "/",
         element: <LandingPage />,
       },
       /** Routes that only non-authenticated users can access */

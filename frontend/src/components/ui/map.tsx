@@ -3,6 +3,11 @@ import mapboxgl, { type LngLatLike } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { createClient } from '@supabase/supabase-js';
 import redTideData from '../../../../fwc_redtide.json';
+import { useGetBeaches } from '@/api/beach';
+import BeachCard from '../beach/beach-card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
+import { ChevronUp, Waves } from 'lucide-react';
+import { haversineDistanceMiles } from '@/lib/utils';
 
 type MapRef = mapboxgl.Map | null;
 
@@ -14,6 +19,14 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const popupRef = useRef<mapboxgl.Popup | null>(null); // Used to close the popup programmatically outside of mapbox
+
+  // Used to fetch beaches and find distance from user's location
+  const beaches = useGetBeaches();
+  const [userLng, setUserLng] = useState<number>(-81.3792);
+  const [userLat, setUserLat] = useState<number>(28.5383);
+  const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
 
   // fallback coords central FL
   const [lng] = useState<number>(-81.3792); 
@@ -146,6 +159,62 @@ const Map = () => {
     }
   };
 
+  const openBeachPopup = async (lng: number, lat: number, beachName: string, beachId?: string) => {
+    try {
+      const [beachData, redTide] = await Promise.all([
+        fetchBeachForecast(beachName, lat, lng, beachId),
+        getRedTideData(beachName, lat, lng),
+      ]);
+
+      let popupContent;
+      if (beachData) {
+        const forecast = beachData.forecast;
+        popupContent = `
+          <div class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
+            ${getCardImg(forecast['Cloud Cover'])}
+            <div style="display: flex; flex-direction: column; align-items: flex-end; margin-left: auto;">
+              <div style="font-size: 15px; margin-bottom: 9px;">${forecast['Cloud Cover']}</div>
+              <div style="font-size: 28px; margin-bottom: 7px;">
+                ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
+              </div>
+              <div style="font-size: 15px; max-width: 150px; word-break: break-word; text-align: right;">
+                ${beachName}
+              </div>
+            </div>
+          </div>
+          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.height >= 0.5 ? 'High' : 'Low'}</div></div>
+          <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">${beachData.airQ}</div></div>
+          <div class="weather-row"><div class="weather-category">UV Index</div><div class="weather-rating">${Math.round(forecast["uv_index"])}</div></div>
+          <div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide?.abundance || 'Unknown'}</div></div>
+          <div style="text-align:center; margin-top:5px;">
+            <button data-beach-id="${beachId}" style="background:none; border:none; color:#6a6a6a; text-decoration:underline; cursor:pointer;"
+              onClick="window.location.href='/beaches/${beachId}'">
+              More Info
+            </button>
+          </div>
+        `;
+      } else {
+        popupContent = `
+          <h3 class="beach-name">${beachName}</h3>
+          <p style="color:#666; font-style:italic;">Beach data not available</p>
+          ${redTide ? `<div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide.abundance}</div></div>` : ''}
+        `;
+      }
+
+      if (popupRef.current) {
+        popupRef.current.remove();
+      }
+
+      popupRef.current = new mapboxgl.Popup()
+        .setLngLat([lng, lat])
+        .setHTML(popupContent)
+        .addTo(mapRef.current!);
+
+    } catch (err) {
+      console.error("Error opening beach popup:", err);
+    }
+  };
+
 
   // Initialize map
   useEffect(() => {
@@ -225,82 +294,7 @@ const Map = () => {
           const beachId = feature.properties? feature.properties['@id'].slice(5): null;
 
           try {
-            const [beachData, redTideData] = await Promise.all([
-              fetchBeachForecast(beachName, lat, lng, beachId), // returns { forecast, airQ, cTide }
-              getRedTideData(beachName, lat, lng),
-            ]);
-            
-            console.log(beachData?.cTide);
-
-            let popupContent;
-
-            if (beachData) {
-              const forecast = beachData.forecast;
-
-              popupContent = `
-              <div class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
-                ${getCardImg(forecast['Cloud Cover'])}
-                <!-- Text section aligned to the right -->
-                <div style="display: flex; flex-direction: column; align-items: flex-end; min-width: 0; margin-left: auto;">
-                  <div style="font-size: 15px; margin-bottom: 9px;">
-                    ${forecast['Cloud Cover']}
-                  </div>
-                  <div style="font-size: 28px; margin-bottom: 7px;">
-                    ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
-                  </div>
-                  <div style="font-size: 15px; max-width: 150px; word-break: break-word; text-align: right;">
-                    ${beachName}
-                  </div>
-                </div>
-              </div>
-
-              <div class="weather-row">
-                <div class="weather-category">Tides</div>
-                <div class="weather-rating"> ${beachData.cTide.height >= 0.5 ? 'High' : 'Low'} </div>
-              </div>
-              <div class="weather-row">
-                <div class="weather-category">Air Quality</div>
-                <div class="weather-rating">${beachData.airQ}</div>
-              </div>
-              <div class="weather-row">
-                <div class="weather-category">UV Index</div>
-                <div class="weather-rating">${Math.round(forecast["uv_index"])}</div>
-              </div>
-              <div class="weather-row">
-                <div class="weather-category">Red Tide</div>
-                <div class="weather-rating">
-                  ${redTideData?.abundance || 'Unknown'}
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; align-items: center; height: 20px; margin-top: 5px;">
-                <button 
-                  data-beach-id="${beachId}"
-                  style="background: none; border: none; color: rgb(106, 106, 106); padding: 0px 8px; font-size: 11px; border-radius: 8px; text-align: center; text-decoration: underline; cursor: pointer;"
-                  onClick="window.location.href='/beaches/${beachId}';">
-                  More Info
-                </button>
-              </div>
-            `;
-
-            } else {
-              popupContent = `
-                <h3 class="beach-name">${beachName}</h3>
-                <p style="color: #666; font-style: italic;">Beach data not available</p>
-                ${redTideData ? `
-                  <div class="weather-row">
-                    <div class="weather-category">Red Tide</div>
-                    <div class="weather-rating">
-                      ${redTideData.abundance}
-                    </div>
-                  </div>
-                ` : ''}
-              `;
-            }
-
-            new mapboxgl.Popup()
-              .setLngLat([lng, lat] as LngLatLike)
-              .setHTML(popupContent)
-              .addTo(mapRef.current!);
+            await openBeachPopup(lng, lat, beachName, beachId);
 
           } catch (error) {
             console.error('Error fetching beach data:', error);
@@ -368,6 +362,8 @@ const Map = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         initializeMap(position.coords.longitude, position.coords.latitude, zoom);
+        setUserLat(position.coords.latitude);
+        setUserLng(position.coords.longitude);
       },
       (err) => {
         console.error('Could not get location', err);
@@ -381,7 +377,42 @@ const Map = () => {
     };
   }, [lng, lat, zoom]);
 
-  return <div ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />;
+  return <div className='relative w-full h-[calc(100vh-3.75rem)]'> {/** Subtract height of header/navbar */}
+    <div ref={mapContainerRef} className='w-full h-[calc(100vh-3.75rem)]' /> {/** Subtract height of header/navbar */}
+
+    {/** Grid overlay */}
+     <Collapsible
+        open={beachesOverlayOpen}
+        onOpenChange={setBeachesOverlayOpen}
+        className='absolute top-8 left-8 hidden md:block md:w-1/2 lg:w-1/3 bg-background border border-border rounded-xl'
+      >
+        <CollapsibleTrigger className='flex items-center w-full justify-between gap-2 py-4 px-8'>
+          <span className='flex items-center gap-2'>
+            <Waves className='w-4 h-4' />
+            <h1 className='text-xl font-medium'>Beaches</h1>
+          </span>
+
+          <span className='flex items-center justify-center rounded-full border border-border bg-neutral-100 p-2'>
+            <ChevronUp className={`w-4 h-4 transition-transform ${beachesOverlayOpen ? 'rotate-180' : ''}`} />
+          </span>
+        </CollapsibleTrigger>
+        <CollapsibleContent className='p-4 grid h-[calc(100vh-11rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2'>
+          {beaches.data && beaches.data.map((beach) => {
+            const lat = parseFloat(beach.location.split(",")[0])
+            const lng = parseFloat(beach.location.split(",")[1])
+
+            return <div className='contents cursor-pointer' key={beach.id} onClick={() => {
+              mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
+              openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
+            }}>
+              <BeachCard coords={[lng, lat]} beachName={beach.name} beachId={parseInt(beach.mapbox_id)} distance={
+                `${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`
+              } />
+            </div>
+          })}
+        </CollapsibleContent>
+     </Collapsible>
+  </div>;
 };
 
 export default Map;

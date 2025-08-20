@@ -2,10 +2,11 @@ import { Link, useLocation } from "react-router-dom";
 
 export const Footer = () => {
   const isAuthRoute = useLocation().pathname.startsWith("/auth");
+  const isMapPage = useLocation().pathname.startsWith("/beaches");
   return (
     <footer
       className={
-        isAuthRoute ? "hidden" : "bg-gradient-to-r from-green-50 to-blue-100"
+       (isAuthRoute || isMapPage) ? "hidden" : "bg-gradient-to-r from-green-50 to-blue-100"
       }
     >
       <div className="mx-auto w-full max-w-[1000px] p-4 py-6 lg:py-8">

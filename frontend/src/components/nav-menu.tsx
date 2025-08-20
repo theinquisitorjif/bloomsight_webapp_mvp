@@ -9,7 +9,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Link } from "react-router-dom";
 
@@ -21,7 +20,7 @@ export const NavMenu = () => {
           <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
           <NavigationMenuContent className="z-[1000]">
             <ul className="grid gap-2 w-[250px]">
-              <ListItem href="/" title="Map">
+              <ListItem href="/beaches" title="Map">
                 Explore new beaches
               </ListItem>
               <ListItem href="/safety" title="Safety">
@@ -31,9 +30,17 @@ export const NavMenu = () => {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-            <Link to="/beach">Beach</Link>
-          </NavigationMenuLink>
+          <NavigationMenuTrigger>About</NavigationMenuTrigger>
+          <NavigationMenuContent className="z-[1000]">
+            <ul className="grid gap-2 w-[250px]">
+              <ListItem href="/team" title="Team">
+                Learn more about our team
+              </ListItem>
+              <ListItem href="/contact" title="Contact">
+                Having issues? Contact us
+              </ListItem>
+            </ul>
+          </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
