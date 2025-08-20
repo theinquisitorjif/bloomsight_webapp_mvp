@@ -14,7 +14,7 @@ export const BeachSafety = () => {
         <p>How to keep yourself and Florida safe anywhere and all the time</p>
       </div>
 
-      <Link to="#">
+      <Link to="/safety">
         <Button
           className="px-20 border border-border rounded-full text-primary bg-gradient-to-r from-green-50 to-blue-100"
           size="sm"

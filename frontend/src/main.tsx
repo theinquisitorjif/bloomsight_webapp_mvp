@@ -16,6 +16,7 @@ import { Button } from "./components/ui/button";
 import supabase from "./supabase";
 import { BeachPage } from "./pages/beach-page";
 import { LandingPage } from "./pages/landing-page";
+import SafetyPage from "./pages/safety-page";
 
 const authRoutes = [
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       {
         path: "/beaches/:id",
         element: <BeachPage />,
+      },
+      {
+        path: "/safety",
+        element: <SafetyPage />,
       },
       {
         path: "/",
