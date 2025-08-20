@@ -8,6 +8,7 @@ import BeachCard from '../beach/beach-card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
+import { Skeleton } from './skeleton';
 
 type MapRef = mapboxgl.Map | null;
 
@@ -397,7 +398,10 @@ const Map = () => {
           </span>
         </CollapsibleTrigger>
         <CollapsibleContent className='p-4 grid h-[calc(100vh-11rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2'>
-          {beaches.data && beaches.data.map((beach) => {
+          {beaches.isPending ?
+            [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
+              return <Skeleton key={i} className="w-full h-60 rounded-lg" />
+            }) : beaches.data && beaches.data.length > 0 && beaches.data.map((beach) => {
             const lat = parseFloat(beach.location.split(",")[0])
             const lng = parseFloat(beach.location.split(",")[1])
 
