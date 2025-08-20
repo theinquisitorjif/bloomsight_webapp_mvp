@@ -8,11 +8,12 @@ load_dotenv()
 # Pull the variables from the environment
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
 def init_supabase():
     if not SUPABASE_URL or not SUPABASE_ANON_KEY:
         raise ValueError("Missing SUPABASE_URL or SUPABASE_ANON_KEY")
-    return create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    return create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY)
 
 HEADERS = {
     "apikey": SUPABASE_ANON_KEY,
