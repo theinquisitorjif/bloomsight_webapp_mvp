@@ -2,11 +2,13 @@ import { Link, useLocation } from "react-router-dom";
 
 export const Footer = () => {
   const isAuthRoute = useLocation().pathname.startsWith("/auth");
-  const isMapPage = useLocation().pathname.startsWith("/beaches");
+  const isMapPage = useLocation().pathname == "/beaches";
   return (
     <footer
       className={
-       (isAuthRoute || isMapPage) ? "hidden" : "bg-gradient-to-r from-green-50 to-blue-100"
+        isAuthRoute || isMapPage
+          ? "hidden"
+          : "bg-gradient-to-r from-green-50 to-blue-100"
       }
     >
       <div className="mx-auto w-full max-w-[1000px] p-4 py-6 lg:py-8">
@@ -86,11 +88,8 @@ export const Footer = () => {
         <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
         <div className="sm:flex sm:items-center sm:justify-between">
           <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-            © 2025{" "}
-            <a className="hover:underline">
-              Alarex™
-            </a>
-            . All Rights Reserved.
+            © 2025 <a className="hover:underline">Alarex™</a>. All Rights
+            Reserved.
           </span>
           <div className="flex mt-4 sm:justify-center sm:mt-0">
             {/* <a
