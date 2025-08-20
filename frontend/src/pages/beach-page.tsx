@@ -17,6 +17,7 @@ import {
   useGetWeatherForecastByBeachID,
 } from "@/api/beach";
 import { useLocation } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
@@ -28,7 +29,22 @@ export const BeachPage = () => {
   const beachQuery = useGetBeachByBeachID(id);
 
   if (beachQuery.isPending) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex flex-col items-center pt-10 pb-20">
+        <main className="container p-2 xl:max-w-[1000px] space-y-4">
+          <Skeleton className="w-full h-[340px] rounded-lg" />
+
+          <Skeleton className="w-full h-10 rounded-lg" />
+
+          <Skeleton className="w-full h-10 rounded-lg" />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton className="w-full h-80 rounded-lg" />
+            <Skeleton className="w-full h-80 rounded-lg" />
+          </div>
+        </main>
+      </div>
+    );
   } else if (!beachQuery.data || !beachQuery.data.location) {
     return <p>Beach not found</p>;
   }

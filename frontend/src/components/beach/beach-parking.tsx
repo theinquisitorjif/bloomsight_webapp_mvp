@@ -56,7 +56,6 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
       .addTo(map);
   }, [beachQuery.data]);
 
-  // Add parking markers + directions
   useEffect(() => {
     if (
       !mapInstanceRef.current ||
@@ -71,16 +70,17 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
       .split(",")
       .map(parseFloat);
 
-    parkingSpotsQuery.data.top_access_points.forEach((spot, index) => {
-      if (!spot.coordinates || !spot.address) return;
+    const addParkingSpots = () => {
+      parkingSpotsQuery.data.top_access_points.forEach((spot, index) => {
+        if (!spot.coordinates || !spot.address) return;
 
-      const [lat, lng] = spot.coordinates.split(",").map(parseFloat);
+        const [lat, lng] = spot.coordinates.split(",").map(parseFloat);
 
-      // Add marker
-      new mapboxgl.Marker({ color: "red" })
-        .setLngLat([lng, lat])
-        .setPopup(
-          new mapboxgl.Popup().setHTML(`
+        // Add marker
+        new mapboxgl.Marker({ color: "red" })
+          .setLngLat([lng, lat])
+          .setPopup(
+            new mapboxgl.Popup().setHTML(`
             <div>
               <h4>${spot.address}</h4>
               <p>${spot.parking_fee_str}</p>
@@ -92,33 +92,45 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
               </a>
             </div>
           `)
-        )
-        .addTo(map);
+          )
+          .addTo(map);
 
-      // Draw route line
-      map.addSource(`route-${index}`, {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          geometry: {
-            type: "LineString",
-            coordinates: [
-              [beachLng, beachLat],
-              [lng, lat],
-            ],
+        // Draw route line (must wait for style load)
+        if (map.getSource(`route-${index}`)) {
+          map.removeLayer(`route-${index}`);
+          map.removeSource(`route-${index}`);
+        }
+
+        map.addSource(`route-${index}`, {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [beachLng, beachLat],
+                [lng, lat],
+              ],
+            },
+            properties: {},
           },
-          properties: {},
-        },
-      });
+        });
 
-      map.addLayer({
-        id: `route-${index}`,
-        type: "line",
-        source: `route-${index}`,
-        layout: { "line-join": "round", "line-cap": "round" },
-        paint: { "line-color": "#007aff", "line-width": 3 },
+        map.addLayer({
+          id: `route-${index}`,
+          type: "line",
+          source: `route-${index}`,
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: { "line-color": "#007aff", "line-width": 3 },
+        });
       });
-    });
+    };
+
+    if (map.isStyleLoaded()) {
+      addParkingSpots();
+    } else {
+      map.once("load", addParkingSpots);
+    }
   }, [parkingSpotsQuery.data, beachQuery.data]);
 
   return (
