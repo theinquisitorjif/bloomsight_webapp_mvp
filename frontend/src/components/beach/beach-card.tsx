@@ -1,5 +1,3 @@
-import { useGetPicturesByBeachID } from "@/api/beach";
-import { Skeleton } from "../ui/skeleton";
 import { ImageIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
@@ -7,27 +5,20 @@ import { Link } from "react-router-dom";
 interface BeachCardProps {
   beachName: string;
   coords: [number, number];
-  beachId: number;
+  imgSrc: string | null;
+  beachId: number | string;
   distance?: string;
 }
 
 const BeachCard: React.FC<BeachCardProps> = ({
   beachName,
+  imgSrc,
   beachId,
   distance,
 }) => {
-  const picturesQuery = useGetPicturesByBeachID(beachId);
-
-  let imgSrc = "";
-  if (picturesQuery.data?.length) {
-    imgSrc = picturesQuery.data[0].image_url;
-  }
-
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-border">
-      {picturesQuery.isPending ? (
-        <Skeleton className="w-full h-48"/>
-      ) : imgSrc ? (
+      {imgSrc ? (
         <img
           src={imgSrc}
           alt={beachName}

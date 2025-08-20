@@ -14,4 +14,5 @@ export interface BeachAPIResponse {
   location: string; // Lat-lon separated by comma
   mapbox_id: string;
   name: string;
+  preview_picture: string | null;
 }

@@ -409,7 +409,7 @@ const Map = () => {
               mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
               openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
             }}>
-              <BeachCard coords={[lng, lat]} beachName={beach.name} beachId={parseInt(beach.mapbox_id)} distance={
+              <BeachCard coords={[lng, lat]} beachName={beach.name} imgSrc={beach.preview_picture} beachId={parseInt(beach.mapbox_id)} distance={
                 `${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`
               } />
             </div>

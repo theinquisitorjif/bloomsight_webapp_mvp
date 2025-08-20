@@ -41,8 +41,18 @@ def get_current_user():
 # Retrieve all beaches from Supabase
 @app.route('/beaches', methods=['GET'])
 def get_beaches():
-    response = supabase.table('beaches').select('*').execute()
-    return jsonify(response.data), 200
+    response = supabase.table("beaches").select("*, pictures(image_url)").execute()
+
+    beaches = []
+    for beach in response.data:
+        if "pictures" in beach and beach["pictures"]:
+            beach["preview_picture"] = beach["pictures"][0]["image_url"]
+        else:
+            beach["preview_picture"] = None
+        beach.pop("pictures", None)  # optional cleanup
+        beaches.append(beach)
+
+    return jsonify(beaches), 200
 
 # Get a beach by ID
 @app.route('/beaches/<string:mapbox_id>', methods=['GET'])
@@ -54,6 +64,13 @@ def get_beach(mapbox_id):
     
     if len(response.data) > 1:
         return jsonify({"error": "Multiple beaches found"}), 400
+    
+    # Get a preview picture for the beach
+    picture_res = supabase.table("pictures").select("image_url").eq("mapbox_id", mapbox_id).limit(1).execute()
+    if picture_res.data:
+        response.data[0]["preview_picture"] = picture_res.data[0]["image_url"]
+    else:
+        response.data[0]["preview_picture"] = None
 
     return jsonify(response.data[0]), 200
 
