@@ -225,3 +225,13 @@ export function useDeleteCommentByBeachID(id: number) {
     },
   });
 }
+
+export function useGetBeaches() {
+  return useQuery<BeachAPIResponse[]>({
+    queryKey: ["beaches"],
+    queryFn: async () => {
+      const { data } = await api.get("/beaches");
+      return data;
+    },
+  });
+}
