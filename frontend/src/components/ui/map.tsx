@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsib
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { Skeleton } from './skeleton';
+import { ConditionsScoreSkeleton } from '../beach/conditions-score-skeleton';
 
 type MapRef = mapboxgl.Map | null;
 
@@ -85,8 +86,9 @@ const Map = () => {
           console.error('Error fetching forecast:', forecastError);
           return null;
         }
+        console.log('Forecasts fetched:', forecasts);
 
-        if (forecasts && forecasts.length > 0) {
+        if (forecasts[0].current && forecasts.length > 0) {
           if (forecasts[0].current['cloud_cover'] >= 0 && forecasts[0].current['cloud_cover'] < 20) {
                 forecasts[0].current['Cloud Cover'] = "Mostly Clear";
             } else if (forecasts[0].current['cloud_cover'] >= 20 && forecasts[0].current['cloud_cover'] < 50) {
@@ -397,7 +399,7 @@ const Map = () => {
             <ChevronUp className={`w-4 h-4 transition-transform ${beachesOverlayOpen ? 'rotate-180' : ''}`} />
           </span>
         </CollapsibleTrigger>
-        <CollapsibleContent className='p-4 grid h-[calc(100vh-11rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2'>
+        <CollapsibleContent className="p-4 grid h-[calc(100vh-11rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2 scrollbar-hide">
           {beaches.isPending ?
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
               return <Skeleton key={i} className="w-full h-60 rounded-lg" />

@@ -188,3 +188,12 @@ h4 {
   color: black;
   font-size: 0.9rem;
 }
+
+/* Hide vertical scrollbar while keeping scroll functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
