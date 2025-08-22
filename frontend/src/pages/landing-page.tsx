@@ -180,7 +180,7 @@ const getClosestBeaches = (
           <div className="text-center pb-10">
             <span className="text-3xl text-gray-700">Beaches near </span>
             <a
-              href="/"
+              href="/beaches"
               className="text-3xl text-gray-700 underline hover:text-blue-600 transition-colors"
             >
               {userLocation}
