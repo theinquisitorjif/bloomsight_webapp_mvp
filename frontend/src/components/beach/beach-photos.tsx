@@ -76,7 +76,7 @@ export const BeachPhotos = ({
       <Dialog>
         <DialogTrigger asChild>
           <Button className="absolute bottom-4 left-4" variant="outline">
-            <Image /> {photosQuery.data.length} photos
+            <Image /> {photosQuery.data.length} {photosQuery.data.length === 1 ? "photo" : "photos"}
           </Button>
         </DialogTrigger>
 
