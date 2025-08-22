@@ -1,3 +1,5 @@
+# Necessary installs:
+# supabase dotenv requests bs4 geopy requests_cache retry_requests openmeteo_requests
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
