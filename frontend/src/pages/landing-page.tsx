@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -18,6 +18,8 @@ const LandingPage = () => {
     lat: 0,
     long: 0
   }]);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   interface Beach {
     location: any;
@@ -52,47 +54,47 @@ const LandingPage = () => {
     return data as Beach[];
   };
 
-const getClosestBeaches = (
-  userLat: number,
-  userLng: number,
-  beaches: Beach[],
-  count = 4
-) => {
-  const beachesWithDistance = beaches.map((beach) => {
-    // Parse the location string "lat,long"
-    let lat = 0;
-    let long = 0;
-    if (beach.location) {
-      const parts = beach.location.split(',');
-      if (parts.length === 2) {
-        lat = parseFloat(parts[0]);
-        long = parseFloat(parts[1]);
+  const getClosestBeaches = (
+    userLat: number,
+    userLng: number,
+    beaches: Beach[],
+    count = 10
+  ) => {
+    const beachesWithDistance = beaches.map((beach) => {
+      // Parse the location string "lat,long"
+      let lat = 0;
+      let long = 0;
+      if (beach.location) {
+        const parts = beach.location.split(',');
+        if (parts.length === 2) {
+          lat = parseFloat(parts[0]);
+          long = parseFloat(parts[1]);
+        }
       }
-    }
 
-    const distanceValue = !isNaN(lat) && !isNaN(long)
-      ? getDistance(userLat, userLng, lat, long)
-      : Number.MAX_VALUE;
+      const distanceValue = !isNaN(lat) && !isNaN(long)
+        ? getDistance(userLat, userLng, lat, long)
+        : Number.MAX_VALUE;
 
-    return {
-      ...beach,
-      distanceValue,
-      lat,
-      long,
-    };
-  });
+      return {
+        ...beach,
+        distanceValue,
+        lat,
+        long,
+      };
+    });
 
-  const sorted = beachesWithDistance.sort((a, b) => a.distanceValue - b.distanceValue);
+    const sorted = beachesWithDistance.sort((a, b) => a.distanceValue - b.distanceValue);
 
-  const closest = sorted.slice(0, count).map((beach) => ({
-    name: beach.name,
-    distance: beach.distanceValue === Number.MAX_VALUE ? 'Unknown' : `${beach.distanceValue.toFixed(2)} mi away`,
-    lat: beach.lat,
-    long: beach.long,
-  }));
+    const closest = sorted.slice(0, count).map((beach) => ({
+      name: beach.name,
+      distance: beach.distanceValue === Number.MAX_VALUE ? 'Unknown' : `${beach.distanceValue.toFixed(2)} mi away`,
+      lat: beach.lat,
+      long: beach.long,
+    }));
 
-  return closest;
-};
+    return closest;
+  };
 
   // Initial load: get user location and closest beaches
   useEffect(() => {
@@ -112,7 +114,7 @@ const getClosestBeaches = (
 
             const allBeaches = await fetchBeachesFromDB();
 
-            // Set the 4 closest beaches
+            // Set the closest beaches
             setNearbyBeaches(getClosestBeaches(latitude, longitude, allBeaches));
           } catch (error) {
             console.error('Error fetching beaches or city:', error);
@@ -126,13 +128,23 @@ const getClosestBeaches = (
           console.log('Fallback beaches:', allBeaches);
           setNearbyBeaches(
             allBeaches
-              .slice(0, 4)
+              .slice(0, 10)
               .map((b) => ({ ...b, distance: 'Distance varies', lat: Number(b.lat), long: Number(b.long) }))
           );
         }
       );
     }
   }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, clientWidth } = scrollRef.current;
+    const scrollAmount = direction === 'left' ? -clientWidth : clientWidth;
+    scrollRef.current.scrollTo({
+      left: scrollLeft + scrollAmount,
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -145,7 +157,7 @@ const getClosestBeaches = (
             autoPlay
             loop
             playsInline
-            className="w-full h-full md:h-90 object-cover rounded-2xl shadow-xl"
+            className="w-full h-full md:h-90 object-cover rounded-lg shadow-xl"
           >
             Your browser does not support the video tag.
           </video>
@@ -173,7 +185,7 @@ const getClosestBeaches = (
         </div>
       </div>
 
-      {/* Local Favorites Section */}
+
       <div className="px-6 py-10 bg-blue-50">
         <div className="max-w-6xl mx-auto">
           {/* Beaches near current city */}
@@ -187,26 +199,55 @@ const getClosestBeaches = (
             </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {nearbyBeaches.map((beach, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <img
-                  src={`https://images.unsplash.com/photo-${
-                    ['1544551763-46a013bb70d5', '1559827260-dc66d52bef19', '1571019613454-1cb2f99b2d8b', '1506905925346-21bda4d32df4'][index % 4]
-                  }?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80`}
-                  alt={beach.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-bold text-lg text-gray-800 mb-2">{beach.name}</h3>
-                  <p className="text-blue-900 text-sm mt-2">{beach.distance}</p>
+          <div className="relative flex items-center">
+            {/* Left Arrow */}
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full bg-white p-3 rounded-full shadow-md hover:bg-gray-100 z-10"
+            >
+              <ChevronLeft className="w-6 h-6 text-gray-700" />
+            </button>
+
+            {/* Scrollable Row */}
+            <div
+              ref={scrollRef}
+              className="flex space-x-8 overflow-x-hidden scroll-smooth px-6 py-4"
+            >
+              {nearbyBeaches.map((beach, index) => (
+                <div
+                  key={index}
+                  className="min-w-[250px] bg-white rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex-shrink-0"
+                >
+                  <img
+                    alt={beach.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="font-bold text-lg text-gray-800 mb-2">{beach.name}</h3>
+                    <p className="text-blue-900 text-sm mt-2">{beach.distance}</p>
+                  </div>
                 </div>
+              ))}
+              {/* Extra "Find More" card */}
+              <div className="min-w-[250px] bg-white rounded-xl flex items-center justify-center flex-shrink-0 hover:shadow-xl transition-shadow duration-300">
+                <a
+              href="/beaches"
+              className="text-3xl text-gray-700 underline hover:text-blue-600 transition-colors"
+            >
+              Find more
+            </a>
               </div>
-            ))}
+            </div>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full bg-white p-3 rounded-full shadow-md hover:bg-gray-100 z-10"
+            >
+              <ChevronRight className="w-6 h-6 text-gray-700" />
+            </button>
           </div>
+
         </div>
       </div>
     </div>
