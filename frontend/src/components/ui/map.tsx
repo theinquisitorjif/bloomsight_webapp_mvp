@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsib
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { Skeleton } from './skeleton';
+import { ConditionsScoreSkeleton } from '../beach/conditions-score-skeleton';
 
 type MapRef = mapboxgl.Map | null;
 
@@ -85,8 +86,9 @@ const Map = () => {
           console.error('Error fetching forecast:', forecastError);
           return null;
         }
+        console.log('Forecasts fetched:', forecasts);
 
-        if (forecasts && forecasts.length > 0) {
+        if (forecasts[0].current && forecasts.length > 0) {
           if (forecasts[0].current['cloud_cover'] >= 0 && forecasts[0].current['cloud_cover'] < 20) {
                 forecasts[0].current['Cloud Cover'] = "Mostly Clear";
             } else if (forecasts[0].current['cloud_cover'] >= 20 && forecasts[0].current['cloud_cover'] < 50) {
