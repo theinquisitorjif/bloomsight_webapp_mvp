@@ -25,10 +25,11 @@ const BeachCard: React.FC<BeachCardProps> = ({
           className="w-full h-48 object-cover"
         />
       ) : (
-        <div className="w-full h-48 flex items-center justify-center gap-2 bg-neutral-100">
-          <ImageIcon />
-          <p className="text-muted-foreground text-sm">No photos yet</p>
-        </div>
+        <img
+          src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
+          alt={beachName}
+          className="w-full h-48 object-cover"
+        />
       )}
       <div className="p-4">
         <h3 className="font-bold text-lg text-gray-800 mb-2">{beachName}</h3>

@@ -101,8 +101,8 @@ const LandingPage = () => {
   };
 
   const handleBeachSelect = (beach: any) => {
-    const beachId = beach.properties?.['@id'] || beach.id;
-    navigate(`/beach/${beachId}`);
+    const beachId = beach.properties?.['@mapbox_id'] || beach.mapbox_id;
+    navigate(`/beaches/${beachId}`);
     setSearchQuery('');
     setShowSearchResults(false);
   };
@@ -177,7 +177,7 @@ const LandingPage = () => {
                           className="flex items-center p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
                         >
                           <img
-                            src={beach.preview_picture}
+                            src={beach.preview_picture || "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"}
                             alt={beach.name}
                             className="w-12 h-12 rounded-lg object-cover mr-4"
                           />
