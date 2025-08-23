@@ -1,0 +1,12 @@
+flask
+flask-cors
+gunicorn
+requests
+python-dotenv
+supabase
+openmeteo-requests
+pandas
+requests-cache
+retry-requests
+bs4
+geopy

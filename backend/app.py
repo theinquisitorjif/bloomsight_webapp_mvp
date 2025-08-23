@@ -19,7 +19,7 @@ supabase = init_supabase()
 noaa = NOAAMarineData()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins="http://localhost:5173")  # allows frontend running on a different port to call the backen
+CORS(app, supports_credentials=True, origins=["http://localhost", "http://localhost:5173"])  # allows frontend running on a different port to call the backen
 
 @app.route('/')
 def index():
@@ -43,18 +43,45 @@ def get_current_user():
 # Retrieve all beaches from Supabase
 @app.route('/beaches', methods=['GET'])
 def get_beaches():
-    response = supabase.table("beaches").select("*, pictures(image_url)").execute()
+    try:
+        resp = supabase.table("beaches").select("*, pictures(image_url)").execute()
+        rows = resp.data or []
 
+        beaches = []
+        for beach in rows:
+            pics = beach.get("pictures") or []
+            beach["preview_picture"] = pics[0]["image_url"] if pics else None
+            beach.pop("pictures", None)
+            beaches.append(beach)
+
+        # <-- bare array shape the UI expects
+        return jsonify(beaches), 200
+
+    except Exception as e:
+        import traceback, sys
+        traceback.print_exc(file=sys.stderr)
+        return jsonify({"error": f"/beaches failed: {str(e)}"}), 500
+
+    except Exception as e:
+        # Make the error visible in container logs AND return JSON
+        import traceback, sys
+        traceback.print_exc(file=sys.stderr)
+        return jsonify({"error": f"/beaches failed: {str(e)}"}), 500
+
+
+@app.route('/beaches_wrapped', methods=['GET'])
+def get_beaches_wrapped():
+    response = supabase.table("beaches").select("*, pictures(image_url)").execute()
     beaches = []
     for beach in response.data:
         if "pictures" in beach and beach["pictures"]:
             beach["preview_picture"] = beach["pictures"][0]["image_url"]
         else:
             beach["preview_picture"] = None
-        beach.pop("pictures", None)  # optional cleanup
+        beach.pop("pictures", None)
         beaches.append(beach)
-
-    return jsonify(beaches), 200
+    # <-- wrapped shape
+    return jsonify({"data": beaches}), 200
 
 # Get a beach by ID
 @app.route('/beaches/<string:mapbox_id>', methods=['GET'])

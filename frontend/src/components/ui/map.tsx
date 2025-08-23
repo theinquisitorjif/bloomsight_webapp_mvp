@@ -9,8 +9,14 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsib
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { Skeleton } from './skeleton';
+import { ConditionsScoreSkeleton } from '../beach/conditions-score-skeleton';
 
 type MapRef = mapboxgl.Map | null;
+
+const API_BASE =
+  import.meta.env.VITE_API_URL ??
+  import.meta.env.VITE_API_BASE ??
+  '/api';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -28,6 +34,10 @@ const Map = () => {
   const [userLng, setUserLng] = useState<number>(-81.3792);
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
+  const rawBeaches = beaches.data as unknown;
+  const beachList: Beach[] = Array.isArray(rawBeaches)
+    ? (rawBeaches as Beach[])
+    : ((rawBeaches as any)?.data ?? []);
 
   // fallback coords central FL
   const [lng] = useState<number>(-81.3792); 
@@ -39,6 +49,14 @@ const Map = () => {
     lat: number;
     long: number;
     abundance: string;
+  }
+
+  interface Beach {
+    id: number;
+    name: string;
+    mapbox_id: string;           
+    location: string;            
+    preview_picture?: string | null;
   }
 
     function getCloudCoverColor(cloudCover: string) {
@@ -99,17 +117,14 @@ const Map = () => {
             }
           console.log('Forecast found:', forecasts[0].current);
           // get air quality
-          const response = await fetch(`http://localhost:5002/beaches/${id}/weather-forecast`);
+          const response = await fetch(`${API_BASE}/beaches/${id}/weather-forecast`);
           const data = await response.json();
           const airQ = Math.round(data[0]["air_quality"]);
 
           // get tides
-          const tidesres = await fetch(`http://localhost:5002/beaches/${id}/tide-prediction`);
+          const tidesres = await fetch(`${API_BASE}/beaches/${id}/tide-prediction`);
           const tidesData = await tidesres.json();
-          const cTide = tidesData.tides[4] || [{
-            "height": -1,
-            "time": ""
-          }];
+          const cTide = tidesData.tides[4];
 
 
           return { forecast: forecasts[0].current, airQ, cTide };
@@ -187,7 +202,7 @@ const Map = () => {
               </div>
             </div>
           </div>
-          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.time ? beachData.cTide.height >= 0.5 ? 'High' : 'Low' : "No tide data"}</div></div>
+          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.height >= 0.5 ? 'High' : 'Low'}</div></div>
           <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">${beachData.airQ}</div></div>
           <div class="weather-row"><div class="weather-category">UV Index</div><div class="weather-rating">${Math.round(forecast["uv_index"])}</div></div>
           <div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide?.abundance || 'Unknown'}</div></div>
@@ -405,19 +420,29 @@ const Map = () => {
           {beaches.isPending ?
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
               return <Skeleton key={i} className="w-full h-60 rounded-lg" />
-            }) : beaches.data && beaches.data.length > 0 && beaches.data.map((beach) => {
-            const lat = parseFloat(beach.location.split(",")[0])
-            const lng = parseFloat(beach.location.split(",")[1])
+            }) : beachList.length > 0 && beachList.map((beach: Beach) => {
+                const lat = parseFloat(beach.location.split(",")[0]);
+                const lng = parseFloat(beach.location.split(",")[1]);
 
-            return <div className='contents cursor-pointer' key={beach.id} onClick={() => {
-              mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
-              openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
-            }}>
-              <BeachCard coords={[lng, lat]} beachName={beach.name} imgSrc={beach.preview_picture} beachId={parseInt(beach.mapbox_id)} distance={
-                `${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`
-              } />
-            </div>
-          })}
+                return (
+                  <div
+                    className='contents cursor-pointer'
+                    key={beach.id}
+                    onClick={() => {
+                      mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
+                      openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
+                    }}
+                  >
+                    <BeachCard
+                      coords={[lng, lat]}
+                      beachName={beach.name}
+                      imgSrc={beach.preview_picture ?? null} 
+                      beachId={parseInt(beach.mapbox_id)}
+                      distance={`${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`}
+                    />
+                  </div>
+                );
+              })}
         </CollapsibleContent>
      </Collapsible>
   </div>;
