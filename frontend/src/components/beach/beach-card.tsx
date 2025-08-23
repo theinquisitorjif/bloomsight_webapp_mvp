@@ -22,13 +22,13 @@ const BeachCard: React.FC<BeachCardProps> = ({
         <img
           src={imgSrc}
           alt={beachName}
-          className="w-full h-48 object-cover"
+          className="w-full h-48 object-cover rounded-t-xl"
         />
       ) : (
         <img
           src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"
           alt={beachName}
-          className="w-full h-48 object-cover"
+          className="w-full h-48 object-cover rounded-t-xl"
         />
       )}
       <div className="p-4">

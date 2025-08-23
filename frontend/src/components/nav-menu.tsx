@@ -42,6 +42,19 @@ export const NavMenu = () => {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Policy</NavigationMenuTrigger>
+          <NavigationMenuContent className="z-[1000]">
+            <ul className="grid gap-2 w-[250px]">
+              <ListItem href="/privacy" title="Privacy Policy">
+                Learn more about our privacy policy
+              </ListItem>
+              <ListItem href="/terms" title="Terms & Conditions">
+                Learn more about our terms and conditions
+              </ListItem>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );

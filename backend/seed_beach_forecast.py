@@ -34,7 +34,7 @@ def fetch_current_and_hourly(lat: float, lon: float):
         "current": [
             "temperature_2m", "precipitation", "rain",
             "wind_speed_10m", "wind_gusts_10m",
-            "relative_humidity_2m", "uv_index", "cloud_cover"
+            "relative_humidity_2m", "uv_index", "cloud_cover", "weather_code"
         ],
         "hourly": [
             "temperature_2m", "precipitation_probability", "rain",

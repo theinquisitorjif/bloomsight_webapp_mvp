@@ -9,7 +9,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsib
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { Skeleton } from './skeleton';
-import { ConditionsScoreSkeleton } from '../beach/conditions-score-skeleton';
 
 type MapRef = mapboxgl.Map | null;
 
