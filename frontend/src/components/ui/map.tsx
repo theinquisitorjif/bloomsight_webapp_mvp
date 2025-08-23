@@ -107,7 +107,10 @@ const Map = () => {
           // get tides
           const tidesres = await fetch(`http://localhost:5002/beaches/${id}/tide-prediction`);
           const tidesData = await tidesres.json();
-          const cTide = tidesData.tides[4];
+          const cTide = tidesData.tides[4] || [{
+            "height": -1,
+            "time": ""
+          }];
 
 
           return { forecast: forecasts[0].current, airQ, cTide };
@@ -185,7 +188,7 @@ const Map = () => {
               </div>
             </div>
           </div>
-          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.height >= 0.5 ? 'High' : 'Low'}</div></div>
+          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.time ? beachData.cTide.height >= 0.5 ? 'High' : 'Low' : "No tide data"}</div></div>
           <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">${beachData.airQ}</div></div>
           <div class="weather-row"><div class="weather-category">UV Index</div><div class="weather-rating">${Math.round(forecast["uv_index"])}</div></div>
           <div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide?.abundance || 'Unknown'}</div></div>
