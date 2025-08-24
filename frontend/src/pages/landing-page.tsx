@@ -62,12 +62,11 @@ const LandingPage = () => {
   };
 
   const getSortedBeaches = () => {
-    if (!beaches.data || beaches.data.length === 0) return [];
-    
+    if (!Array.isArray(beaches.data) || beaches.data.length === 0) return [];
+
     return beaches.data
       .map((beach) => {
-        const lat = parseFloat(beach.location.split(",")[0]);
-        const lng = parseFloat(beach.location.split(",")[1]);
+        const [lat, lng] = beach.location.split(",").map(parseFloat);
         const distance = haversineDistanceMiles(lat, lng, userLat, userLng);
         return { ...beach, distance };
       })
