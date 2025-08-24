@@ -29,6 +29,10 @@ const Map = () => {
   const [userLng, setUserLng] = useState<number>(-81.3792);
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
+  
+  // New state for tracking map bounds and visible beaches
+  const [mapBounds, setMapBounds] = useState<mapboxgl.LngLatBounds | null>(null);
+  const [visibleBeaches, setVisibleBeaches] = useState<unknown[]>([]);
 
   // fallback coords central FL
   const [lng] = useState<number>(-81.3792); 
@@ -41,6 +45,29 @@ const Map = () => {
     long: number;
     abundance: string;
   }
+
+  // Function to check if a beach is within the current map bounds
+  const isBeachInBounds = (beachLat: number, beachLng: number, bounds: mapboxgl.LngLatBounds) => {
+    return bounds.contains([beachLng, beachLat]);
+  };
+
+  // Function to update visible beaches based on map bounds
+  const updateVisibleBeaches = () => {
+    if (!mapRef.current || !beaches.data || !Array.isArray(beaches.data)) {
+      setVisibleBeaches([]);
+      return;
+    }
+
+    const bounds = mapRef.current.getBounds();
+    setMapBounds(bounds);
+
+    const filtered = beaches.data.filter(beach => {
+      const [beachLat, beachLng] = beach.location.split(",").map(parseFloat);
+      return bounds ? isBeachInBounds(beachLat, beachLng, bounds) : false;
+    });
+
+    setVisibleBeaches(filtered);
+  };
 
     function getCloudCoverColor(cloudCover: string) {
       //add in checking for rain and nighttime
@@ -221,6 +248,12 @@ const Map = () => {
     }
   };
 
+  // Effect to update visible beaches when beaches data changes
+  useEffect(() => {
+    if (mapRef.current && beaches.data) {
+      updateVisibleBeaches();
+    }
+  }, [beaches.data]);
 
   // Initialize map
   useEffect(() => {
@@ -357,6 +390,13 @@ const Map = () => {
           if (!hoverSource) return;
           hoverSource.setData({ type: 'FeatureCollection', features: [] });
         });
+
+        // Add event listeners for map movement to update visible beaches
+        mapRef.current?.on('moveend', updateVisibleBeaches);
+        mapRef.current?.on('zoomend', updateVisibleBeaches);
+
+        // Initial update of visible beaches
+        updateVisibleBeaches();
       });
 
       // marker for user location
@@ -383,8 +423,8 @@ const Map = () => {
     };
   }, [lng, lat, zoom]);
 
-  return <div className='relative w-full h-[calc(100vh-5rem)]'> {/** Subtract height of header/navbar */}
-    <div ref={mapContainerRef} className='w-full h-[calc(100vh-5rem)]' /> {/** Subtract height of header/navbar */}
+  return <div className='relative w-full h-[calc(100vh-3.75rem)]'> {/** Subtract height of header/navbar */}
+    <div ref={mapContainerRef} className='w-full h-[calc(100vh-3.75rem)]' /> {/** Subtract height of header/navbar */}
 
     {/** Grid overlay */}
      <Collapsible
@@ -395,20 +435,20 @@ const Map = () => {
         <CollapsibleTrigger className='flex items-center w-full justify-between gap-2 py-4 px-8'>
           <span className='flex items-center gap-2'>
             <Waves className='w-4 h-4' />
-            <h1 className='text-xl font-medium'>Beaches</h1>
+            <h1 className='text-xl font-medium'>Beaches in View ({visibleBeaches.length})</h1>
           </span>
 
           <span className='flex items-center justify-center rounded-full border border-border bg-neutral-100 p-2'>
             <ChevronUp className={`w-4 h-4 transition-transform ${beachesOverlayOpen ? 'rotate-180' : ''}`} />
           </span>
         </CollapsibleTrigger>
-        <CollapsibleContent className="p-4 grid h-[calc(100vh-13rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2 scrollbar-hide">
+        <CollapsibleContent className="p-4 grid h-[calc(100vh-11rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2 scrollbar-hide">
           {beaches.isPending ? (
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <Skeleton key={i} className="w-full h-60 rounded-lg" />
             ))
-          ) : Array.isArray(beaches.data) && beaches.data.length > 0 ? (
-            beaches.data.map((beach) => {
+          ) : visibleBeaches.length > 0 ? (
+            visibleBeaches.map((beach) => {
               const [lat, lng] = beach.location.split(",").map(parseFloat);
               return (
                 <div
@@ -429,7 +469,7 @@ const Map = () => {
                 </div>
               );
             })
-          ) : <p>No beaches found...</p>}
+          ) : <p>{beaches.data ? "No beaches visible in current view..." : "No beaches found..."}</p>}
         </CollapsibleContent>
      </Collapsible>
   </div>;
