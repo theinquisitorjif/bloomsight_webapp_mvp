@@ -2,7 +2,6 @@ import { useSession } from "@/context/session-context";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 import UserButton from "./user-button";
-import { LocationSearch } from "./location-search";
 import { NavMenu } from "./nav-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -13,6 +12,7 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { Menu } from "lucide-react";
+import BeachSearch from "./beach/beach-search";
 
 export const Header = () => {
   const isAuthRoute = useLocation().pathname.startsWith("/auth");
@@ -20,7 +20,7 @@ export const Header = () => {
   const { session } = useSession();
 
   return (
-    <header className={isAuthRoute ? "hidden" : "p-2 h-15"}>
+    <header className={isAuthRoute ? "hidden" : "p-2 h-20"}>
       <div className="container flex items-center justify-between mx-auto max-w-[1000px]">
         {isMobile ? (
           <Sheet>
@@ -42,10 +42,10 @@ export const Header = () => {
         ) : (
           <div className="flex items-center gap-10">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/logo-only-nobg.png" alt="logo" className="w-12" />
+              <img src="/logo-only-nobg.png" alt="logo" className="w-14" />
             </Link>
 
-            <LocationSearch />
+            <BeachSearch />
 
             <NavMenu />
           </div>
@@ -53,7 +53,7 @@ export const Header = () => {
 
         {isMobile && (
           <div className="flex items-center gap-2">
-            <LocationSearch />
+            <BeachSearch />
           </div>
         )}
 

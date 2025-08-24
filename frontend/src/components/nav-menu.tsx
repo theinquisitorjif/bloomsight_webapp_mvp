@@ -20,7 +20,7 @@ export const NavMenu = () => {
           <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
           <NavigationMenuContent className="z-[1000]">
             <ul className="grid gap-2 w-[250px]">
-              <ListItem href="/beaches" title="Map">
+              <ListItem href="/beaches" title="Map" imgSrc="/nav-map.png">
                 Explore new beaches
               </ListItem>
               <ListItem href="/safety" title="Safety">
@@ -64,12 +64,19 @@ function ListItem({
   title,
   children,
   href,
+  imgSrc,
   ...props
-}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
+}: React.ComponentPropsWithoutRef<"li"> & { href: string; imgSrc?: string }) {
   return (
     <li {...props}>
       <NavigationMenuLink asChild>
         <Link to={href}>
+          {imgSrc && (
+            <img
+              src={imgSrc}
+              className="h-30 w-full rounded-sm mb-2 object-cover"
+            />
+          )}
           <div className="text-sm leading-none font-medium">{title}</div>
           <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
             {children}

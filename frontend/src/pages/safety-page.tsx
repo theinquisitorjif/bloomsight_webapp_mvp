@@ -20,13 +20,15 @@ const SafetyPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
           <div className="h-full">
-            <h1 className="sticky top-0 text-2xl font-bold">
-              Mating Seasons & Wildlife Awareness
-            </h1>
-            <p>
-              It's important to be aware of the mating seasons happening around
-              beaches and lakes. Here's what you need to know.
-            </p>
+            <div className="sticky top-0">
+              <h1 className="text-2xl font-bold">
+                Mating Seasons & Wildlife Awareness
+              </h1>
+              <p>
+                It's important to be aware of the mating seasons happening
+                around beaches and lakes. Here's what you need to know.
+              </p>
+            </div>
           </div>
 
           <Accordion
@@ -143,13 +145,15 @@ const SafetyPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
           <div className="h-full">
-            <h1 className="sticky top-0 text-2xl font-bold">
-              Harmful Algal Blooms (HABs)
-            </h1>
-            <p>
-              These are the most common algal blooms in Florida and their
-              effects on the environment and people.
-            </p>
+            <div className="sticky top-0">
+              <h1 className="text-2xl font-bold">
+                Harmful Algal Blooms (HABs)
+              </h1>
+              <p>
+                These are the most common algal blooms in Florida and their
+                effects on the environment and people.
+              </p>
+            </div>
           </div>
 
           <Accordion
@@ -225,13 +229,13 @@ const SafetyPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
           <div className="h-full">
-            <h1 className="sticky top-0 text-2xl font-bold">
-              Dangers of High Tides
-            </h1>
-            <p>
-              These can be life-threatening if not taken with caution when
-              traveling to beaches.
-            </p>
+            <div className="sticky top-0">
+              <h1 className="text-2xl font-bold">Dangers of High Tides</h1>
+              <p>
+                These can be life-threatening if not taken with caution when
+                traveling to beaches.
+              </p>
+            </div>
           </div>
 
           <Accordion
@@ -269,14 +273,16 @@ const SafetyPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-10">
           <div className="h-full">
-            <h1 className="sticky top-0 text-2xl font-bold">
-              Your Impact on Florida’s Coast
-            </h1>
-            <p>
-              When visiting Florida’s beaches and coastal waters, your actions
-              directly affect the health of marine life, water quality, and
-              habitats.
-            </p>
+            <div className="sticky top-0">
+              <h1 className="text-2xl font-bold">
+                Your Impact on Florida’s Coast
+              </h1>
+              <p>
+                When visiting Florida’s beaches and coastal waters, your actions
+                directly affect the health of marine life, water quality, and
+                habitats.
+              </p>
+            </div>
           </div>
           <Accordion
             type="single"

@@ -17,21 +17,21 @@ const UserButton = () => {
   const { session } = useSession();
 
   if (!session) {
-    return <Skeleton className="size-9 rounded-full" />;
+    return <Skeleton className="size-11 rounded-full" />;
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer">
         {session.user.user_metadata.picture ? (
-          <Avatar className="size-9">
+          <Avatar className="size-11">
             <AvatarImage src={session.user.user_metadata.picture} />
             <AvatarFallback>{session.user.user_metadata.name}</AvatarFallback>
           </Avatar>
         ) : (
           <GeneratedAvatar
             seed={session.user.user_metadata.name || "B"}
-            className="size-9"
+            className="size-11"
           />
         )}
       </DropdownMenuTrigger>
