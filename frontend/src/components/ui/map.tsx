@@ -9,7 +9,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsib
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { Skeleton } from './skeleton';
-import { ConditionsScoreSkeleton } from '../beach/conditions-score-skeleton';
 
 type MapRef = mapboxgl.Map | null;
 
@@ -34,10 +33,6 @@ const Map = () => {
   const [userLng, setUserLng] = useState<number>(-81.3792);
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
-  const rawBeaches = beaches.data as unknown;
-  const beachList: Beach[] = Array.isArray(rawBeaches)
-    ? (rawBeaches as Beach[])
-    : ((rawBeaches as any)?.data ?? []);
 
   // fallback coords central FL
   const [lng] = useState<number>(-81.3792); 
@@ -49,14 +44,6 @@ const Map = () => {
     lat: number;
     long: number;
     abundance: string;
-  }
-
-  interface Beach {
-    id: number;
-    name: string;
-    mapbox_id: string;           
-    location: string;            
-    preview_picture?: string | null;
   }
 
     function getCloudCoverColor(cloudCover: string) {
@@ -124,7 +111,10 @@ const Map = () => {
           // get tides
           const tidesres = await fetch(`${API_BASE}/beaches/${id}/tide-prediction`);
           const tidesData = await tidesres.json();
-          const cTide = tidesData.tides[4];
+          const cTide = tidesData.tides[4] || [{
+            "height": -1,
+            "time": ""
+          }];
 
 
           return { forecast: forecasts[0].current, airQ, cTide };
@@ -202,7 +192,7 @@ const Map = () => {
               </div>
             </div>
           </div>
-          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.height >= 0.5 ? 'High' : 'Low'}</div></div>
+          <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.time ? beachData.cTide.height >= 0.5 ? 'High' : 'Low' : "No tide data"}</div></div>
           <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">${beachData.airQ}</div></div>
           <div class="weather-row"><div class="weather-category">UV Index</div><div class="weather-rating">${Math.round(forecast["uv_index"])}</div></div>
           <div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide?.abundance || 'Unknown'}</div></div>
@@ -420,7 +410,7 @@ const Map = () => {
           {beaches.isPending ?
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
               return <Skeleton key={i} className="w-full h-60 rounded-lg" />
-            }) : beachList.length > 0 && beachList.map((beach: Beach) => {
+            }) : beaches.data && beaches.data.length > 0 && beaches.data.map((beach) => {
                 const lat = parseFloat(beach.location.split(",")[0]);
                 const lng = parseFloat(beach.location.split(",")[1]);
 

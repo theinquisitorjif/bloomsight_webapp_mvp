@@ -1,8 +1,11 @@
 import axios from "axios";
 import supabase from "../supabase";
 
+const API_BASE =
+  import.meta.env.VITE_BACKEND_URL ?? import.meta.env.VITE_API_BASE ?? "/api";
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: API_BASE,
   withCredentials: true,
 });
 

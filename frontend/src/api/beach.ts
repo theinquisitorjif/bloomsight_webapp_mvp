@@ -227,18 +227,11 @@ export function useDeleteCommentByBeachID(id: number) {
 }
 
 export function useGetBeaches() {
-  return useQuery({
-    queryKey: ['beaches'],
+  return useQuery<BeachAPIResponse[]>({
+    queryKey: ["beaches"],
     queryFn: async () => {
-      const res = await fetch('/api/beaches');   // nginx proxy
-      if (!res.ok) throw new Error('Failed to fetch beaches');
-      const json = await res.json();
-
-      // Accept both shapes:
-      // 1) bare array: [ {...}, ... ]
-      // 2) wrapped:   { data: [ {...}, ... ] }
-      return Array.isArray(json) ? json : (json?.data ?? []);
+      const { data } = await api.get("/beaches");
+      return data;
     },
   });
 }
-
