@@ -9,13 +9,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsib
 import { ChevronUp, Waves } from 'lucide-react';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { Skeleton } from './skeleton';
+import { API_BASE } from '@/api/api-client';
 
 type MapRef = mapboxgl.Map | null;
-
-const API_BASE =
-  import.meta.env.VITE_API_URL ??
-  import.meta.env.VITE_API_BASE ??
-  '/api';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -407,32 +403,33 @@ const Map = () => {
           </span>
         </CollapsibleTrigger>
         <CollapsibleContent className="p-4 grid h-[calc(100vh-11rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2 scrollbar-hide">
-          {beaches.isPending ?
-            [1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
-              return <Skeleton key={i} className="w-full h-60 rounded-lg" />
-            }) : beaches.data && beaches.data.length > 0 && beaches.data.map((beach) => {
-                const lat = parseFloat(beach.location.split(",")[0]);
-                const lng = parseFloat(beach.location.split(",")[1]);
-
-                return (
-                  <div
-                    className='contents cursor-pointer'
-                    key={beach.id}
-                    onClick={() => {
-                      mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
-                      openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
-                    }}
-                  >
-                    <BeachCard
-                      coords={[lng, lat]}
-                      beachName={beach.name}
-                      imgSrc={beach.preview_picture ?? null} 
-                      beachId={parseInt(beach.mapbox_id)}
-                      distance={`${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`}
-                    />
-                  </div>
-                );
-              })}
+          {beaches.isPending ? (
+            [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <Skeleton key={i} className="w-full h-60 rounded-lg" />
+            ))
+          ) : Array.isArray(beaches.data) && beaches.data.length > 0 ? (
+            beaches.data.map((beach) => {
+              const [lat, lng] = beach.location.split(",").map(parseFloat);
+              return (
+                <div
+                  className="contents cursor-pointer"
+                  key={beach.id}
+                  onClick={() => {
+                    mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
+                    openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
+                  }}
+                >
+                  <BeachCard
+                    coords={[lng, lat]}
+                    beachName={beach.name}
+                    imgSrc={beach.preview_picture ?? null}
+                    beachId={parseInt(beach.mapbox_id)}
+                    distance={`${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`}
+                  />
+                </div>
+              );
+            })
+          ) : <p>No beaches found...</p>}
         </CollapsibleContent>
      </Collapsible>
   </div>;

@@ -1,8 +1,7 @@
 import axios from "axios";
 import supabase from "../supabase";
 
-const API_BASE =
-  import.meta.env.VITE_BACKEND_URL ?? import.meta.env.VITE_API_BASE ?? "/api";
+export const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:5002"; // Local Development
 
 export const api = axios.create({
   baseURL: API_BASE,
