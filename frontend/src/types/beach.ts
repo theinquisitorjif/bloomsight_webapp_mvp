@@ -15,4 +15,6 @@ export interface BeachAPIResponse {
   mapbox_id: string;
   name: string;
   preview_picture: string | null;
+  city: string | null;
+  state: string | null;
 }

@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Search, X } from 'lucide-react';
 import { useGetBeaches } from '@/api/beach';
 import { haversineDistanceMiles } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom'; // or your routing library
+import type { BeachAPIResponse } from '@/types/beach';
 
 const LandingPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,7 +101,7 @@ const LandingPage = () => {
     setShowSearchResults(value.trim().length > 0);
   };
 
-  const handleBeachSelect = (beach: any) => {
+  const handleBeachSelect = (beach: BeachAPIResponse & { 'properties'?: Record<string, string> }) => {
     const beachId = beach.properties?.['@mapbox_id'] || beach.mapbox_id;
     navigate(`/beaches/${beachId}`);
     setSearchQuery('');
