@@ -202,7 +202,8 @@ export const SignInPage = () => {
         text-balance *:[a]:underline *:[a]:underline-offset-4"
           >
             By clicking continue, you agree to our{" "}
-            <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a> and{" "}
+            <a href="/privacy">Privacy Policy</a>
           </div>
         </div>
       </div>

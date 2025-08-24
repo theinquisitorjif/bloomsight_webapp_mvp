@@ -17,6 +17,8 @@ import supabase from "./supabase";
 import { BeachPage } from "./pages/beach-page";
 import { LandingPage } from "./pages/landing-page";
 import SafetyPage from "./pages/safety-page";
+import PrivacyPolicyPage from "./pages/privacy-policy";
+import TermsPage from "./pages/terms-page";
 
 const authRoutes = [
   {
@@ -74,6 +76,14 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <LandingPage />,
+      },
+      {
+        path: "/privacy",
+        element: <PrivacyPolicyPage />,
+      },
+      {
+        path: "/terms",
+        element: <TermsPage />,
       },
       /** Routes that only non-authenticated users can access */
       {
