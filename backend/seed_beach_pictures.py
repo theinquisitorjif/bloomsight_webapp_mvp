@@ -59,4 +59,4 @@ if __name__ == "__main__":
         }).execute()
 
          # Respect Unsplash free tier: 50 requests/hour ≈ 1 every 72s
-        time.sleep(0.5)  # adjust if you upgraded your API plan
+        time.sleep(40)  # adjust if you upgraded your API plan

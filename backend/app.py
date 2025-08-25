@@ -9,7 +9,7 @@ from beach_access_points import main as get_beach_access_json
 from tide_conditions import get_tide_prediction_json
 from daily_beach_forecast_backend import get_beach_forecast
 from fwc_redtide import beaches as redtide_beaches
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import uuid
 
 TEMP_THRESHOLD = float(os.environ.get("BEACH_TEMP_THRESHOLD", 20.0))
@@ -196,25 +196,41 @@ def tide_prediction(mapbox_id):
 #For getting weather forecast data
 @app.route('/beaches/<string:mapbox_id>/weather-forecast', methods=['GET'])
 def beach_weather_forecast(mapbox_id):
-    # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
+    forecast_data = supabase.table('beaches').select('forecast, last_updated').eq('mapbox_id', mapbox_id).single().execute()
 
+    if not forecast_data.data:
+        return jsonify({'error': 'Beach not found'}), 404
+
+    if forecast_data.data.get('last_updated'):
+        last_updated = datetime.fromisoformat(forecast_data.data['last_updated'])
+        age = datetime.now(timezone.utc) - last_updated  # both are now aware
+
+        # If the forecast is less than 12 hours old, return it
+        if age < timedelta(hours=12) and forecast_data.data.get('forecast'):
+            return jsonify(forecast_data.data['forecast']), 200
+
+    # Retrieve full beach info
+    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
     if not beach_data.data:
         return jsonify({'error': 'Beach not found'}), 404
 
     beach = beach_data.data
-    location = beach.get('location')
-    lat_str, lon_str = location.split(",")
-    lat = float(lat_str.strip())
-    lon = float(lon_str.strip())
-
-    if lat is None or lon is None:
-        return jsonify({'error': 'Beach coordinates missing'}), 400
+    lat_str, lon_str = beach['location'].split(",")
+    lat, lon = float(lat_str.strip()), float(lon_str.strip())
 
     try:
         forecasts = get_beach_forecast(lat, lon)
+
+        supabase.table('beaches').update({
+            'forecast': forecasts,
+            'last_updated': datetime.now(timezone.utc).isoformat()
+        }).eq('mapbox_id', mapbox_id).execute()
+
         return jsonify(forecasts), 200
     except Exception as e:
+        # Fall back to stale forecast if available
+        if forecast_data.data.get('forecast'):
+            return jsonify(forecast_data.data['forecast']), 200
         return jsonify({'error': f'Failed to fetch forecast: {str(e)}'}), 500
 
 #get water quality/ red tide/ karena brevis abundance
