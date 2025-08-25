@@ -13,30 +13,6 @@ import { API_BASE } from '@/api/api-client';
 
 type MapRef = mapboxgl.Map | null;
 
-// TypeScript interfaces
-interface Beach {
-  id: string | number;
-  name: string;
-  location: string;
-  preview_picture?: string | null;
-  mapbox_id: string;
-  [key: string]: any; // Allow additional properties
-}
-
-interface BeachesQuery {
-  data?: Beach[] | null;
-  isPending: boolean;
-  isError: boolean;
-  error?: any;
-}
-
-interface RedTideBeach {
-  name: string;
-  lat: number;
-  long: number;
-  abundance: string;
-}
-
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -49,95 +25,47 @@ const Map = () => {
   const popupRef = useRef<mapboxgl.Popup | null>(null); // Used to close the popup programmatically outside of mapbox
 
   // Used to fetch beaches and find distance from user's location
-  const beaches = useGetBeaches() as BeachesQuery;
+  const beaches = useGetBeaches();
   const [userLng, setUserLng] = useState<number>(-81.3792);
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
   
   // New state for tracking map bounds and visible beaches
   const [mapBounds, setMapBounds] = useState<mapboxgl.LngLatBounds | null>(null);
-  const [visibleBeaches, setVisibleBeaches] = useState<Beach[]>([]);
+  const [visibleBeaches, setVisibleBeaches] = useState<unknown[]>([]);
 
   // fallback coords central FL
   const [lng] = useState<number>(-81.3792); 
   const [lat] = useState<number>(28.5383);
   const [zoom] = useState<number>(7);
 
-  // Store the last successfully loaded beaches data
-  const [lastLoadedBeaches, setLastLoadedBeaches] = useState<Beach[]>([]);
+  interface RedTideBeach {
+    name: string;
+    lat: number;
+    long: number;
+    abundance: string;
+  }
+
+  // Function to check if a beach is within the current map bounds
+  const isBeachInBounds = (beachLat: number, beachLng: number, bounds: mapboxgl.LngLatBounds) => {
+    return bounds.contains([beachLng, beachLat]);
+  };
 
   // Function to update visible beaches based on map bounds
   const updateVisibleBeaches = () => {
-    console.log('updateVisibleBeaches called');
-    console.log('mapRef.current:', !!mapRef.current);
-    console.log('beaches.isPending:', beaches.isPending);
-    console.log('beaches.data exists:', !!beaches.data);
-    console.log('lastLoadedBeaches count:', lastLoadedBeaches.length);
-    
-    // Check if map is ready
-    if (!mapRef.current) {
-      console.log('No map reference available');
-      return;
-    }
-
-    // Use current data if available, otherwise use last loaded data
-    let beachesToFilter: Beach[] = [];
-    
-    if (beaches.data && Array.isArray(beaches.data) && beaches.data.length > 0) {
-      beachesToFilter = beaches.data;
-      // Update our backup copy when we have fresh data
-      setLastLoadedBeaches(beaches.data);
-      console.log('Using fresh beaches data:', beaches.data.length);
-    } else if (lastLoadedBeaches.length > 0) {
-      beachesToFilter = lastLoadedBeaches;
-      console.log('Using cached beaches data:', lastLoadedBeaches.length);
-    } else {
-      console.log('No beaches data available (fresh or cached)');
+    if (!mapRef.current || !beaches.data || !Array.isArray(beaches.data)) {
       setVisibleBeaches([]);
       return;
     }
 
     const bounds = mapRef.current.getBounds();
     setMapBounds(bounds);
-    
-    console.log('Current map bounds:', bounds.toArray());
-    console.log('Total beaches to filter:', beachesToFilter.length);
 
-    const filtered = beachesToFilter.filter((beach: Beach) => {
-      try {
-        // Check if location exists and is a string
-        if (!beach.location || typeof beach.location !== 'string') {
-          console.warn(`Missing or invalid location for beach ${beach.name}:`, beach.location);
-          return false;
-        }
-
-        // More robust coordinate parsing - handle different formats
-        const locationParts = beach.location.split(",");
-        if (locationParts.length !== 2) {
-          console.warn(`Invalid location format for beach ${beach.name}:`, beach.location);
-          return false;
-        }
-
-        const beachLat = parseFloat(locationParts[0].trim());
-        const beachLng = parseFloat(locationParts[1].trim());
-
-        // Check if coordinates are valid numbers
-        if (isNaN(beachLat) || isNaN(beachLng)) {
-          console.warn(`Invalid coordinates for beach ${beach.name}: lat=${beachLat}, lng=${beachLng}`);
-          return false;
-        }
-
-        // Check if beach is within bounds - Mapbox expects [lng, lat] order
-        const isInBounds = bounds.contains([beachLng, beachLat]);
-        
-        return isInBounds;
-      } catch (error) {
-        console.error(`Error processing beach ${beach.name}:`, error);
-        return false;
-      }
+    const filtered = beaches.data.filter(beach => {
+      const [beachLat, beachLng] = beach.location.split(",").map(parseFloat);
+      return bounds ? isBeachInBounds(beachLat, beachLng, bounds) : false;
     });
 
-    console.log('Filtered beaches count:', filtered.length);
     setVisibleBeaches(filtered);
   };
 
@@ -322,19 +250,10 @@ const Map = () => {
 
   // Effect to update visible beaches when beaches data changes
   useEffect(() => {
-    console.log('useEffect triggered - beaches data changed');
-    console.log('mapRef.current exists:', !!mapRef.current);
-    console.log('beaches.isPending:', beaches.isPending);
-    console.log('beaches.data exists:', !!beaches.data);
-    
-    // Update whenever we have a map and either fresh data or cached data
-    if (mapRef.current) {
-      console.log('Map exists, calling updateVisibleBeaches');
+    if (mapRef.current && beaches.data) {
       updateVisibleBeaches();
-    } else {
-      console.log('No map reference, skipping update');
     }
-  }, [beaches.data, lastLoadedBeaches]); // Remove beaches.isPending dependency
+  }, [beaches.data]);
 
   // Initialize map
   useEffect(() => {
@@ -529,7 +448,7 @@ const Map = () => {
               <Skeleton key={i} className="w-full h-60 rounded-lg" />
             ))
           ) : visibleBeaches.length > 0 ? (
-            visibleBeaches.map((beach: Beach) => {
+            visibleBeaches.map((beach) => {
               const [lat, lng] = beach.location.split(",").map(parseFloat);
               return (
                 <div
