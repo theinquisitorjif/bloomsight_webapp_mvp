@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight} from 'lucide-react';
 import { useGetBeaches } from '@/api/beach';
 import { haversineDistanceMiles } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom'; // or your routing library
+import { useNavigate } from 'react-router-dom';
 import type { BeachAPIResponse } from '@/types/beach';
 import BeachSearch from '@/components/beach/beach-search';
 
@@ -12,7 +12,7 @@ const LandingPage = () => {
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [userLng, setUserLng] = useState<number>(-81.3792);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate(); // or your navigation method
+  const navigate = useNavigate();
 
   const beaches = useGetBeaches();
 
@@ -59,7 +59,6 @@ const LandingPage = () => {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, 10);
   };
-
 
   const handleBeachSelect = (beach: BeachAPIResponse & { 'properties'?: Record<string, string> }) => {
     const beachId = beach.properties?.['@mapbox_id'] || beach.mapbox_id;
@@ -163,6 +162,36 @@ const LandingPage = () => {
           >
             <ChevronRight className="w-6 h-6 text-gray-700" />
           </button>
+        </div>
+      </div>
+      
+      {/* About Section */}
+      <div className="bg-blue-100 py-10">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-blue-900 mb-4">About Us</h2>
+          <p className="text-gray-700 leading-relaxed">
+            BloomSight is your go-to source for beach information, focusing on red tide and harmful algae blooms (HABs). We provide up-to-the-minute data from scientific organizations like the FWC and NOAA, combined with real-time community reports. This dual-source approach ensures you have the most accurate information on beach conditions. Our location-aware search helps you quickly find beaches near you, so you're always informed before you go.
+          </p>
+        </div>
+      </div>
+
+      {/* Key Features Section */}
+      <div className="bg-white py-16">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-8 text-center">
+            <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold text-blue-800 mb-2">Location-Based Search</h3>
+              <p className="text-gray-700">
+                Instantly find beaches near you with our location-aware search. The homepage shows you the closest beaches, and you can easily search for any other destination.
+              </p>
+            </div>
+            <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold text-blue-800 mb-2">Community Insights</h3>
+              <p className="text-gray-700">
+                Join our community by sharing your on-the-ground observations. Your reports on conditions like respiratory irritation or fish kills help everyone stay informed.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
