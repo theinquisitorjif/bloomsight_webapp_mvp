@@ -18,6 +18,43 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+/**
+ * Fetch the most recent forecast for a beach near given lat/lng.
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export async function getForecast(lat: number, lng: number, tolerance = 0.005) {
+  try {
+    // 1. Fetch rows (only forecast, location, updated_at)
+    const { data: beaches, error } = await supabase
+      .from("beaches")
+      .select("forecast, location, last_updated")
+      .order("last_updated", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching beaches:", error);
+      return null;
+    }
+
+    // 2. Parse and filter in JS
+    const matching = beaches.filter((row) => {
+      const [rowLat, rowLng] = row.location.split(",").map(Number);
+      return (
+        Math.abs(rowLat - lat) <= tolerance &&
+        Math.abs(rowLng - lng) <= tolerance
+      );
+    });
+
+    // 3. Return the latest forecast (since data is already ordered by updated_at)
+    return matching.length > 0 ? matching[0].forecast : null;
+  } catch (err) {
+    console.error("Unexpected error in getForecast:", err);
+    return null;
+  }
+}
+
+
+
+
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -42,63 +79,82 @@ const Map = () => {
     abundance: string;
   }
 
-    function getCloudCoverColor(cloudCover: string) {
-      //add in checking for rain and nighttime
-      if (cloudCover == "Mostly Clear") {
-          return "linear-gradient(to bottom right, #B8DCFF, #38A2FF)"; // mostly clear
-      } else if (cloudCover == "Partly Cloudy") {
-          return "linear-gradient(to bottom right, #C9E8FF, #60A3D6)"; // partly cloudy
-      } else if (cloudCover == "Cloudy") {
-          return "linear-gradient(to bottom right, #DEEDFF, #6696CC)"; // cloudy
-      } else { 
-          return "linear-gradient(to bottom right, #E0E0E0, #8A8A8A)"; // overcast
-      }
+  function getWeatherColor(weatherCode: number) {
+    console.log("weatherCode", weatherCode);
+
+    if (weatherCode === 0) {
+      // Clear sky
+      return "linear-gradient(to bottom right, #B8DCFF, #38A2FF)";
+    } else if (weatherCode === 1) {
+      // Mainly clear / partly cloudy
+      return "linear-gradient(to bottom right, #C9E8FF, #60A3D6)";
+    } else if (weatherCode === 2) {
+      // Cloudy
+      return "linear-gradient(to bottom right, #B0CDE0, #5E8EB8)";
+    } else if (weatherCode === 3) {
+      // Overcast
+      return "linear-gradient(to bottom right, #DEEDFF, #6696CC)";
+    } else if (weatherCode >= 61 && weatherCode <= 67) {
+      // Rainy
+      return "linear-gradient(to bottom right, #A9C2D4, #4A6C8C)";
+    } else if (weatherCode >= 71 && weatherCode <= 77) {
+      // Snowy
+      return "linear-gradient(to bottom right, #FFFFFF, #B0C4DE)";
+    } else if (weatherCode >= 95 && weatherCode <= 99) {
+      // Thunderstorm
+      return "linear-gradient(to bottom right, #5A5A5A, #2C2C2C)";
+    } else {
+      // Default fallback
+      return "linear-gradient(to bottom right, #E0E0E0, #8A8A8A)";
     }
-  
-  function getCardImg(cloudCover: string){
-    //add in checking for rain and nighttime
-    if (cloudCover == "Mostly Clear") {
-        return '<img src="../../../public/weather-2-svgrepo-com (1).svg" style="width: 40px;">';
-      } else if (cloudCover == "Partly Cloudy") {
-        return '<img src="../../../public/weather-symbol-4-svgrepo-com.svg" style="width: 50px;">';
-      } else if (cloudCover == "Cloudy") {
-        return '<img src="../../../public/weather-9-svgrepo-com (1).svg" style="width: 50px; padding-bottom: 10px; padding-left: 10px;">';
-      } else { //overcast
-        return '<img src="../../../public/weather-symbol-8-svgrepo-com.svg" style="width: 50px; padding-bottom: 10px; padding-left: 10px;">';
-      }
   }
+
+
+  function getCardImg(weatherCode: number) {
+    const isRainy = weatherCode >= 61 && weatherCode <= 67; // include all rain types
+    const isClear = weatherCode === 0;
+
+    if (isRainy) {
+      return '<img src="https://openweathermap.org/img/wn/09d.png" style="width:50px;" alt="Rainy">';
+    } else if (isClear) {
+      return '<img src="https://openweathermap.org/img/wn/01d.png" style="width:50px;" alt="Clear">';
+    } else if (weatherCode === 1) {
+      return '<img src="https://openweathermap.org/img/wn/02d.png" style="width:50px;" alt="Partly cloudy">';
+    } else if (weatherCode === 2) {
+      return '<img src="https://openweathermap.org/img/wn/03d.png" style="width:50px;" alt="Cloudy">';
+    } else if (weatherCode === 3) {
+      return '<img src="https://openweathermap.org/img/wn/04d.png" style="width:50px;" alt="Overcast">';
+    } else if (weatherCode >= 71 && weatherCode <= 77) {
+      return '<img src="https://openweathermap.org/img/wn/13d.png" style="width:50px;" alt="Snow">';
+    } else if (weatherCode >= 95 && weatherCode <= 99) {
+      return '<img src="https://openweathermap.org/img/wn/11d.png" style="width:50px;" alt="Thunderstorm">';
+    } else {
+      // Default for other cloud/fog types
+      return '<img src="https://openweathermap.org/img/wn/50d.png" style="width:50px;" alt="Cloudy">';
+    }
+  }
+
 
   const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number, id?: string) => {
     try {
       if (lat && lng) {
-        const tolerance = 0.005;
-        const { data: forecasts, error: forecastError } = await supabase
-          .from('beach_forecasts')
-          .select('current')
-          .gte('lat', lat - tolerance)
-          .lte('lat', lat + tolerance)
-          .gte('lon', lng - tolerance)
-          .lte('lon', lng + tolerance)
-          .order('updated_at', { ascending: false })
-          .limit(1);
 
-        if (forecastError) {
-          console.error('Error fetching forecast:', forecastError);
-          return null;
-        }
-        console.log('Forecasts fetched:', forecasts);
+        const forecasts = await getForecast(lat, lng);
+        const thisForecast = forecasts[0];
+        console.log('Fetched forecasts:', thisForecast);
 
-        if (forecasts[0].current && forecasts.length > 0) {
-          if (forecasts[0].current['cloud_cover'] >= 0 && forecasts[0].current['cloud_cover'] < 20) {
-                forecasts[0].current['Cloud Cover'] = "Mostly Clear";
-            } else if (forecasts[0].current['cloud_cover'] >= 20 && forecasts[0].current['cloud_cover'] < 50) {
-                forecasts[0].current['Cloud Cover'] = "Partly Cloudy";
-            } else if (forecasts[0].current['cloud_cover'] >= 50 && forecasts[0].current['cloud_cover'] < 80) {
-                forecasts[0].current['Cloud Cover'] = "Cloudy";
+        if (thisForecast && forecasts.length > 0) {
+          const cc = thisForecast.cloud_cover;
+          if (cc >= 0 && cc < 20) {
+                thisForecast['Cloud Cover'] = "Mostly Clear";
+            } else if (cc >= 20 && cc < 50) {
+                thisForecast['Cloud Cover'] = "Partly Cloudy";
+            } else if (cc >= 50 && cc < 80) {
+                thisForecast['Cloud Cover'] = "Cloudy";
             } else {
-                forecasts[0].current['Cloud Cover'] = "Overcast";
+               thisForecast['Cloud Cover'] = "Overcast";
             }
-          console.log('Forecast found:', forecasts[0].current);
+
           // get air quality
           const response = await fetch(`${API_BASE}/beaches/${id}/weather-forecast`);
           const data = await response.json();
@@ -113,7 +169,7 @@ const Map = () => {
           }];
 
 
-          return { forecast: forecasts[0].current, airQ, cTide };
+          return { forecast: thisForecast, airQ, cTide };
         }
 
         console.log('No forecast found for coordinates:', lat, lng);
@@ -175,13 +231,14 @@ const Map = () => {
       let popupContent;
       if (beachData) {
         const forecast = beachData.forecast;
+        console.log("forecast", forecast);
         popupContent = `
-          <div class="weather-section" style="background: ${getCloudCoverColor(forecast['Cloud Cover'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
-            ${getCardImg(forecast['Cloud Cover'])}
+          <div class="weather-section" style="background: ${getWeatherColor(forecast['weather_code'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
+            ${getCardImg(forecast['weather_code'])}
             <div style="display: flex; flex-direction: column; align-items: flex-end; margin-left: auto;">
               <div style="font-size: 15px; margin-bottom: 9px;">${forecast['Cloud Cover']}</div>
               <div style="font-size: 28px; margin-bottom: 7px;">
-                ${Math.round((forecast["temperature_2m"] * 9) / 5 + 32)}°F
+                ${Math.round(forecast["temp"])}°F
               </div>
               <div style="font-size: 15px; max-width: 150px; word-break: break-word; text-align: right;">
                 ${beachName}
