@@ -174,6 +174,19 @@ def beach_parking(mapbox_id):
 #Endpoint for getting tide predictions
 @app.route("/beaches/<string:mapbox_id>/tide-prediction", methods=["GET"])
 def tide_prediction(mapbox_id):
+    tide_prediction_data = supabase.table('beaches').select('tide_prediction, last_updated').eq('mapbox_id', mapbox_id).single().execute()
+
+    if not tide_prediction_data.data:
+        return jsonify({'error': 'Beach not found'}), 404
+    
+    if tide_prediction_data.data.get('last_updated'):
+        last_updated = datetime.fromisoformat(tide_prediction_data.data['last_updated'])
+        age = datetime.now(timezone.utc) - last_updated  # both are now aware
+
+        # If the tide prediction is less than 12 hours old, return it
+        if age < timedelta(hours=12) and tide_prediction_data.data.get('tide_prediction'):
+            return jsonify(tide_prediction_data.data['tide_prediction']), 200
+
     # Retrieve the beach info from Supabase
     beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
 
@@ -191,6 +204,12 @@ def tide_prediction(mapbox_id):
         return jsonify({'error': 'Beach coordinates missing'}), 400
 
     data = get_tide_prediction_json(lat, lon, name)
+
+    supabase.table('beaches').update({
+        'tide_prediction': data,
+        'last_updated': datetime.now(timezone.utc).isoformat()
+    }).eq('mapbox_id', mapbox_id).execute()
+
     return jsonify(data), 200
 
 #For getting weather forecast data
