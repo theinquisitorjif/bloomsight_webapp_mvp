@@ -1,6 +1,8 @@
 import json
 import os
 import requests
+import time
+import random
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -47,13 +49,16 @@ def format_feature(feature):
         
         # Get mapbox_id from @id field if it exists, skip first 5 characters and convert to number
         at_id = feature["properties"].get("@id")
-        mapbox_id = None
+        
         if at_id and len(at_id) > 5:
             try:
                 mapbox_id = int(at_id[5:])
             except ValueError:
-                # If it can't be converted to int, keep as None
-                mapbox_id = None
+                # If it can't be converted to int, generate unique ID
+                mapbox_id = int(time.time() * 1000) + random.randint(1, 999)
+        else:
+            # No @id found or @id too short, generate unique ID using timestamp + random
+            mapbox_id = int(time.time() * 1000) + random.randint(1, 999)
         
         location = f"{lat}, {lon}"
 
