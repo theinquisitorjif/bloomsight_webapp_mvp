@@ -21,6 +21,14 @@ def insert_row(table, payload):
     response.raise_for_status()
     return response.json()
 
+def delete_all_beaches():
+    """Delete all records from the beaches table"""
+    url = f"{SUPABASE_URL}/rest/v1/beaches"
+    # Delete all records (no filter means delete everything)
+    response = requests.delete(url, headers=HEADERS)
+    response.raise_for_status()
+    print("All beaches deleted from database")
+
 def format_feature(feature):
     try:
         coords = feature["geometry"]["coordinates"]
@@ -29,21 +37,48 @@ def format_feature(feature):
 
         lat = coords[1]
         lon = coords[0]
-        name = feature["properties"].get("name", "Unnamed Beach")
+        name = feature["properties"].get("name") or feature["properties"].get("place_name")
+        if not name:
+            raise ValueError("No name or place_name found")
+        
+        # Remove comma and everything after it if present
+        if "," in name:
+            name = name.split(",")[0].strip()
+        
+        # Get mapbox_id from @id field if it exists, skip first 5 characters and convert to number
+        at_id = feature["properties"].get("@id")
+        mapbox_id = None
+        if at_id and len(at_id) > 5:
+            try:
+                mapbox_id = int(at_id[5:])
+            except ValueError:
+                # If it can't be converted to int, keep as None
+                mapbox_id = None
+        
         location = f"{lat}, {lon}"
 
-        return {
+        beach_data = {
             "name": name,
             "location": location,
             "description": "Imported from GeoJSON"
         }
+        
+        # Only add mapbox_id if it exists
+        if mapbox_id:
+            beach_data["mapbox_id"] = mapbox_id
+
+        return beach_data
 
     except (KeyError, TypeError, ValueError) as e:
         print(f"Skipping invalid feature: {e}")
         return None
 
 
-def seed_beaches(geojson_path):
+def seed_beaches(geojson_path, reset=False):
+    if reset:
+        print("Resetting database...")
+        delete_all_beaches()
+    
     with open(geojson_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -64,4 +99,5 @@ def seed_beaches(geojson_path):
     print(f"\n Done! {total} beaches seeded.")
 
 if __name__ == "__main__":
-    seed_beaches("backend/export.geojson")
+    # Set reset=True to clear database before seeding
+    seed_beaches("beaches2.geojson", reset=False)

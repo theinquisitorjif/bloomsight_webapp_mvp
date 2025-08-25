@@ -168,7 +168,7 @@ const LandingPage = () => {
       {/* About Section */}
       <div className="bg-blue-100 py-10">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-blue-900 mb-4">About Us</h2>
+          <h5 className="text-3xl font-bold text-blue-900 mb-4">About BloomSight</h5>
           <p className="text-gray-700 leading-relaxed">
             BloomSight is your go-to source for beach information, focusing on red tide and harmful algae blooms (HABs). We provide up-to-the-minute data from scientific organizations like the FWC and NOAA, combined with real-time community reports. This dual-source approach ensures you have the most accurate information on beach conditions. Our location-aware search helps you quickly find beaches near you, so you're always informed before you go.
           </p>

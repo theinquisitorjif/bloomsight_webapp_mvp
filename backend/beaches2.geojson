@@ -3,6 +3,1045 @@
     {
       "type": "Feature",
       "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCSmhLN0E",
+        "wikidata": "Q2304580",
+        "place_name": "Butler Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.26359,
+          29.79777
+        ],
+        "type": "Point"
+      },
+      "id": "003218a1a619527679c0d916624a1fd1"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDaVNJN0E",
+        "wikidata": "Q993930",
+        "place_name": "Key Colony Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.017832,
+          24.721296
+        ],
+        "type": "Point"
+      },
+      "id": "00c2d7e2b317d71b3bc25970ce994a3e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpId3FxN0E",
+        "wikidata": "Q2570675",
+        "place_name": "South Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.342834,
+          27.590445
+        ],
+        "type": "Point"
+      },
+      "id": "081a63eab219e2e4ca50304524708dee"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpINy9LN0E",
+        "wikidata": "Q1862368",
+        "place_name": "St. Augustine Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.271545,
+          29.851456
+        ],
+        "type": "Point"
+      },
+      "id": "0dc5ff78df06e7f863ba16ebcdaee59c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "accuracy": "street",
+        "place_name": "Haulover Beach Park Path & Road, Sunny Isles Beach, Florida 33160, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.121471,
+          25.907419
+        ],
+        "type": "Point"
+      },
+      "id": "0f37004cb749434b8ef817158240eaf0"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpJZ1NNN0E",
+        "place_name": "Seacrest Beach, Inlet Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.01946,
+          30.281254
+        ],
+        "type": "Point"
+      },
+      "id": "1295249c7eb26489d1cfd9719fa81de5"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDTnNvN0E",
+        "place_name": "Highland Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.065905,
+          26.399373
+        ],
+        "type": "Point"
+      },
+      "id": "13c83fc615fca820ae47c95064e56a70"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEcTZJN0E",
+        "wikidata": "Q985167",
+        "place_name": "Ormond Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.055574,
+          29.285731
+        ],
+        "type": "Point"
+      },
+      "id": "18c23988d3f7a5eb4a8e0f2b09f512bf"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEOEFvN0E",
+        "wikidata": "Q2056505",
+        "place_name": "Ponte Vedra Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.380169,
+          30.227496
+        ],
+        "type": "Point"
+      },
+      "id": "1c0dcc6c76d27126b6db5a8dad509781"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEejdJN0E",
+        "wikidata": "Q7164674",
+        "place_name": "Pensacola Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -87.144061,
+          30.336032
+        ],
+        "type": "Point"
+      },
+      "id": "22bdc233e64a16fa5264661d920ab99b"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFdzFvN0E",
+        "wikidata": "Q2151584",
+        "place_name": "Sunny Isles Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.12126,
+          25.943263
+        ],
+        "type": "Point"
+      },
+      "id": "297a187fce427548376c9ad714edd96b"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEdlBJN0E",
+        "wikidata": "Q1075852",
+        "place_name": "Panama City Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.805315,
+          30.177941
+        ],
+        "type": "Point"
+      },
+      "id": "2aec9c9a7aaaa0d910eac5b3f4a3fde6"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFRlFvN0E",
+        "place_name": "Redington Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.809124,
+          27.806968
+        ],
+        "type": "Point"
+      },
+      "id": "2afec7a35039fd9858fb35bf34ac8d78"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpLcUpzN0E",
+        "place_name": "White Beach, Sarasota, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.52671,
+          27.240286
+        ],
+        "type": "Point"
+      },
+      "id": "2b50e9ea52003e88b3b5a3a4f90ca836"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFeFlvN0E",
+        "place_name": "Surfside, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.123525,
+          25.885249
+        ],
+        "type": "Point"
+      },
+      "id": "2dda8ec1b4b21f8db089a6dbe08dd7f9"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCVFVLN0E",
+        "place_name": "Carrabelle Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -84.68454,
+          29.833199
+        ],
+        "type": "Point"
+      },
+      "id": "31c72cbbb9ca049065581d731abea244"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpJNERNN0E",
+        "place_name": "South Cocoa Beach, Cocoa Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.606284,
+          28.281407
+        ],
+        "type": "Point"
+      },
+      "id": "396eb5f80a80bc6353d895913d393a6a"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpBL0dJN0E",
+        "wikidata": "Q852653",
+        "place_name": "Cocoa Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.607482,
+          28.319435
+        ],
+        "type": "Point"
+      },
+      "id": "39d3b5c77f25807251c7cb94ddb3c5c5"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDZXBJN0E",
+        "place_name": "Juno Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.056843,
+          26.883162
+        ],
+        "type": "Point"
+      },
+      "id": "45e257557fa38b5619b32db9d1c0aa18"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIellxN0E",
+        "place_name": "South Ponte Vedra Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.323685,
+          30.022467
+        ],
+        "type": "Point"
+      },
+      "id": "47501f168b277df82bb6f51310f75eff"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEeFRJN0E",
+        "wikidata": "Q1230410",
+        "place_name": "Patrick AFB, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.601469,
+          28.241889
+        ],
+        "type": "Point"
+      },
+      "id": "49b4275660845a85a07b033fe069798e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCcUVJN0E",
+        "wikidata": "Q994756",
+        "place_name": "Flagler Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.127414,
+          29.481036
+        ],
+        "type": "Point"
+      },
+      "id": "4d291a2f124f96026e3ec9da390b3f67"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCbzFJN0E",
+        "wikidata": "Q1975746",
+        "place_name": "Fernandina Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.429849,
+          30.674873
+        ],
+        "type": "Point"
+      },
+      "id": "4d6b294cf228dd05c112bd57dfdf2501"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIWFpvN0E",
+        "wikidata": "Q1412667",
+        "place_name": "St. George Island, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -84.881296,
+          29.65577
+        ],
+        "type": "Point"
+      },
+      "id": "5208973757291416da96127929f7278e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpBdEhNN0E",
+        "place_name": "Bethune Beach, New Smyrna Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.83737,
+          28.946953
+        ],
+        "type": "Point"
+      },
+      "id": "555d58b565b51d5930c87c1db9fb8b9d"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "accuracy": "street",
+        "place_name": "Walton Rocks Beach, Jensen Beach, Florida 34957, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.233242,
+          27.338325
+        ],
+        "type": "Point"
+      },
+      "id": "56b0d5b487566d3a76dda492829f7a06"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpGc0NNN0E",
+        "place_name": "Manhattan Beach, Jacksonville, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.39969,
+          30.366432
+        ],
+        "type": "Point"
+      },
+      "id": "58dfb0f88822c085e9c563f4e2a44091"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpBeitNN0E",
+        "place_name": "Blue Mountain Beach, Santa Rosa Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.19645,
+          30.33701
+        ],
+        "type": "Point"
+      },
+      "id": "5991b191aac21b05c2c1d5dd2ef54195"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDQmxLN0E",
+        "place_name": "Davis Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.46473,
+          29.967949
+        ],
+        "type": "Point"
+      },
+      "id": "61a45f709cb1114275307975b5c6050e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpGZnRvN0E",
+        "wikidata": "Q992514",
+        "place_name": "Indian Rocks Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.850491,
+          27.884029
+        ],
+        "type": "Point"
+      },
+      "id": "675fed03bf79888b5d94fb2f484d7b65"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIS2tzN0E",
+        "place_name": "Paradise Beach, Pensacola, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -87.42007,
+          30.399298
+        ],
+        "type": "Point"
+      },
+      "id": "67ab1012b34b275b6906b2fcf843cdb8"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEUmdNN0E",
+        "place_name": "Floridana Beach, Melbourne Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.496994,
+          27.946695
+        ],
+        "type": "Point"
+      },
+      "id": "6d31528ecc6614606f4940214e74f8bc"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpESTdvN0E",
+        "wikidata": "Q999465",
+        "place_name": "Mexico Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.418123,
+          29.948172
+        ],
+        "type": "Point"
+      },
+      "id": "6fea2a557ec608dbfb837d73ee2b89d6"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFWWtJN0E",
+        "wikidata": "Q2107439",
+        "place_name": "Satellite Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.590425,
+          28.175988
+        ],
+        "type": "Point"
+      },
+      "id": "78d73f8fd6c20284abead45bbec721ae"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpLRXZzN0E",
+        "place_name": "Venice Beach, Venice, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.45422,
+          27.099768
+        ],
+        "type": "Point"
+      },
+      "id": "7f460b1c345aaa60d19a701ddf0ddb46"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCTjZvN0E",
+        "wikidata": "Q490595",
+        "place_name": "Daytona Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.982215,
+          29.176131
+        ],
+        "type": "Point"
+      },
+      "id": "81f3fe99fc4ce2d8bd7e8ded65725fb7"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFUXlxN0E",
+        "place_name": "Keaton Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -83.59204,
+          29.826607
+        ],
+        "type": "Point"
+      },
+      "id": "839d9336d0341e3553ac2936c17ca180"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIUlNxN0E",
+        "place_name": "Saint Joe Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.36127,
+          29.902382
+        ],
+        "type": "Point"
+      },
+      "id": "92aeaaa2edab0ebcb211815ac3822f7a"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCNG5xN0E",
+        "wikidata": "Q2580673",
+        "place_name": "Crescent Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.253494,
+          29.768744
+        ],
+        "type": "Point"
+      },
+      "id": "985e8584d17ab618c1babb0dc85e8d3c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDRktxN0E",
+        "place_name": "Dekle Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -83.61835,
+          29.847984
+        ],
+        "type": "Point"
+      },
+      "id": "9a3f0eaaf135546c31ee9c556d97fc7e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEWnVvN0E",
+        "wikidata": "Q989461",
+        "place_name": "Neptune Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.396437,
+          30.312129
+        ],
+        "type": "Point"
+      },
+      "id": "a3ef513bd87e33301e01fd7bf6354e0a"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpJc3ZLN0E",
+        "wikidata": "Q7961219",
+        "place_name": "Wakulla Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -84.25956,
+          30.10803
+        ],
+        "type": "Point"
+      },
+      "id": "a3f82fe28a6f621dde16ea295e8c8476"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFdDJvN0E",
+        "wikidata": "Q57200",
+        "place_name": "St. Pete Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.741868,
+          27.726516
+        ],
+        "type": "Point"
+      },
+      "id": "a648488ce941df0716c0ddd7967da6c4"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpqK3pz",
+        "place_name": "American Beach, Fernandina Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.44428,
+          30.573854
+        ],
+        "type": "Point"
+      },
+      "id": "a689551f79d1df52cf3392ff57b2d6ec"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIUTdNN0E",
+        "wikidata": "Q16896477",
+        "place_name": "Pass-A-Grille Beach, St. Pete Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.735794,
+          27.697239
+        ],
+        "type": "Point"
+      },
+      "id": "aaa0f26082e23183930edc655f4969bd"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEZERzN0E",
+        "place_name": "Fred Howard Park, Tarpon Springs, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.79145,
+          28.158415
+        ],
+        "type": "Point"
+      },
+      "id": "b5e9fc42ce4a056bacb47dc77abbca4e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpER21JN0E",
+        "wikidata": "Q1013994",
+        "place_name": "Melbourne Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.557219,
+          28.06838
+        ],
+        "type": "Point"
+      },
+      "id": "b84e86bd7ee733938e2da018c447911a"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIazlxN0E",
+        "wikidata": "Q54322478",
+        "place_name": "Shired Island, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -83.201805,
+          29.397856
+        ],
+        "type": "Point"
+      },
+      "id": "bbc7cacb73aacf67452807095525c277"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpETm1vN0E",
+        "wikidata": "Q2429075",
+        "place_name": "Miramar Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.361512,
+          30.378663
+        ],
+        "type": "Point"
+      },
+      "id": "bcc328859dda84f2ba07e18b81ff8d35"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFMEJNN0E",
+        "place_name": "Johnsons Beach, Pensacola, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -87.41993,
+          30.299067
+        ],
+        "type": "Point"
+      },
+      "id": "c10a0d71aef7c449eeac70df60390e34"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDYTFvN0E",
+        "wikidata": "Q988928",
+        "place_name": "Jacksonville Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.392204,
+          30.290025
+        ],
+        "type": "Point"
+      },
+      "id": "c11319fc33c5b3d88eb91de7cdd33293"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpJUHJNN0E",
+        "place_name": "Rosemary Beach, Inlet Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -86.0163,
+          30.280087
+        ],
+        "type": "Point"
+      },
+      "id": "c274d8c2829df3aa00ab8d91f997ee99"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzowYWpz",
+        "wikidata": "Q514250",
+        "place_name": "Atlantic Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.398271,
+          30.333497
+        ],
+        "type": "Point"
+      },
+      "id": "c67617d17b9beddc9077927ffe2b046d"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpKWlVzN0E",
+        "place_name": "Sunset Beach, Treasure Island, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.76355,
+          27.755848
+        ],
+        "type": "Point"
+      },
+      "id": "c91cd8d4e63e531f1f30753e03916ec8"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFNnZJN0E",
+        "place_name": "Treasure Island, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.76923,
+          27.769015
+        ],
+        "type": "Point"
+      },
+      "id": "c96e10e60c0813ebeca8126a2f1b4542"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDaWVvN0E",
+        "wikidata": "Q485186",
+        "place_name": "Key West, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.80665,
+          24.558241
+        ],
+        "type": "Point"
+      },
+      "id": "ce9f4b300e52198187b5719909500f33"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpDN3JvN0E",
+        "place_name": "Madeira Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.801086,
+          27.801067
+        ],
+        "type": "Point"
+      },
+      "id": "d013714aa9a12378ca8341ea313226e1"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpCNkdvN0E",
+        "place_name": "Golden Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.119963,
+          25.957137
+        ],
+        "type": "Point"
+      },
+      "id": "d1bf7c73fa166c59de7f26fa51a90bf4"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpJaURLN0E",
+        "wikidata": "Q304175",
+        "place_name": "Upper Grand Lagoon, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.74429,
+          30.158836
+        ],
+        "type": "Point"
+      },
+      "id": "d536b7af707402c75e7bc20505052e7d"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpHaUNzN0E",
+        "place_name": "Nokomis Beach, Nokomis, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -82.4703,
+          27.124498
+        ],
+        "type": "Point"
+      },
+      "id": "ddcf61ad3b67614087a759e6d0c04d39"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpEOW1JN0E",
+        "wikidata": "Q721475",
+        "place_name": "Port St. Joe, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -85.304208,
+          29.813936
+        ],
+        "type": "Point"
+      },
+      "id": "e2fe2e120d16c8ea246f1313859a60ba"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpIdnJvN0E",
+        "wikidata": "Q993774",
+        "place_name": "Fort Myers Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.955171,
+          26.453815
+        ],
+        "type": "Point"
+      },
+      "id": "e38117a7029b4df0cf9965b6ae16106c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpBcUdLN0E",
+        "place_name": "Beverly Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.1446,
+          29.515106
+        ],
+        "type": "Point"
+      },
+      "id": "e5bde906ab73e74530ad2ae741adc15c"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpJcE1LN0E",
+        "wikidata": "Q2570621",
+        "place_name": "Vilano Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -81.29297,
+          29.918959
+        ],
+        "type": "Point"
+      },
+      "id": "e6340956442d5b198b774d0f2e73846e"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFS3lJN0E",
+        "wikidata": "Q994772",
+        "place_name": "Riviera Beach, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.031911,
+          26.785837
+        ],
+        "type": "Point"
+      },
+      "id": "ed795d31d017db21b135f19d19294c7b"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpFOElNN0E",
+        "place_name": "Key Largo Park, Key Largo, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.43481,
+          25.099619
+        ],
+        "type": "Point"
+      },
+      "id": "f0cc5f39f10c59dd96d4962ce4638514"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mapbox_id": "dXJuOm1ieHBsYzpBelZzN0E",
+        "place_name": "Blowing Rocks, Jupiter Island, Florida, United States"
+      },
+      "geometry": {
+        "coordinates": [
+          -80.08171,
+          26.977001
+        ],
+        "type": "Point"
+      },
+      "id": "f81eb75772829e4dd85749a1b25d3357"
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "@id": "node/10174230392",
         "lifeguard": "no",
         "name": "Siesta Key Beach",
@@ -210,25 +1249,6 @@
         "type": "Point"
       },
       "id": "node/11781627571"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/12118286390",
-        "description": "18 - As últimas sereias (Lamantim)",
-        "image": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.beauvalnature.org%2Fthumbnail%2FdNwruIPwmnXl_hnpw-5I4oDXwDrw4ursk7jl7JuoGQE%2Fex%3A1%3Aso%2Fh%3A904%2Ftrim%3A1%2Fw%3A904%2Fplain%2Fs3%3A%2Fbeauvalnature.org%2Fimages%2Fd4c77b8c-13e7-4da6-bf62",
-        "name": "Costa oriental da Flórida",
-        "natural": "beach",
-        "source": "18;As últimas sereias;Lamantim"
-      },
-      "geometry": {
-        "coordinates": [
-          -80.401821,
-          27.800447
-        ],
-        "type": "Point"
-      },
-      "id": "node/12118286390"
     },
     {
       "type": "Feature",
@@ -837,8 +1857,8 @@
       },
       "geometry": {
         "coordinates": [
-          -82.406204,
-          27.771694
+          -82.417767,
+          27.791001
         ],
         "type": "Point"
       },
@@ -1974,36 +2994,6 @@
         "type": "Point"
       },
       "id": "node/5898656290"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/6240836245",
-        "natural": "beach"
-      },
-      "geometry": {
-        "coordinates": [
-          -81.438422,
-          30.494176
-        ],
-        "type": "Point"
-      },
-      "id": "node/6240836245"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/6240836251",
-        "natural": "beach"
-      },
-      "geometry": {
-        "coordinates": [
-          -81.441013,
-          30.496643
-        ],
-        "type": "Point"
-      },
-      "id": "node/6240836251"
     },
     {
       "type": "Feature",
