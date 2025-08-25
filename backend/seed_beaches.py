@@ -100,4 +100,4 @@ def seed_beaches(geojson_path, reset=False):
 
 if __name__ == "__main__":
     # Set reset=True to clear database before seeding
-    seed_beaches("beaches2.geojson", reset=False)
+    seed_beaches("NEWFLBEACHES.geojson", reset=False)
