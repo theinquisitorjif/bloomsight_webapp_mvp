@@ -20,7 +20,7 @@ export const NavMenu = () => {
           <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
           <NavigationMenuContent className="z-[1000]">
             <ul className="grid gap-2 w-[250px]">
-              <ListItem href="/beaches" title="Map" imgSrc="/nav-map.png">
+              <ListItem href="/beaches" title="Map">
                 Explore new beaches
               </ListItem>
               <ListItem href="/safety" title="Safety">
