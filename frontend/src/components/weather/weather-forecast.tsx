@@ -49,7 +49,7 @@ export default function WeatherForecast({
   return (
     <section
       id="weather"
-      className="rounded-lg border border-border flex-1 px-4 py-2 space-y-4"
+      className="rounded-lg border border-border flex-1 px-4 py-2 space-y-4 bg-background shadow-sm"
     >
       <Accordion defaultValue="day-0" type="single" className="w-full">
         {upcomingDays.map((day, index) => (

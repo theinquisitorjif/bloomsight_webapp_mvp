@@ -38,7 +38,7 @@ export function BeachRecommendation({ score }: RecommendationProps) {
   }
 
   return (
-    <div className="rounded-lg overflow-hidden border border-border h-full mt-6 p-4 bg-background">
+    <div className="rounded-lg overflow-hidden border border-border h-full mt-6 p-4 bg-background shadow-sm">
       <div
         className={`flex items-center gap-2 border border-border p-4 rounded-md ${colorClasses}`}
       >

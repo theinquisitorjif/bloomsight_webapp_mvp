@@ -12,6 +12,7 @@ import {
 import { Skeleton } from "./ui/skeleton";
 import { LogOutIcon, SettingsIcon } from "lucide-react";
 import supabase from "@/supabase";
+import { Link } from "react-router-dom";
 
 const UserButton = () => {
   const { session } = useSession();
@@ -48,9 +49,11 @@ const UserButton = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer flex items-center justify-between">
-          Settings <SettingsIcon className="size-4" />
-        </DropdownMenuItem>
+        <Link to="/settings">
+          <DropdownMenuItem className="cursor-pointer flex items-center justify-between">
+            Settings <SettingsIcon className="size-4" />
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem
           onClick={() => {
             supabase.auth.signOut();

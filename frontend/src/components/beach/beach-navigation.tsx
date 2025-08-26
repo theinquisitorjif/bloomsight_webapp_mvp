@@ -32,8 +32,8 @@ export const BeachNavigation = () => {
     <nav
       ref={navRef}
       className={clsx(
-        "overflow-x-auto w-full mt-10 pb-4 sticky top-0 bg-background z-10 transition-shadow",
-        isSticky && "shadow-lg border-b border-t-0 border-border"
+        "overflow-x-auto w-full mt-10 pb-4 sticky top-0 z-10 transition-shadow",
+        isSticky && "shadow-lg border-b border-t-0 border-border bg-background"
       )}
     >
       <div className="xl:max-w-[1000px] container flex gap-10 mx-auto border-t border-border ">

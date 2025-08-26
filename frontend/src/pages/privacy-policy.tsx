@@ -6,7 +6,7 @@ const PrivacyPolicyPage = () => {
           Privacy Policy
         </h1>
         <hr />
-        <div className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <div className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <p className="text-muted-foreground">Last updated: August 24, 2025</p>
           <p>
             This Privacy Policy describes Our policies and procedures on the
@@ -37,7 +37,7 @@ const PrivacyPolicyPage = () => {
           Definitions
         </h3>
         <p>For the purposes of this Privacy Policy:</p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>
             <p>
               <strong>Account</strong> means a unique account created for You to
@@ -141,7 +141,7 @@ const PrivacyPolicyPage = () => {
           identify You. Personally identifiable information may include, but is
           not limited to:
         </p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>
             <p>Email address</p>
           </li>
@@ -187,7 +187,7 @@ const PrivacyPolicyPage = () => {
           and to improve and analyze Our Service. The technologies We use may
           include:
         </p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>
             <strong>Cookies or Browser Cookies.</strong> A cookie is a small
             file placed on Your Device. You can instruct Your browser to refuse
@@ -223,7 +223,7 @@ const PrivacyPolicyPage = () => {
           We use both Session and Persistent Cookies for the purposes set out
           below:
         </p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>
             <p>
               <strong>Necessary / Essential Cookies</strong>
@@ -274,7 +274,7 @@ const PrivacyPolicyPage = () => {
           Use of Your Personal Data
         </h3>
         <p>The Company may use Personal Data for the following purposes:</p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>
             <p>
               <strong>To provide and maintain our Service</strong>, including to
@@ -347,7 +347,7 @@ const PrivacyPolicyPage = () => {
         <p>
           We may share Your personal information in the following situations:
         </p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>
             <strong>With Service Providers:</strong> We may share Your personal
             information with Service Providers to monitor and analyze the use of
@@ -466,7 +466,7 @@ const PrivacyPolicyPage = () => {
           The Company may disclose Your Personal Data in the good faith belief
           that such action is necessary to:
         </p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>Comply with a legal obligation</li>
           <li>Protect and defend the rights or property of the Company</li>
           <li>
@@ -537,7 +537,7 @@ const PrivacyPolicyPage = () => {
           If you have any questions about this Privacy Policy, You can contact
           us:
         </p>
-        <ul className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <ul className="bg-background shadow-sm p-4 rounded-md border border-border flex flex-col gap-2">
           <li>By email: bloomsight.services@gmail.com</li>
         </ul>
       </main>

@@ -194,7 +194,7 @@ export const BeachParking = ({ beachId }: { beachId: number }) => {
         <div
           ref={mapRef}
           style={{ width: "100%", height: "455px" }}
-          className="rounded-lg mt-6 bg-neutral-200"
+          className="rounded-lg mt-6 bg-neutral-200 shadow-sm"
         />
       </div>
     </section>

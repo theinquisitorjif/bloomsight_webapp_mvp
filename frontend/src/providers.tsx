@@ -12,6 +12,18 @@ const Providers = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
+        {/** Backgroun gradient colors */}
+        <div
+          className="pointer-events-none fixed top-0 right-0 z-[-2] h-[700px] w-[700px]
+          bg-[radial-gradient(110%_60%_at_70%_20%,rgba(0,163,255,0.1)_0%,rgba(0,163,255,0)_70%)]
+          dark:bg-[radial-gradient(110%_60%_at_70%_20%,rgba(0,163,255,0.15)_0%,rgba(0,163,255,0)_80%)]"
+        ></div>
+        <div
+          className="pointer-events-none fixed top-0 left-0 z-[-2] h-[700px] w-[700px] 
+          bg-[radial-gradient(110%_60%_at_20%_20%,rgba(50,205,50,0.1)_0%,rgba(50,205,50,0)_70%)] 
+          dark:bg-[radial-gradient(110%_60%_at_20%_20%,rgba(50,205,50,0.15)_0%,rgba(50,205,50,0)_80%)]"
+        ></div>
+
         <Header />
         <Outlet />
         <Footer />

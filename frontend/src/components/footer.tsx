@@ -8,7 +8,7 @@ export const Footer = () => {
       className={
         isAuthRoute || isMapPage
           ? "hidden"
-          : "bg-gradient-to-r from-green-50 to-blue-100"
+          : "bg-gradient-to-r from-green-50 to-blue-100 border-t border-border"
       }
     >
       <div className="mx-auto w-full max-w-[1000px] p-4 py-6 lg:py-8">

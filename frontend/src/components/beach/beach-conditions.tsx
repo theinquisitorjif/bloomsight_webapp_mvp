@@ -75,7 +75,7 @@ export const BeachConditions = ({
       </h3>
       <p>What to expect when visiting {beachName}</p>
 
-      <div className="mt-4 relative rounded-lg border border-border flex-1 h-40 overflow-hidden">
+      <div className="mt-4 relative rounded-lg border border-border flex-1 h-40 overflow-hidden bg-background shadow-sm">
         {tidePredictionQuery.data ? (
           <TideChart data={tidePredictionQuery.data} />
         ) : tidePredictionQuery.isPending ? (
@@ -132,7 +132,7 @@ export const BeachConditions = ({
           />
         )}
 
-        <div className="rounded-lg border border-border lg:col-span-3 flex-1 h-40 p-4">
+        <div className="rounded-lg border border-border lg:col-span-3 flex-1 h-40 p-4 bg-background shadow-sm">
           <span className="flex items-center gap-1">
             <Thermometer size={14} />
             <p className="text-sm text-muted-foreground">Water Temperature</p>
@@ -171,7 +171,7 @@ const AtmosphereData = ({
   air_quality: string | number;
 }) => {
   return (
-    <div className="p-4 rounded-lg border lg:col-span-3 border-border h-40 bg-white">
+    <div className="p-4 rounded-lg border lg:col-span-3 border-border h-40 bg-white bg-background shadow-sm">
       <div className="grid grid-cols-2 gap-3 h-full">
         <dl>
           <dt className="text-sm text-muted-foreground flex items-center gap-1">
@@ -218,7 +218,7 @@ const WindSpeeds = ({
   direction: string | number;
 }) => {
   return (
-    <div className="rounded-lg flex gap-6 items-start lg:col-span-4 justify-between border border-border h-40 p-4">
+    <div className="rounded-lg flex gap-6 items-start lg:col-span-4 justify-between border border-border h-40 p-4 bg-background shadow-sm">
       <div>
         <span className="flex items-center gap-1">
           <Wind size={14} />

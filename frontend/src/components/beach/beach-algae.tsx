@@ -18,7 +18,7 @@ export const BeachAlgae = ({ beachId }: { beachId: number }) => {
       <h3 className="text-2xl font-semibold tracking-tight">Water Quality</h3>
 
       <div className="md:gap-6 grid grid-cols-1 md:grid-cols-2">
-        <div className="mt-4 rounded-lg border border-border flex-1 p-4">
+        <div className="mt-4 rounded-lg border border-border flex-1 p-4 bg-background shadow-sm">
           <p className="text-sm text-muted-foreground">Current & Rip Tides</p>
           <div className="flex items-center gap-2 mt-1">
             <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ export const BeachAlgae = ({ beachId }: { beachId: number }) => {
             Some risk present. Be aware of changing conditions.
           </p>
         </div> */}
-        <div className="mt-4 rounded-lg border border-border flex-1 p-4">
+        <div className="mt-4 rounded-lg border border-border flex-1 p-4 bg-background shadow-sm">
           <p className="text-sm text-muted-foreground">Red Tide</p>
           <div className="flex items-center gap-2 mt-1">
             <div className="flex items-center gap-2">
