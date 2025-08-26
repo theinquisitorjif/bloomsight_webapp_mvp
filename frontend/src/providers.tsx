@@ -24,6 +24,14 @@ const Providers = () => {
           dark:bg-[radial-gradient(110%_60%_at_20%_20%,rgba(50,205,50,0.15)_0%,rgba(50,205,50,0)_80%)]"
         ></div>
 
+        <div
+          className="absolute inset-0 h-full w-full bg-background z-[-3]
+             bg-[radial-gradient(#e5e7eb_1px,transparent_1px)]
+             [background-size:16px_16px]
+             [mask-image:radial-gradient(ellipse_50%_50%_at_50%_0%,#000_60%,transparent_100%)]
+         "
+        ></div>
+
         <Header />
         <Outlet />
         <Footer />
