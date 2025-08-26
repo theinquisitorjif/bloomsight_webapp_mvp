@@ -6,7 +6,7 @@ const TermsPage = () => {
           Terms & Conditions
         </h1>
         <hr />
-        <div className="bg-neutral-100 p-4 rounded-lg flex flex-col gap-2">
+        <div className="bg-background border border-border shadow-sm p-4 rounded-lg flex flex-col gap-2">
           <p>
             These terms and conditions apply to the bloomsight app (hereby
             referred to as "Application") for mobile devices that was created by

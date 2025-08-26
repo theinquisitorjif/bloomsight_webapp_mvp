@@ -20,7 +20,13 @@ export const Header = () => {
   const { session } = useSession();
 
   return (
-    <header className={isAuthRoute ? "hidden" : "p-2 h-20"}>
+    <header
+      className={
+        isAuthRoute
+          ? "hidden"
+          : "p-2 h-20 z-[10000] bg-background border-b border-border"
+      }
+    >
       <div className="container flex items-center justify-between mx-auto max-w-[1000px]">
         {isMobile ? (
           <Sheet>

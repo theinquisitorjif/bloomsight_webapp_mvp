@@ -11,9 +11,13 @@ const SafetyPage = () => {
     <div className="flex flex-col items-center pt-10 pb-20">
       <main className="container p-2 xl:max-w-[1000px] space-y-4">
         <div className="relative border border-border overflow-hidden bg-neutral-100 rounded-lg w-full h-[340px] flex flex-col items-center justify-center">
-          <img src="https://images.unsplash.com/flagged/photo-1557899775-24a0957d3895?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+          <img
+            src="/banner.png"
+            alt="Banner"
+            className="w-full object-cover h-full scale-105"
+          />
 
-          <h1 className="absolute bottom-4 left-4 text-4xl font-bold text-neutral-100">
+          <h1 className="absolute bottom-4 left-4 text-3xl font-bold bg-gradient-to-r from-green-300 to-blue-500 bg-clip-text text-transparent">
             Safety Information
           </h1>
         </div>
@@ -34,7 +38,7 @@ const SafetyPage = () => {
           <Accordion
             type="single"
             collapsible
-            className="w-full"
+            className="w-full bg-background rounded-lg shadow-sm border border-border p-4"
             defaultValue="item-1"
           >
             <AccordionItem value="item-1">
@@ -159,7 +163,7 @@ const SafetyPage = () => {
           <Accordion
             type="single"
             collapsible
-            className="w-full"
+            className="w-full bg-background rounded-lg shadow-sm border border-border p-4"
             defaultValue="item-1"
           >
             <AccordionItem value="item-1">
@@ -241,7 +245,7 @@ const SafetyPage = () => {
           <Accordion
             type="single"
             collapsible
-            className="w-full"
+            className="w-full bg-background rounded-lg shadow-sm border border-border p-4"
             defaultValue="item-1"
           >
             <AccordionItem value="item-1">
@@ -287,7 +291,7 @@ const SafetyPage = () => {
           <Accordion
             type="single"
             collapsible
-            className="w-full"
+            className="w-full bg-background rounded-lg shadow-sm border border-border p-4"
             defaultValue="item-1"
           >
             <AccordionItem value="item-1">

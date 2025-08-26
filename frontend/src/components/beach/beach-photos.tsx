@@ -34,7 +34,7 @@ export const BeachPhotos = ({
   }
 
   return (
-    <div className="grid grid-cols-6 gap-4 h-[340px] relative">
+    <div className="grid grid-cols-6 gap-4 h-[340px] relative bg-background shadow-sm rounded-lg">
       <img
         src={photosQuery.data[0].image_url}
         className={cn(
@@ -76,7 +76,8 @@ export const BeachPhotos = ({
       <Dialog>
         <DialogTrigger asChild>
           <Button className="absolute bottom-4 left-4" variant="outline">
-            <Image /> {photosQuery.data.length} {photosQuery.data.length === 1 ? "photo" : "photos"}
+            <Image /> {photosQuery.data.length}{" "}
+            {photosQuery.data.length === 1 ? "photo" : "photos"}
           </Button>
         </DialogTrigger>
 

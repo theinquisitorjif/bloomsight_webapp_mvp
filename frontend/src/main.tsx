@@ -12,13 +12,13 @@ import NonAuthProtectedRoute from "./non-auth-protected-route";
 import { ForgotPasswordPage } from "./pages/auth/forgot-password-page";
 import { ResetPasswordPage } from "./pages/auth/reset-password-page";
 import { VerifyEmailPage } from "./pages/auth/verify-email-page";
-import { Button } from "./components/ui/button";
-import supabase from "./supabase";
 import { BeachPage } from "./pages/beach-page";
 import { LandingPage } from "./pages/landing-page";
 import SafetyPage from "./pages/safety-page";
 import PrivacyPolicyPage from "./pages/privacy-policy";
 import TermsPage from "./pages/terms-page";
+import EmptyStatePage from "./pages/empty-state-page";
+import SettingsPage from "./pages/settings-page";
 
 const authRoutes = [
   {
@@ -45,13 +45,8 @@ const protectedRoutes = [
     element: <VerifyEmailPage />,
   },
   {
-    path: "/protected",
-    element: (
-      <div>
-        can't access this foo!{" "}
-        <Button onClick={() => supabase.auth.signOut()}>Logout</Button>
-      </div>
-    ),
+    path: "/settings",
+    element: <SettingsPage />,
   },
 ];
 
@@ -84,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: "/terms",
         element: <TermsPage />,
+      },
+      {
+        path: "/*", // Catch all route
+        element: <EmptyStatePage />,
       },
       /** Routes that only non-authenticated users can access */
       {

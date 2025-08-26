@@ -71,7 +71,7 @@ const LandingPage = () => {
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row items-center justify-center px-6 py-12 gap-12 max-w-6xl mx-auto">
         {/* Beach Video */}
-        <div className="w-full lg:w-1/2">
+        <div className="w-full lg:w-1/2 relative">
           <video
             src="/BS_intro.mp4"
             autoPlay
@@ -81,6 +81,7 @@ const LandingPage = () => {
           >
             Your browser does not support the video tag.
           </video>
+          <img src="https://gifdb.com/images/high/loud-noises-498-x-280-gif-t45khfqzv5l7me7t.gif" className="absolute top-12 right-12 w-40 h-40" />
         </div>
 
         {/* Right Side Content */}
@@ -179,12 +180,14 @@ const LandingPage = () => {
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-8 text-center">
             <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+              <img src="/search.png" alt="Search Icon" className="w-30 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-blue-800 mb-2">Location-Based Search</h3>
               <p className="text-gray-700">
                 Instantly find beaches near you with our location-aware search. The homepage shows you the closest beaches, and you can easily search for any other destination.
               </p>
             </div>
             <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+              <img src="/insights.png" alt="Community Icon" className="w-36 mx-auto" />
               <h3 className="text-xl font-semibold text-blue-800 mb-2">Community Insights</h3>
               <p className="text-gray-700">
                 Join our community by sharing your on-the-ground observations. Your reports on conditions like respiratory irritation or fish kills help everyone stay informed.

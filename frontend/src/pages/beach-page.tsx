@@ -18,6 +18,7 @@ import {
 } from "@/api/beach";
 import { useLocation } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import EmptyStatePage from "./empty-state-page";
 
 export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
@@ -46,7 +47,7 @@ export const BeachPage = () => {
       </div>
     );
   } else if (!beachQuery.data || !beachQuery.data.location) {
-    return <p>Beach not found</p>;
+    return <EmptyStatePage description="Beach not found" />;
   }
 
   return (

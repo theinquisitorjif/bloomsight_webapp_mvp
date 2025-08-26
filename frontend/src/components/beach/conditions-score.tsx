@@ -32,7 +32,7 @@ export const ConditionsScore = ({ score }: { score: number }) => {
   };
 
   return (
-    <div className="p-2 rounded-lg border border-border mt-2">
+    <div className="p-2 rounded-lg border border-border mt-2 bg-background shadow-sm">
       <p className="text-muted-foreground text-sm">Current Conditions</p>
       <div className="flex items-center gap-1">
         <p
