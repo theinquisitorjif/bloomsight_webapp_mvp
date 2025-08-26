@@ -15,37 +15,37 @@ import uuid
 from supabase import create_client
 from dateutil import parser  # more robust datetime parser
 
-import re
+# import re
 
-_ISO_RE = re.compile(
-    r"^(?P<date>\d{4}-\d{2}-\d{2})[T ](?P<hms>\d{2}:\d{2}:\d{2})"
-    r"(?:\.(?P<frac>\d+))?(?P<tz>Z|[+-]\d{2}:\d{2}|[+-]\d{4})?$"
-)
+# _ISO_RE = re.compile(
+#     r"^(?P<date>\d{4}-\d{2}-\d{2})[T ](?P<hms>\d{2}:\d{2}:\d{2})"
+#     r"(?:\.(?P<frac>\d+))?(?P<tz>Z|[+-]\d{2}:\d{2}|[+-]\d{4})?$"
+# )
 
-def parse_iso8601_lenient(ts: str) -> datetime:
-    """
-    Parse ISO-8601 with 0–6 fractional digits and 'Z' or ±HH:MM / ±HHMM tz.
-    Always returns an aware datetime in UTC.
-    """
-    ts = ts.strip()
-    m = _ISO_RE.match(ts)
-    if not m:
-        raise ValueError(f"Not ISO-8601-ish: {ts}")
+# def parse_iso8601_lenient(ts: str) -> datetime:
+#     """
+#     Parse ISO-8601 with 0–6 fractional digits and 'Z' or ±HH:MM / ±HHMM tz.
+#     Always returns an aware datetime in UTC.
+#     """
+#     ts = ts.strip()
+#     m = _ISO_RE.match(ts)
+#     if not m:
+#         raise ValueError(f"Not ISO-8601-ish: {ts}")
 
-    frac = m.group("frac") or ""
-    # clamp/pad fractional seconds to 6 digits
-    if len(frac) > 6:
-        frac = frac[:6]
-    else:
-        frac = frac.ljust(6, "0")
+#     frac = m.group("frac") or ""
+#     # clamp/pad fractional seconds to 6 digits
+#     if len(frac) > 6:
+#         frac = frac[:6]
+#     else:
+#         frac = frac.ljust(6, "0")
 
-    tz = (m.group("tz") or "+00:00").replace("Z", "+00:00")
-    # strptime wants %z as +HHMM (no colon)
-    tz_nocolon = tz.replace(":", "")
+#     tz = (m.group("tz") or "+00:00").replace("Z", "+00:00")
+#     # strptime wants %z as +HHMM (no colon)
+#     tz_nocolon = tz.replace(":", "")
 
-    normalized = f"{m.group('date')}T{m.group('hms')}.{frac}{tz_nocolon}"
-    # result is timezone-aware; convert to UTC
-    return datetime.strptime(normalized, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc)
+#     normalized = f"{m.group('date')}T{m.group('hms')}.{frac}{tz_nocolon}"
+#     # result is timezone-aware; convert to UTC
+#     return datetime.strptime(normalized, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc)
 
 
 TEMP_THRESHOLD = float(os.environ.get("BEACH_TEMP_THRESHOLD", 20.0))
@@ -207,57 +207,79 @@ def beach_parking(mapbox_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-#Endpoint for getting tide predictions
-@app.route("/tide-prediction", methods=["GET"])
-def tide_prediction():
+import re
+from datetime import datetime, timedelta, timezone
+
+# lenient ISO parser (0-6 fractional digits, Z or +HH:MM or +HHMM)
+_ISO_RE = re.compile(
+    r"^(?P<date>\d{4}-\d{2}-\d{2})[T ](?P<hms>\d{2}:\d{2}:\d{2})"
+    r"(?:\.(?P<frac>\d+))?(?P<tz>Z|[+-]\d{2}:\d{2}|[+-]\d{4})?$"
+)
+
+def parse_iso8601_lenient(ts: str) -> datetime:
+    ts = (ts or "").strip()
+    if not ts:
+        raise ValueError("Empty timestamp")
+    m = _ISO_RE.match(ts)
+    if not m:
+        # last resort: try fromisoformat directly (may still fail)
+        return datetime.fromisoformat(ts)
+    frac = (m.group("frac") or "").ljust(6, "0")[:6]
+    tz = (m.group("tz") or "+00:00").replace("Z", "+00:00")
+    tz_nocolon = tz.replace(":", "")
+    normalized = f"{m.group('date')}T{m.group('hms')}.{frac}{tz_nocolon}"
+    return datetime.strptime(normalized, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc)
+
+@app.route("/beaches/<string:mapbox_id>/tide-prediction", methods=["GET"])
+def tide_prediction(mapbox_id):
+    # 1) Look up beach row (must include location and optional cached tide)
+    beach_res = supabase.table("beaches").select("name, location, tide_prediction, last_updated").eq("mapbox_id", mapbox_id).single().execute()
+    if not beach_res.data:
+        return jsonify({"error": "Beach not found"}), 404
+
+    beach = beach_res.data
+    location = beach.get("location")
+    if not location:
+        return jsonify({"error": "Beach coordinates missing"}), 400
+
+    # parse coordinates safely
     try:
-        # get coords from query
-        lat = float(request.args.get("lat"))
-        lon = float(request.args.get("lon"))
+        lat_str, lon_str = location.split(",")
+        lat = float(lat_str.strip())
+        lon = float(lon_str.strip())
+    except Exception:
+        return jsonify({"error": "Invalid beach location format"}), 400
 
-        # check supabase for existing entry
-        tide_prediction_data = supabase.table("tide_predictions").select("*").eq("lat", lat).eq("lon", lon).single().execute()
+    # 2) If there's a cached tide_prediction + last_updated, check freshness
+    tide_cached = beach.get("tide_prediction")
+    last_updated_str = beach.get("last_updated")
+    if tide_cached and last_updated_str:
+        try:
+            last_updated = parse_iso8601_lenient(last_updated_str)
+            age = datetime.now(timezone.utc) - last_updated
+            # consider cached tides fresh for 12 hours
+            if age < timedelta(hours=12):
+                return jsonify(tide_cached), 200
+        except Exception as e:
+            # log parse failure (optional) and continue to fetch new data
+            app.logger.debug(f"Could not parse last_updated '{last_updated_str}': {e}")
 
-        if tide_prediction_data.data:
-            try:
-                # robust parsing of last_updated
-                if tide_prediction_data.data.get('last_updated'):
-                    last_updated = parse_iso8601_lenient(tide_prediction_data.data['last_updated'])
-                    age = datetime.now(timezone.utc) - last_updated
-                    if age < timedelta(hours=12) and tide_prediction_data.data.get('tide_prediction'):
-                        return jsonify(tide_prediction_data.data['tide_prediction']), 200
+    # 3) fetch new tide prediction (your existing function)
+    try:
+        tide_data = get_tide_prediction_json(lat, lon, beach.get("name"))
+        # save back to DB (write microsecond-precision UTC ISO)
+        supabase.table("beaches").update({
+            "tide_prediction": tide_data,
+            "last_updated": datetime.now(timezone.utc).isoformat(timespec="microseconds")
+        }).eq("mapbox_id", mapbox_id).execute()
 
-            except Exception:
-                # fallback: normalize manually for weird microseconds
-                ts = tide_prediction_data.data['last_updated']
-                if "+" in ts:
-                    date_part, offset = ts.split("+")
-                    if "." in date_part:
-                        date, micro = date_part.split(".")
-                        micro = micro.ljust(6, "0")  # pad to 6 digits
-                        ts = f"{date}.{micro}+{offset}"
-                last_updated = datetime.fromisoformat(ts)
-
-            # check if fresh (within 6 hours)
-            if datetime.utcnow() - last_updated < timedelta(hours=6):
-                return jsonify(tide_prediction_data.data)
-
-        # if not fresh or not found → fetch from API
-        # NOTE: replace this with your actual tide API fetch logic
-        prediction = {
-            "lat": lat,
-            "lon": lon,
-            "prediction": "high tide",
-            "last_updated": datetime.utcnow().isoformat()
-        }
-
-        # upsert to supabase
-        supabase.table("tide_predictions").upsert(prediction).execute()
-
-        return jsonify(prediction)
-
+        return jsonify(tide_data), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        app.logger.exception("Failed to fetch tide prediction:")
+        # fallback: return cached tide even if stale, otherwise error
+        if tide_cached:
+            return jsonify(tide_cached), 200
+        return jsonify({"error": f"Failed to fetch tide prediction: {str(e)}"}), 500
 
 #For getting weather forecast data
 @app.route('/beaches/<string:mapbox_id>/weather-forecast', methods=['GET'])
