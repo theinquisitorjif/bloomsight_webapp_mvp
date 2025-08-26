@@ -12,6 +12,42 @@ from fwc_redtide import beaches as redtide_beaches
 from datetime import datetime, timedelta, timezone
 import uuid
 
+from supabase import create_client
+from dateutil import parser  # more robust datetime parser
+
+import re
+
+_ISO_RE = re.compile(
+    r"^(?P<date>\d{4}-\d{2}-\d{2})[T ](?P<hms>\d{2}:\d{2}:\d{2})"
+    r"(?:\.(?P<frac>\d+))?(?P<tz>Z|[+-]\d{2}:\d{2}|[+-]\d{4})?$"
+)
+
+def parse_iso8601_lenient(ts: str) -> datetime:
+    """
+    Parse ISO-8601 with 0–6 fractional digits and 'Z' or ±HH:MM / ±HHMM tz.
+    Always returns an aware datetime in UTC.
+    """
+    ts = ts.strip()
+    m = _ISO_RE.match(ts)
+    if not m:
+        raise ValueError(f"Not ISO-8601-ish: {ts}")
+
+    frac = m.group("frac") or ""
+    # clamp/pad fractional seconds to 6 digits
+    if len(frac) > 6:
+        frac = frac[:6]
+    else:
+        frac = frac.ljust(6, "0")
+
+    tz = (m.group("tz") or "+00:00").replace("Z", "+00:00")
+    # strptime wants %z as +HHMM (no colon)
+    tz_nocolon = tz.replace(":", "")
+
+    normalized = f"{m.group('date')}T{m.group('hms')}.{frac}{tz_nocolon}"
+    # result is timezone-aware; convert to UTC
+    return datetime.strptime(normalized, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc)
+
+
 TEMP_THRESHOLD = float(os.environ.get("BEACH_TEMP_THRESHOLD", 20.0))
 WIND_THRESHOLD = float(os.environ.get("BEACH_WIND_THRESHOLD", 10.0))
 
@@ -84,24 +120,24 @@ def get_beaches_wrapped():
     return jsonify({"data": beaches}), 200
 
 # Get a beach by ID
-@app.route('/beaches/<string:mapbox_id>', methods=['GET'])
-def get_beach(mapbox_id):
-    response = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).execute()
+# @app.route('/beaches/<string:mapbox_id>', methods=['GET'])
+# def get_beach(mapbox_id):
+#     response = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).execute()
 
-    if not response.data:
-        return jsonify({"error": "Beach not found"}), 404
+#     if not response.data:
+#         return jsonify({"error": "Beach not found"}), 404
     
-    if len(response.data) > 1:
-        return jsonify({"error": "Multiple beaches found"}), 400
+#     if len(response.data) > 1:
+#         return jsonify({"error": "Multiple beaches found"}), 400
     
-    # Get a preview picture for the beach
-    picture_res = supabase.table("pictures").select("image_url").eq("mapbox_id", mapbox_id).limit(1).execute()
-    if picture_res.data:
-        response.data[0]["preview_picture"] = picture_res.data[0]["image_url"]
-    else:
-        response.data[0]["preview_picture"] = None
+#     # Get a preview picture for the beach
+#     picture_res = supabase.table("pictures").select("image_url").eq("mapbox_id", mapbox_id).limit(1).execute()
+#     if picture_res.data:
+#         response.data[0]["preview_picture"] = picture_res.data[0]["image_url"]
+#     else:
+#         response.data[0]["preview_picture"] = None
 
-    return jsonify(response.data[0]), 200
+#     return jsonify(response.data[0]), 200
 
 
 # Manually add a beach to Supabase
@@ -172,45 +208,56 @@ def beach_parking(mapbox_id):
         return jsonify({"error": str(e)}), 500
 
 #Endpoint for getting tide predictions
-@app.route("/beaches/<string:mapbox_id>/tide-prediction", methods=["GET"])
-def tide_prediction(mapbox_id):
-    tide_prediction_data = supabase.table('beaches').select('tide_prediction, last_updated').eq('mapbox_id', mapbox_id).single().execute()
+@app.route("/tide-prediction", methods=["GET"])
+def tide_prediction():
+    try:
+        # get coords from query
+        lat = float(request.args.get("lat"))
+        lon = float(request.args.get("lon"))
 
-    if not tide_prediction_data.data:
-        return jsonify({'error': 'Beach not found'}), 404
-    
-    if tide_prediction_data.data.get('last_updated'):
-        last_updated = datetime.fromisoformat(tide_prediction_data.data['last_updated'])
-        age = datetime.now(timezone.utc) - last_updated  # both are now aware
+        # check supabase for existing entry
+        tide_prediction_data = supabase.table("tide_predictions").select("*").eq("lat", lat).eq("lon", lon).single().execute()
 
-        # If the tide prediction is less than 12 hours old, return it
-        if age < timedelta(hours=12) and tide_prediction_data.data.get('tide_prediction'):
-            return jsonify(tide_prediction_data.data['tide_prediction']), 200
+        if tide_prediction_data.data:
+            try:
+                # robust parsing of last_updated
+                if tide_prediction_data.data.get('last_updated'):
+                    last_updated = parse_iso8601_lenient(tide_prediction_data.data['last_updated'])
+                    age = datetime.now(timezone.utc) - last_updated
+                    if age < timedelta(hours=12) and tide_prediction_data.data.get('tide_prediction'):
+                        return jsonify(tide_prediction_data.data['tide_prediction']), 200
 
-    # Retrieve the beach info from Supabase
-    beach_data = supabase.table('beaches').select('*').eq('mapbox_id', mapbox_id).single().execute()
+            except Exception:
+                # fallback: normalize manually for weird microseconds
+                ts = tide_prediction_data.data['last_updated']
+                if "+" in ts:
+                    date_part, offset = ts.split("+")
+                    if "." in date_part:
+                        date, micro = date_part.split(".")
+                        micro = micro.ljust(6, "0")  # pad to 6 digits
+                        ts = f"{date}.{micro}+{offset}"
+                last_updated = datetime.fromisoformat(ts)
 
-    if not beach_data.data:
-        return jsonify({'error': 'Beach not found'}), 404
+            # check if fresh (within 6 hours)
+            if datetime.utcnow() - last_updated < timedelta(hours=6):
+                return jsonify(tide_prediction_data.data)
 
-    beach = beach_data.data
-    location = beach.get('location')
-    name = beach.get('name')
-    lat_str, lon_str = location.split(",")
-    lat = float(lat_str.strip())
-    lon = float(lon_str.strip())
+        # if not fresh or not found → fetch from API
+        # NOTE: replace this with your actual tide API fetch logic
+        prediction = {
+            "lat": lat,
+            "lon": lon,
+            "prediction": "high tide",
+            "last_updated": datetime.utcnow().isoformat()
+        }
 
-    if lat is None or lon is None:
-        return jsonify({'error': 'Beach coordinates missing'}), 400
+        # upsert to supabase
+        supabase.table("tide_predictions").upsert(prediction).execute()
 
-    data = get_tide_prediction_json(lat, lon, name)
+        return jsonify(prediction)
 
-    supabase.table('beaches').update({
-        'tide_prediction': data,
-        'last_updated': datetime.now(timezone.utc).isoformat()
-    }).eq('mapbox_id', mapbox_id).execute()
-
-    return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 #For getting weather forecast data
 @app.route('/beaches/<string:mapbox_id>/weather-forecast', methods=['GET'])
@@ -221,10 +268,8 @@ def beach_weather_forecast(mapbox_id):
         return jsonify({'error': 'Beach not found'}), 404
 
     if forecast_data.data.get('last_updated'):
-        last_updated = datetime.fromisoformat(forecast_data.data['last_updated'])
-        age = datetime.now(timezone.utc) - last_updated  # both are now aware
-
-        # If the forecast is less than 12 hours old, return it
+        last_updated = parse_iso8601_lenient(forecast_data.data['last_updated'])
+        age = datetime.now(timezone.utc) - last_updated
         if age < timedelta(hours=12) and forecast_data.data.get('forecast'):
             return jsonify(forecast_data.data['forecast']), 200
 

@@ -21,8 +21,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const getBeachForecast = async (beachId: string) => {
-  if (!beachId) return null;
-
   try {
     // 1. Fetch the beach row from Supabase
     const { data: beachRows, error: beachError } = await supabase
@@ -45,13 +43,15 @@ export const getBeachForecast = async (beachId: string) => {
     const [lat, lng] = beach.location.split(",").map(Number);
 
     // 2. Fetch forecast from your API endpoint (this populates the forecast column)
-    let forecastData: any = null;
+    let forecastData = null;
     try {
-      const response = await fetch(`${API_BASE}/beaches/${beach.mapbox_id}/weather-forecast`);
+      console.log("Fetching forecast for beach ID:", beachId);
+      const response = await fetch(`${API_BASE}/beaches/${beachId}/weather-forecast`);
       if (!response.ok) {
-        console.warn(`Failed to fetch forecast for beach ${beach.mapbox_id}`);
+        console.log(`Failed to fetch forecast for beach ${beachId}`);
       } else {
         const data = await response.json();
+        console.log("Forecast data from API:", data);
         if (Array.isArray(data) && data.length > 0) {
           forecastData = data[0]; // take the first forecast entry
         }
@@ -124,16 +124,12 @@ export const getBeachForecast = async (beachId: string) => {
   }
 };
 
-
-
-
 const getFeatureId = (properties: any) => {
   if (properties?.['@id']) {
     return properties['@id'].slice(5); // remove first 5 chars
   }
   return properties?.mapbox_id || null;
 };
-
 
 const Map = () => {
   const mapRef = useRef<MapRef>(null);
@@ -254,7 +250,7 @@ const Map = () => {
     }
   };
 
-  const openBeachPopup = async (lng: number, lat: number, beachName: string, beachId?: string) => {
+  const openBeachPopup = async (lng: number, lat: number, beachName: string, beachId: string) => {
     try {
       const [beachData, redTide] = await Promise.all([
         getBeachForecast(beachId),
@@ -262,7 +258,7 @@ const Map = () => {
       ]);
 
       let popupContent;
-      console.log("beachData", beachData);
+      console.log("beachData (the forecast)", beachData);
       if (beachData) {
         const forecast = beachData.forecast;
         console.log("forecast", forecast);
