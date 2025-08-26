@@ -67,7 +67,9 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
                 <Star fill="black" size={18} />
                 <Link to="#" className="underline underline-offset-2">
                   {reviewsQuery.data?.number_of_reviews}{" "}
-                  {reviewsQuery.data?.number_of_reviews === 1 ? "review" : "reviews"}
+                  {reviewsQuery.data?.number_of_reviews === 1
+                    ? "review"
+                    : "reviews"}
                 </Link>
               </div>
             )}
@@ -282,9 +284,11 @@ export const BeachComments = ({ beachId }: { beachId: number }) => {
         )}
 
         {commentsQuery.data?.comments.length === 0 && (
-          <h3 className="text-lg tracking-tight">
-            No comments. Be the first to comment!
-          </h3>
+          <img
+            src="/comments-empty.png"
+            alt="No comments"
+            className="w-80 mx-auto md:-my-10"
+          />
         )}
       </div>
     </section>
