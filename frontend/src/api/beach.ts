@@ -20,7 +20,7 @@ import {
   type BeachPicturesAPIResponse,
 } from "@/types/beach";
 
-export function useGetBeachByBeachID(id: number) {
+export function useGetBeachByBeachID(id: string) {
   return useQuery<BeachAPIResponse>({
     queryKey: ["beach", id],
     queryFn: async () => {
@@ -30,7 +30,7 @@ export function useGetBeachByBeachID(id: number) {
   });
 }
 
-export function useGetParkingSpotsByBeachID(id: number) {
+export function useGetParkingSpotsByBeachID(id: string) {
   return useQuery<ParkingSpotsAPIResponse>({
     queryKey: ["parking-spots", id],
     queryFn: async () => {
@@ -50,7 +50,7 @@ export function useGetTidePredictionByBeachID(id: number) {
   });
 }
 
-export function useGetWeatherForecastByBeachID(id: number) {
+export function useGetWeatherForecastByBeachID(id: string) {
   return useQuery<WeatherForecastAPIResponse[]>({
     queryKey: ["weather-forecast"],
     queryFn: async () => {

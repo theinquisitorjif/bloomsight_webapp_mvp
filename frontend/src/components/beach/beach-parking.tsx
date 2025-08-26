@@ -6,7 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { useGetBeachByBeachID, useGetParkingSpotsByBeachID } from "@/api/beach";
 
-export const BeachParking = ({ beachId }: { beachId: number }) => {
+export const BeachParking = ({ beachId }: { beachId: string }) => {
   const { ref } = useSectionInView("parking", 0.5);
 
   const mapRef = useRef<HTMLDivElement | null>(null);

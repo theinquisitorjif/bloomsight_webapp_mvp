@@ -1307,21 +1307,6 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "node/2765978148",
-        "natural": "beach"
-      },
-      "geometry": {
-        "coordinates": [
-          -80.188439,
-          27.239738
-        ],
-        "type": "Point"
-      },
-      "id": "node/2765978148"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "node/2917137675",
         "name": "South Beach",
         "natural": "beach"
@@ -2833,22 +2818,6 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "node/4993527967",
-        "name": "Vilano Point",
-        "natural": "beach"
-      },
-      "geometry": {
-        "coordinates": [
-          -81.293828,
-          29.909621
-        ],
-        "type": "Point"
-      },
-      "id": "node/4993527967"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "node/5067211262",
         "name": "Murray Point",
         "natural": "beach"
@@ -2933,39 +2902,6 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "node/5487137022",
-        "description": "Public Beach Access via East Oakland Park Boulevard. ",
-        "natural": "beach",
-        "surface": "unpaved"
-      },
-      "geometry": {
-        "coordinates": [
-          -80.098057,
-          26.167553
-        ],
-        "type": "Point"
-      },
-      "id": "node/5487137022"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/5662498017",
-        "natural": "beach",
-        "surface": "concrete"
-      },
-      "geometry": {
-        "coordinates": [
-          -80.766044,
-          28.447307
-        ],
-        "type": "Point"
-      },
-      "id": "node/5662498017"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "node/5898656288",
         "name": "Public Beach Access 3",
         "natural": "beach"
@@ -3017,21 +2953,6 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "node/6415054917",
-        "natural": "beach"
-      },
-      "geometry": {
-        "coordinates": [
-          -80.353956,
-          27.650069
-        ],
-        "type": "Point"
-      },
-      "id": "node/6415054917"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "node/6748857338",
         "name": "Princess Beach",
         "natural": "beach"
@@ -3061,21 +2982,6 @@
         "type": "Point"
       },
       "id": "node/7029159397"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/9267318638",
-        "natural": "beach"
-      },
-      "geometry": {
-        "coordinates": [
-          -82.627362,
-          27.777438
-        ],
-        "type": "Point"
-      },
-      "id": "node/9267318638"
     },
     {
       "type": "Feature",

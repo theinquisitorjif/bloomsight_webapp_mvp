@@ -47,30 +47,34 @@ def format_feature(feature):
         if "," in name:
             name = name.split(",")[0].strip()
         
-        # Get mapbox_id from @id field if it exists, skip first 5 characters and convert to number
-        at_id = feature["properties"].get("@id")
+        # Priority-based mapbox_id setting
+        mapbox_id = None
         
+        # First, check if @id exists
+        at_id = feature["properties"].get("@id")
         if at_id and len(at_id) > 5:
             try:
-                mapbox_id = int(at_id[5:])
+                mapbox_id = at_id[5:]
             except ValueError:
-                # If it can't be converted to int, generate unique ID
-                mapbox_id = int(time.time() * 1000) + random.randint(1, 999)
-        else:
-            # No @id found or @id too short, generate unique ID using timestamp + random
-            mapbox_id = int(time.time() * 1000) + random.randint(1, 999)
+                pass  # Continue to next check if conversion fails
+        
+        # If no valid @id, check if mapbox_id already exists
+        if mapbox_id is None:
+            existing_mapbox_id = feature["properties"].get("mapbox_id")
+            if existing_mapbox_id is not None:
+                try:
+                    mapbox_id = existing_mapbox_id
+                except (ValueError, TypeError):
+                    pass
         
         location = f"{lat}, {lon}"
 
         beach_data = {
             "name": name,
             "location": location,
-            "description": "Imported from GeoJSON"
+            "description": "Imported from GeoJSON",
+            "mapbox_id": mapbox_id
         }
-        
-        # Only add mapbox_id if it exists
-        if mapbox_id:
-            beach_data["mapbox_id"] = mapbox_id
 
         return beach_data
 
@@ -105,4 +109,4 @@ def seed_beaches(geojson_path, reset=False):
 
 if __name__ == "__main__":
     # Set reset=True to clear database before seeding
-    seed_beaches("NEWFLBEACHES.geojson", reset=False)
+    seed_beaches("fl beaches.geojson", reset=False)

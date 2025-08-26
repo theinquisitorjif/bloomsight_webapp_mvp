@@ -18,41 +18,121 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-/**
- * Fetch the most recent forecast for a beach near given lat/lng.
- */
-// eslint-disable-next-line react-refresh/only-export-components
-export async function getForecast(lat: number, lng: number, tolerance = 0.005) {
-  try {
-    // 1. Fetch rows (only forecast, location, updated_at)
-    const { data: beaches, error } = await supabase
-      .from("beaches")
-      .select("forecast, location, last_updated")
-      .order("last_updated", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching beaches:", error);
+// eslint-disable-next-line react-refresh/only-export-components
+export const getBeachForecast = async (beachId: string) => {
+  if (!beachId) return null;
+
+  try {
+    // 1. Fetch the beach row from Supabase
+    const { data: beachRows, error: beachError } = await supabase
+      .from("beaches")
+      .select("id, name, location, mapbox_id")
+      .eq("mapbox_id", beachId)
+      .limit(1);
+
+    if (beachError) {
+      console.error("Error fetching beach by ID:", beachError);
       return null;
     }
 
-    // 2. Parse and filter in JS
-    const matching = beaches.filter((row) => {
-      const [rowLat, rowLng] = row.location.split(",").map(Number);
-      return (
-        Math.abs(rowLat - lat) <= tolerance &&
-        Math.abs(rowLng - lng) <= tolerance
-      );
-    });
+    if (!beachRows || beachRows.length === 0) {
+      console.log("Beach not found:", beachId);
+      return null;
+    }
 
-    // 3. Return the latest forecast (since data is already ordered by updated_at)
-    return matching.length > 0 ? matching[0].forecast : null;
+    const beach = beachRows[0];
+    const [lat, lng] = beach.location.split(",").map(Number);
+
+    // 2. Fetch forecast from your API endpoint (this populates the forecast column)
+    let forecastData: any = null;
+    try {
+      const response = await fetch(`${API_BASE}/beaches/${beach.mapbox_id}/weather-forecast`);
+      if (!response.ok) {
+        console.warn(`Failed to fetch forecast for beach ${beach.mapbox_id}`);
+      } else {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          forecastData = data[0]; // take the first forecast entry
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching forecast data from API:", err);
+    }
+
+    if (forecastData) {
+      const wc = forecastData.weather_code;
+
+      // Map weather codes to Cloud Cover description
+      if (wc === 0) {
+        forecastData['Cloud Cover'] = "Clear sky";
+      } else if ([1, 2].includes(wc)) {
+        forecastData['Cloud Cover'] = "Partly cloudy";
+      } else if (wc === 3) {
+        forecastData['Cloud Cover'] = "Overcast";
+      } else if (wc >= 45 && wc <= 48) {
+        forecastData['Cloud Cover'] = "Foggy";
+      } else if (wc >= 51 && wc <= 57) {
+        forecastData['Cloud Cover'] = "Drizzle";
+      } else if (wc >= 61 && wc <= 67) {
+        forecastData['Cloud Cover'] = "Rainy";
+      } else if (wc >= 71 && wc <= 77) {
+        forecastData['Cloud Cover'] = "Snowy";
+      } else if (wc >= 80 && wc <= 82) {
+        forecastData['Cloud Cover'] = "Rain showers";
+      } else if (wc >= 85 && wc <= 86) {
+        forecastData['Cloud Cover'] = "Snow showers";
+      } else if (wc >= 95 && wc <= 99) {
+        forecastData['Cloud Cover'] = "Thunderstorms";
+      } else {
+        forecastData['Cloud Cover'] = "Overcast";
+      }
+    }
+
+    // 3. Fetch air quality from your API
+    let airQ = null;
+    try {
+      const response = await fetch(`${API_BASE}/beaches/${beach.mapbox_id}/weather-forecast`);
+      const data = await response.json();
+      airQ = Math.round(data[0]?.air_quality ?? -1);
+    } catch (err) {
+      console.warn("Could not fetch air quality data:", err);
+    }
+
+    // 4. Fetch tide data from your API
+    let cTide = { height: -1, time: "" };
+    try {
+      const tideRes = await fetch(`${API_BASE}/beaches/${beach.mapbox_id}/tide-prediction`);
+      const tideData = await tideRes.json();
+      cTide = tideData?.tides?.[4] || cTide;
+    } catch (err) {
+      console.warn("Could not fetch tide data:", err);
+    }
+
+    return {
+      forecast: forecastData,
+      airQ,
+      cTide,
+      beachId: beach.mapbox_id,
+      lat,
+      lng,
+      name: beach.name,
+    };
   } catch (err) {
-    console.error("Unexpected error in getForecast:", err);
+    console.error("Unexpected error in getBeachForecast:", err);
     return null;
   }
-}
+};
 
 
+
+
+const getFeatureId = (properties: any) => {
+  if (properties?.['@id']) {
+    return properties['@id'].slice(5); // remove first 5 chars
+  }
+  return properties?.mapbox_id || null;
+};
 
 
 const Map = () => {
@@ -109,7 +189,6 @@ const Map = () => {
     }
   }
 
-
   function getCardImg(weatherCode: number) {
     const isRainy = weatherCode >= 61 && weatherCode <= 67; // include all rain types
     const isClear = weatherCode === 0;
@@ -135,52 +214,6 @@ const Map = () => {
   }
 
 
-  const fetchBeachForecast = async (beachName: string, lat?: number, lng?: number, id?: string) => {
-    try {
-      if (lat && lng) {
-
-        const forecasts = await getForecast(lat, lng);
-        const thisForecast = forecasts[0];
-        console.log('Fetched forecasts:', thisForecast);
-
-        if (thisForecast && forecasts.length > 0) {
-          const cc = thisForecast.cloud_cover;
-          if (cc >= 0 && cc < 20) {
-                thisForecast['Cloud Cover'] = "Mostly Clear";
-            } else if (cc >= 20 && cc < 50) {
-                thisForecast['Cloud Cover'] = "Partly Cloudy";
-            } else if (cc >= 50 && cc < 80) {
-                thisForecast['Cloud Cover'] = "Cloudy";
-            } else {
-               thisForecast['Cloud Cover'] = "Overcast";
-            }
-
-          // get air quality
-          const response = await fetch(`${API_BASE}/beaches/${id}/weather-forecast`);
-          const data = await response.json();
-          const airQ = Math.round(data[0]["air_quality"]);
-
-          // get tides
-          const tidesres = await fetch(`${API_BASE}/beaches/${id}/tide-prediction`);
-          const tidesData = await tidesres.json();
-          const cTide = tidesData.tides[4] || [{
-            "height": -1,
-            "time": ""
-          }];
-
-
-          return { forecast: thisForecast, airQ, cTide };
-        }
-
-        console.log('No forecast found for coordinates:', lat, lng);
-        return null;
-      }
-    } catch (error) {
-      console.error('An unexpected error occurred:', error);
-      return null;
-    }
-    return null;
-  };
 
   const getRedTideData = (beachName: string, lat: number, lng: number) => {
     try {
@@ -224,11 +257,12 @@ const Map = () => {
   const openBeachPopup = async (lng: number, lat: number, beachName: string, beachId?: string) => {
     try {
       const [beachData, redTide] = await Promise.all([
-        fetchBeachForecast(beachName, lat, lng, beachId),
+        getBeachForecast(beachId),
         getRedTideData(beachName, lat, lng),
       ]);
 
       let popupContent;
+      console.log("beachData", beachData);
       if (beachData) {
         const forecast = beachData.forecast;
         console.log("forecast", forecast);
@@ -249,12 +283,14 @@ const Map = () => {
           <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">${beachData.airQ}</div></div>
           <div class="weather-row"><div class="weather-category">UV Index</div><div class="weather-rating">${Math.round(forecast["uv_index"])}</div></div>
           <div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide?.abundance || 'Unknown'}</div></div>
+          ${beachId ? `
           <div style="text-align:center; margin-top:5px;">
             <button data-beach-id="${beachId}" style="background:none; border:none; color:#6a6a6a; text-decoration:underline; cursor:pointer;"
               onClick="window.location.href='/beaches/${beachId}'">
               More Info
             </button>
           </div>
+          ` : ''}
         `;
       } else {
         popupContent = `
@@ -277,7 +313,6 @@ const Map = () => {
       console.error("Error opening beach popup:", err);
     }
   };
-
 
   // Initialize map
   useEffect(() => {
@@ -347,18 +382,21 @@ const Map = () => {
           });
         }
 
-        // --- Click popup for beaches ---
         mapRef.current?.on('click', 'points-layer', async (e) => {
           const feature = e.features?.[0];
           if (!feature || feature.geometry.type !== 'Point') return;
+
           const coords = feature.geometry.coordinates as [number, number];
           const [lng, lat] = coords;
-          const beachName = feature.properties?.name || 'Unknown Beach';
-          const beachId = feature.properties? feature.properties['@id'].slice(5): null;
+
+          const beachName =
+            feature.properties?.name?.split(",")[0].trim() ||
+            feature.properties?.place_name?.split(",")[0].trim();
+
+          const beachId = getFeatureId(feature.properties);
 
           try {
             await openBeachPopup(lng, lat, beachName, beachId);
-
           } catch (error) {
             console.error('Error fetching beach data:', error);
 
@@ -374,6 +412,7 @@ const Map = () => {
               .addTo(mapRef.current!);
           }
         });
+
 
         // --- Hover: update hover-point source with the hovered feature geometry ---
         mapRef.current?.on('mousemove', 'points-layer', (e) => {
@@ -466,11 +505,11 @@ const Map = () => {
             ))
           ) : Array.isArray(beaches.data) && beaches.data.length > 0 ? (
             beaches.data.map((beach) => {
-              const [lat, lng] = beach.location.split(",").map(parseFloat);
+              const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
               return (
                 <div
                   className="contents cursor-pointer"
-                  key={beach.id}
+                  key={beach.mapbox_id}
                   onClick={() => {
                     mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
                     openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
@@ -480,7 +519,7 @@ const Map = () => {
                     coords={[lng, lat]}
                     beachName={beach.name}
                     imgSrc={beach.preview_picture ?? null}
-                    beachId={parseInt(beach.mapbox_id)}
+                    beachId={beach.mapbox_id}
                     distance={`${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`}
                   />
                 </div>

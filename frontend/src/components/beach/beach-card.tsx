@@ -5,7 +5,7 @@ interface BeachCardProps {
   beachName: string;
   coords: [number, number];
   imgSrc: string | null;
-  beachId: number | string;
+  beachId: string;
   distance?: string;
 }
 

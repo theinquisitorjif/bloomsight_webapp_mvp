@@ -61,8 +61,7 @@ const LandingPage = () => {
   };
 
   const handleBeachSelect = (beach: BeachAPIResponse & { 'properties'?: Record<string, string> }) => {
-    const beachId = beach.properties?.['@mapbox_id'] || beach.mapbox_id;
-    navigate(`/beaches/${beachId}`);
+    navigate(`/beaches/${beach.mapbox_id}`);
   };
 
   const sortedBeaches = getSortedBeaches();
@@ -139,7 +138,7 @@ const LandingPage = () => {
                         coords={[lng, lat]}
                         beachName={beach.name}
                         imgSrc={beach.preview_picture}
-                        beachId={parseInt(beach.mapbox_id)}
+                        beachId={beach.mapbox_id}
                         distance={`${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`}
                       />
                     </div>

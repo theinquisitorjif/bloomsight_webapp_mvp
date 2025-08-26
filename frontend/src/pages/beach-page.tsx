@@ -23,7 +23,7 @@ export const BeachPage = () => {
   const [activeSection, setActiveSection] = useState<string>("Overview");
   const [timeOfLastClick, setTimeOfLastClick] = useState(0); // Used to disable the observer temporarily when user clicks on a link
 
-  const id = parseInt(useLocation().pathname.split("/")[2]);
+  const id = useLocation().pathname.split("/")[2];
 
   const weatherForecastQuery = useGetWeatherForecastByBeachID(id);
   const beachQuery = useGetBeachByBeachID(id);
