@@ -45,13 +45,13 @@ export const getBeachForecast = async (beachId: string) => {
     // 2. Fetch forecast from your API endpoint (this populates the forecast column)
     let forecastData = null;
     try {
-      console.log("Fetching forecast for beach ID:", beachId);
+      //console.log("Fetching forecast for beach ID:", beachId);
       const response = await fetch(`${API_BASE}/beaches/${beachId}/weather-forecast`);
       if (!response.ok) {
         console.log(`Failed to fetch forecast for beach ${beachId}`);
       } else {
         const data = await response.json();
-        console.log("Forecast data from API:", data);
+        //console.log("Forecast data from API:", data);
         if (Array.isArray(data) && data.length > 0) {
           forecastData = data[0]; // take the first forecast entry
         }
@@ -156,7 +156,7 @@ const Map = () => {
   }
 
   function getWeatherColor(weatherCode: number) {
-    console.log("weatherCode", weatherCode);
+    //console.log("weatherCode", weatherCode);
 
     if (weatherCode === 0) {
       // Clear sky
@@ -258,10 +258,10 @@ const Map = () => {
       ]);
 
       let popupContent;
-      console.log("beachData (the forecast)", beachData);
+
       if (beachData) {
         const forecast = beachData.forecast;
-        console.log("forecast", forecast);
+
         popupContent = `
           <div class="weather-section" style="background: ${getWeatherColor(forecast['weather_code'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
             ${getCardImg(forecast['weather_code'])}
@@ -327,7 +327,6 @@ const Map = () => {
       });
 
       mapRef.current.on('load', () => {
-        console.log('Map loaded');
 
         if (!mapRef.current!.getSource('my-points')) {
           mapRef.current?.addSource('my-points', {
