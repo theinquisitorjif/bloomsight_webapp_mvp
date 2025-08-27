@@ -15,39 +15,6 @@ import uuid
 from supabase import create_client
 from dateutil import parser  # more robust datetime parser
 
-# import re
-
-# _ISO_RE = re.compile(
-#     r"^(?P<date>\d{4}-\d{2}-\d{2})[T ](?P<hms>\d{2}:\d{2}:\d{2})"
-#     r"(?:\.(?P<frac>\d+))?(?P<tz>Z|[+-]\d{2}:\d{2}|[+-]\d{4})?$"
-# )
-
-# def parse_iso8601_lenient(ts: str) -> datetime:
-#     """
-#     Parse ISO-8601 with 0–6 fractional digits and 'Z' or ±HH:MM / ±HHMM tz.
-#     Always returns an aware datetime in UTC.
-#     """
-#     ts = ts.strip()
-#     m = _ISO_RE.match(ts)
-#     if not m:
-#         raise ValueError(f"Not ISO-8601-ish: {ts}")
-
-#     frac = m.group("frac") or ""
-#     # clamp/pad fractional seconds to 6 digits
-#     if len(frac) > 6:
-#         frac = frac[:6]
-#     else:
-#         frac = frac.ljust(6, "0")
-
-#     tz = (m.group("tz") or "+00:00").replace("Z", "+00:00")
-#     # strptime wants %z as +HHMM (no colon)
-#     tz_nocolon = tz.replace(":", "")
-
-#     normalized = f"{m.group('date')}T{m.group('hms')}.{frac}{tz_nocolon}"
-#     # result is timezone-aware; convert to UTC
-#     return datetime.strptime(normalized, "%Y-%m-%dT%H:%M:%S.%f%z").astimezone(timezone.utc)
-
-
 TEMP_THRESHOLD = float(os.environ.get("BEACH_TEMP_THRESHOLD", 20.0))
 WIND_THRESHOLD = float(os.environ.get("BEACH_WIND_THRESHOLD", 10.0))
 
