@@ -21,7 +21,7 @@ export default function EditableProfilePicture({
   const [tempPicture, setTempPicture] = useState<string | null>(
     initialPicture || null
   );
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<string | File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +39,7 @@ export default function EditableProfilePicture({
 
   const handleRemove = () => {
     setTempPicture(null);
-    setSelectedFile(null);
+    setSelectedFile("empty");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,14 +53,14 @@ export default function EditableProfilePicture({
   return (
     <div className="p-6 border-b border-border">
       <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 w-full">
           <h3 className="font-semibold text-slate-800 dark:text-slate-200">
             Profile Picture
           </h3>
           <div className="flex items-center gap-4">
-            {tempPicture || picture ? (
+            {tempPicture && picture && tempPicture !== "empty" ? (
               <img
-                src={isEditing ? tempPicture || "" : picture || ""}
+                src={isEditing ? tempPicture : picture}
                 alt="Profile"
                 className="w-24 h-24 rounded-full border-4 border-white shadow-sm object-cover"
               />
@@ -79,9 +79,9 @@ export default function EditableProfilePicture({
                 Edit
               </Button>
             ) : (
-              <div className="space-y-2">
-                <div className="flex flex-wrap justify-between gap-2">
-                  <div className="flex gap-2">
+              <div className="space-y-2 w-full">
+                <div className="flex justify-between gap-2 w-full">
+                  <div className="flex w-fit gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -108,7 +108,7 @@ export default function EditableProfilePicture({
                       Remove
                     </Button>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex w-fit gap-2">
                     <Button
                       size="sm"
                       onClick={handleUpdate}

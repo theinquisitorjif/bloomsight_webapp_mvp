@@ -24,7 +24,8 @@ const UserButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer">
-        {session.user.user_metadata.picture ? (
+        {session.user.user_metadata.picture &&
+        session.user.user_metadata.picture !== "empty" ? (
           <Avatar className="size-11">
             <AvatarImage src={session.user.user_metadata.picture} />
             <AvatarFallback>{session.user.user_metadata.name}</AvatarFallback>
