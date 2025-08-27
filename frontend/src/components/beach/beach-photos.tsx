@@ -1,14 +1,10 @@
 import { Button } from "../ui/button";
 import { Image, ImageIcon } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
 import { cn } from "@/lib/utils";
 import { useGetPicturesByBeachID } from "@/api/beach";
 import { Skeleton } from "../ui/skeleton";
+import FullscreenImageCarousel from "../fullscreen-image-carousel";
+import { useState } from "react";
 
 export const BeachPhotos = ({
   beachId,
@@ -18,6 +14,7 @@ export const BeachPhotos = ({
   beachId: number;
 }) => {
   const photosQuery = useGetPicturesByBeachID(beachId);
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false);
 
   if (photosQuery.isPending || !photosQuery.data) {
     return <Skeleton className="w-full h-[340px] rounded-lg" />;
@@ -73,25 +70,20 @@ export const BeachPhotos = ({
         ) : null}
       </div>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button className="absolute bottom-4 left-4" variant="outline">
-            <Image /> {photosQuery.data.length}{" "}
-            {photosQuery.data.length === 1 ? "photo" : "photos"}
-          </Button>
-        </DialogTrigger>
+      <Button
+        className="absolute bottom-4 left-4"
+        variant="outline"
+        onClick={() => setIsCarouselOpen(true)}
+      >
+        <Image /> {photosQuery.data.length}{" "}
+        {photosQuery.data.length === 1 ? "photo" : "photos"}
+      </Button>
 
-        <DialogContent className="grid grid-cols-2 overflow-y-auto h-3/4 sm:max-w-7xl">
-          <DialogTitle className="col-span-2">Beach photos</DialogTitle>
-
-          {photosQuery.data.map((photo) => (
-            <img
-              src={photo.image_url}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          ))}
-        </DialogContent>
-      </Dialog>
+      <FullscreenImageCarousel
+        images={photosQuery.data.map((photo) => photo.image_url)}
+        isCarouselOpen={isCarouselOpen}
+        setIsCarouselOpen={setIsCarouselOpen}
+      />
     </div>
   );
 };

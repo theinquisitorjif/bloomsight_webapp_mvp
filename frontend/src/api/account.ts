@@ -27,7 +27,7 @@ export function useUpdateUser() {}
 
 export function useGetAccountComments() {
   return useQuery<CommentAPIResponse["comments"]>({
-    queryKey: ["account-comments"],
+    queryKey: ["comments"],
     queryFn: async () => {
       const { data } = await api.get("/account/comments");
       return data.comments;

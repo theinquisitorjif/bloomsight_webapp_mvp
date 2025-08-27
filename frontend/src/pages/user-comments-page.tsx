@@ -1,5 +1,5 @@
 import { useGetAccountComments } from "@/api/account";
-import Comments from "@/components/comments";
+import Comments from "@/components/comments/comments";
 import PageContainer from "@/components/page-container";
 import PageTitle from "@/components/page-title";
 import { Loader2 } from "lucide-react";
@@ -12,7 +12,7 @@ const UserCommentsPage = () => {
   return (
     <PageContainer>
       <PageTitle>Your comments</PageTitle>
-      <div className="space-y-2 mt-8 col-span-2">
+      <div className="space-y-2 mt-8">
         {commentsQuery.isPending ? (
           <Loader2 className="animate-spin" />
         ) : commentsQuery.error ? (

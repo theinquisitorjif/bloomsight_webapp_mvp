@@ -13,7 +13,7 @@ import { CommentForm } from "../comments/comment-form";
 import { useSession } from "@/context/session-context";
 import { useGetCommentsByBeachID, useGetReviewsByBeachID } from "@/api/beach";
 import { useState } from "react";
-import Comments from "../comments";
+import Comments from "../comments/comments";
 
 export const BeachComments = ({ beachId }: { beachId: number }) => {
   const { ref } = useSectionInView("comments", 0.5);

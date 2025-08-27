@@ -1,7 +1,7 @@
 import type { CommentAPIResponse } from "@/types/comment";
 import { Ellipsis, Loader2, Trash } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { GeneratedAvatar } from "./generated-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { GeneratedAvatar } from "../generated-avatar";
 import { TiStar } from "react-icons/ti";
 import {
   Dialog,
@@ -11,20 +11,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
+} from "../ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 import { useState } from "react";
 import { useDeleteCommentByCommentID } from "@/api/beach";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 import { toast } from "sonner";
 import { useSession } from "@/context/session-context";
+import FullscreenImageCarousel from "../fullscreen-image-carousel";
 
 const Comments = ({
   comments,
@@ -33,6 +34,8 @@ const Comments = ({
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<string | null>(null);
   const deleteCommentQuery = useDeleteCommentByCommentID();
+
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false);
 
   const { session } = useSession();
 
@@ -184,11 +187,20 @@ const Comments = ({
             src={picture}
             width={120}
             height={120}
-            className="object-cover rounded-lg aspect-square"
+            className="object-cover rounded-lg aspect-square cursor-pointer"
             alt="Comment picture"
+            onClick={() => setIsCarouselOpen(true)}
           />
         ))}
       </div>
+
+      {comment.pictures.length > 0 && (
+        <FullscreenImageCarousel
+          images={comment.pictures}
+          isCarouselOpen={isCarouselOpen}
+          setIsCarouselOpen={setIsCarouselOpen}
+        />
+      )}
 
       {key !== comments.length - 1 && <Separator className="my-8" />}
     </div>
