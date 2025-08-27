@@ -514,6 +514,16 @@ const Map = () => {
                     mapRef.current!.flyTo({ center: [beach.lng, beach.lat], zoom: 10 });
                     openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
                   }}
+                  onMouseEnter={() => {
+                    openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
+                  }}
+                  onMouseLeave={() => {
+                    // close popup when leaving card
+                    if (popupRef.current) {
+                      popupRef.current.remove();
+                      popupRef.current = null;
+                    }
+                  }}
                 >
                   <BeachCard
                     coords={[beach.lng, beach.lat]}
