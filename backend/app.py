@@ -604,13 +604,37 @@ def update_account():
     picture = data.get("picture")
     if not username and not picture:
         return jsonify({"error": "No data provided"}), 400
-    supabase.auth.admin.update_user(user.id, {
-        data: {
-            "picture": picture,
-            "name": username
+    supabase.auth.admin.update_user_by_id(user.id, {
+        "user_metadata": {
+            "picture": picture or user.user_metadata.get("picture"),
+            "avatar_url": picture or user.user_metadata.get("avatar_url"),
+            "name": username or user.user_metadata.get("name"),
+            "full_name": username or user.user_metadata.get("full_name")
         }
     })
     return jsonify({"message": "Account updated"}), 200
+
+@app.route("/account/picture", methods=["POST"])
+def generate_avatar_url():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not authenticated"}), 401
+    file = request.files.get("file")
+
+    if not file:
+        return jsonify({"error": "No file provided"}), 400
+
+    # Create unique filename
+    file_ext = file.filename.split(".")[-1]
+    file_name = f"{uuid.uuid4()}.{file_ext}"
+
+    # Upload to Supabase storage bucket "pictures"
+    supabase.storage.from_("pictures").upload(file_name, file.read())
+
+    # Get public URL
+    public_url = supabase.storage.from_("pictures").get_public_url(file_name)
+
+    return jsonify({"url": public_url}), 200
 
 if __name__ == '__main__':
    # Run on port 5000 to match vite.config.ts proxy

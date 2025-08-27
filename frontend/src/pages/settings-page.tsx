@@ -1,5 +1,7 @@
-import { useDeleteUser } from "@/api/account";
+import { useDeleteUser, useUpdateUser } from "@/api/account";
 import PageTitle from "@/components/page-title";
+import EditableName from "@/components/settings/editable-name";
+import EditableProfilePicture from "@/components/settings/editable-picture";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +36,7 @@ const SettingsPage = () => {
   const { session } = useSession();
   const navigate = useNavigate();
   const deleteUser = useDeleteUser();
+  const updateUser = useUpdateUser();
 
   if (!session) {
     return <Navigate to="/" replace />;
@@ -53,6 +56,18 @@ const SettingsPage = () => {
     try {
       await deleteUser.mutateAsync();
       navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUpdateUser = async (data: {
+    username?: string;
+    picture?: string | File;
+  }) => {
+    try {
+      await updateUser.mutateAsync(data);
+      supabase.auth.refreshSession();
     } catch (error) {
       console.error(error);
     }
@@ -82,70 +97,19 @@ const SettingsPage = () => {
 
           <div className="bg-white dark:bg-slate-800 rounded-md shadow-sm border border-border overflow-hidden">
             {/* Profile Picture Section */}
-            <div className="p-6 border-b border-border">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <div className="flex flex-col gap-4">
-                  <h3 className="font-semibold text-slate-800 dark:text-slate-200">
-                    Profile Picture
-                  </h3>
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={session.user.user_metadata.picture}
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full border-4 border-white shadow-sm object-cover"
-                    />
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex items-center gap-2"
-                        >
-                          <Plus className="w-4 h-4" />
-                          Change Picture
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex items-center gap-2 text-red-600 hover:text-red-700"
-                        >
-                          <Trash className="w-4 h-4" />
-                          Remove
-                        </Button>
-                      </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
-                        JPG, PNG max 2MB
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <EditableProfilePicture
+              initialPicture={session.user.user_metadata.picture}
+              onUpdate={(picture) => handleUpdateUser({ picture })}
+              initialSeed={session.user.user_metadata.name}
+              isLoading={updateUser.isPending}
+            />
 
             {/* Name Section */}
-            <div className="p-6 border-b border-border">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Full Name
-                  </label>
-                  <Input
-                    type="text"
-                    value={session.user.user_metadata.name || "Not provided"}
-                    readOnly
-                    className="max-w-md bg-slate-50 dark:bg-slate-700"
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="w-4 h-4" />
-                  Edit
-                </Button>
-              </div>
-            </div>
+            <EditableName
+              initialName={session.user.user_metadata.full_name}
+              onUpdate={(name) => handleUpdateUser({ username: name })}
+              isLoading={updateUser.isPending}
+            />
 
             {/* Email Section */}
             <div className="p-6 border-b border-border">
@@ -355,6 +319,7 @@ const SettingsPage = () => {
                           <Button
                             variant="destructive"
                             onClick={handleDeleteAccount}
+                            disabled={deleteUser.isPending}
                           >
                             <Trash className="w-4 h-4 mr-2" />
                             Delete Account
