@@ -259,7 +259,8 @@ def beach_weather_forecast(mapbox_id):
     if forecast_data.data.get('last_updated'):
         last_updated = parse_iso8601_lenient(forecast_data.data['last_updated'])
         age = datetime.now(timezone.utc) - last_updated
-        if age < timedelta(hours=12) and forecast_data.data.get('forecast'):
+        # Changed from 12 hours to 1 hour
+        if age < timedelta(hours=1) and forecast_data.data.get('forecast'):
             return jsonify(forecast_data.data['forecast']), 200
 
     # Retrieve full beach info
@@ -285,7 +286,6 @@ def beach_weather_forecast(mapbox_id):
         if forecast_data.data.get('forecast'):
             return jsonify(forecast_data.data['forecast']), 200
         return jsonify({'error': f'Failed to fetch forecast: {str(e)}'}), 500
-
 #get water quality/ red tide/ karena brevis abundance
 @app.route('/beaches/<string:mapbox_id>/water-quality', methods=['GET'])
 def beach_water_quality(mapbox_id):

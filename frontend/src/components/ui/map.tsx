@@ -26,6 +26,20 @@ interface BoundingBoxCoords {
   southWest: { lat: number; lng: number };
 }
 
+// Interface for tide data
+interface TideData {
+  height: number;
+  time: string;
+  type?: string;
+}
+
+// Interface for heatmap data point
+interface HeatmapPoint {
+  lng: number;
+  lat: number;
+  intensity: number; // 0-1 scale for rip tide risk
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 export const getBeachForecast = async (beachId: string) => {
   try {
@@ -131,6 +145,83 @@ export const getBeachForecast = async (beachId: string) => {
   }
 };
 
+// Function to calculate rip tide risk based on tide data
+const calculateRipTideRisk = (tides: TideData[]): number => {
+  if (!tides || tides.length === 0) return 0;
+
+  // Get current and upcoming tides
+  const currentTime = new Date();
+  const upcomingTides = tides.slice(0, 4); // Look at next 4 tide cycles
+
+  let riskScore = 0;
+  
+  for (let i = 0; i < upcomingTides.length - 1; i++) {
+    const currentTide = upcomingTides[i];
+    const nextTide = upcomingTides[i + 1];
+    
+    if (!currentTide || !nextTide) continue;
+    
+    const heightDiff = Math.abs(currentTide.height - nextTide.height);
+    const timeDiff = Math.abs(new Date(nextTide.time).getTime() - new Date(currentTide.time).getTime()) / (1000 * 60 * 60); // hours
+    
+    // Higher risk with:
+    // 1. Larger height differences (stronger tidal flow)
+    // 2. Shorter time between tides (faster changes)
+    // 3. Low tide conditions (channels more defined)
+    
+    const heightFactor = Math.min(heightDiff / 6, 1); // normalize to 0-1, 6ft+ is high risk
+    const timeFactor = timeDiff < 6 ? (6 - timeDiff) / 6 : 0; // faster changes = higher risk
+    const lowTideFactor = Math.max(0, (2 - Math.min(currentTide.height, nextTide.height)) / 2); // lower tides = higher risk
+    
+    riskScore += (heightFactor * 0.4 + timeFactor * 0.3 + lowTideFactor * 0.3);
+  }
+  
+  return Math.min(riskScore / (upcomingTides.length - 1), 1);
+};
+
+// Function to fetch tide data for heatmap
+const fetchTideDataForHeatmap = async (beaches: any[]): Promise<HeatmapPoint[]> => {
+  const heatmapPoints: HeatmapPoint[] = [];
+  
+  // Process beaches in batches to avoid overwhelming the API
+  const batchSize = 10;
+  for (let i = 0; i < beaches.length; i += batchSize) {
+    const batch = beaches.slice(i, i + batchSize);
+    
+    const promises = batch.map(async (beach) => {
+      try {
+        const tideRes = await fetch(`${API_BASE}/beaches/${beach.mapbox_id}/tide-prediction`);
+        if (!tideRes.ok) return null;
+        
+        const tideData = await tideRes.json();
+        const tides = tideData?.tides || [];
+        
+        const [lat, lng] = beach.location.split(",").map(Number);
+        const ripTideRisk = calculateRipTideRisk(tides);
+        
+        return {
+          lng,
+          lat,
+          intensity: ripTideRisk
+        };
+      } catch (error) {
+        console.warn(`Failed to fetch tide data for beach ${beach.mapbox_id}:`, error);
+        return null;
+      }
+    });
+    
+    const results = await Promise.all(promises);
+    heatmapPoints.push(...results.filter(Boolean));
+    
+    // Add small delay between batches to be respectful to the API
+    if (i + batchSize < beaches.length) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+  
+  return heatmapPoints;
+};
+
 const getFeatureId = (properties: any) => {
   if (properties?.['@id']) {
     return properties['@id'].slice(5); // remove first 5 chars
@@ -149,6 +240,9 @@ const Map = () => {
   const [userLng, setUserLng] = useState<number>(-81.3792);
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
+  const [showRipTideHeatmap, setShowRipTideHeatmap] = useState<boolean>(false);
+  const [heatmapData, setHeatmapData] = useState<HeatmapPoint[]>([]);
+  const [isLoadingHeatmap, setIsLoadingHeatmap] = useState<boolean>(false);
 
   // State for bounding box coordinates
   const [boundingBox, setBoundingBox] = useState<BoundingBoxCoords | null>(null);
@@ -164,6 +258,169 @@ const Map = () => {
     long: number;
     abundance: string;
   }
+
+  // Function to load rip tide heatmap data
+  const loadRipTideHeatmap = async () => {
+    if (!beaches.data || isLoadingHeatmap) return;
+    
+    setIsLoadingHeatmap(true);
+    try {
+      const heatmapPoints = await fetchTideDataForHeatmap(beaches.data);
+      setHeatmapData(heatmapPoints);
+      
+      if (mapRef.current && heatmapPoints.length > 0) {
+        // Add heatmap source and layer
+        if (!mapRef.current.getSource('rip-tide-heatmap')) {
+          mapRef.current.addSource('rip-tide-heatmap', {
+            type: 'geojson',
+            data: {
+              type: 'FeatureCollection',
+              features: heatmapPoints.map(point => ({
+                type: 'Feature',
+                properties: {
+                  intensity: point.intensity
+                },
+                geometry: {
+                  type: 'Point',
+                  coordinates: [point.lng, point.lat]
+                }
+              }))
+            }
+          });
+        }
+        
+        if (!mapRef.current.getLayer('rip-tide-heatmap-layer')) {
+          mapRef.current.addLayer({
+            id: 'rip-tide-heatmap-layer',
+            type: 'heatmap',
+            source: 'rip-tide-heatmap',
+            maxzoom: 15,
+            paint: {
+              // Increase the heatmap weight based on intensity property
+              'heatmap-weight': [
+                'interpolate',
+                ['linear'],
+                ['get', 'intensity'],
+                0, 0,
+                1, 1
+              ],
+              // Increase the heatmap color weight by zoom level
+              // heatmap-intensity is a multiplier on top of heatmap-weight
+              'heatmap-intensity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 1,
+                15, 3
+              ],
+              // Color ramp for heatmap - blue (low risk) to red (high risk)
+              'heatmap-color': [
+                'interpolate',
+                ['linear'],
+                ['heatmap-density'],
+                0, 'rgba(33, 102, 172, 0)',
+                0.2, 'rgba(33, 102, 172, 0.2)',
+                0.4, 'rgba(103, 169, 207, 0.4)',
+                0.6, 'rgba(209, 229, 240, 0.6)',
+                0.8, 'rgba(253, 219, 199, 0.8)',
+                1, 'rgba(239, 59, 44, 0.9)'
+              ],
+              // Adjust the heatmap radius by zoom level
+              'heatmap-radius': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 2,
+                15, 20
+              ],
+              // Transition from heatmap to circle layer by zoom level
+              'heatmap-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                7, 1,
+                15, 0
+              ]
+            }
+          });
+        }
+        
+        // Add a circle layer for individual points at high zoom levels
+        if (!mapRef.current.getLayer('rip-tide-points-layer')) {
+          mapRef.current.addLayer({
+            id: 'rip-tide-points-layer',
+            type: 'circle',
+            source: 'rip-tide-heatmap',
+            minzoom: 14,
+            paint: {
+              // Size circle radius by intensity
+              'circle-radius': [
+                'interpolate',
+                ['linear'],
+                ['get', 'intensity'],
+                0, 4,
+                1, 12
+              ],
+              // Color circle by intensity
+              'circle-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'intensity'],
+                0, '#2166ac',
+                0.25, '#67a9cf',
+                0.5, '#d1e5f0',
+                0.75, '#fdbf6f',
+                1, '#ef3b2c'
+              ],
+              'circle-stroke-color': 'white',
+              'circle-stroke-width': 1,
+              // Transition from heatmap to circle layer by zoom level
+              'circle-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                7, 0,
+                15, 1
+              ]
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading rip tide heatmap:', error);
+    } finally {
+      setIsLoadingHeatmap(false);
+    }
+  };
+
+  // Function to toggle heatmap visibility
+  const toggleRipTideHeatmap = () => {
+    if (!mapRef.current) return;
+    
+    if (showRipTideHeatmap) {
+      // Hide heatmap
+      if (mapRef.current.getLayer('rip-tide-heatmap-layer')) {
+        mapRef.current.setLayoutProperty('rip-tide-heatmap-layer', 'visibility', 'none');
+      }
+      if (mapRef.current.getLayer('rip-tide-points-layer')) {
+        mapRef.current.setLayoutProperty('rip-tide-points-layer', 'visibility', 'none');
+      }
+      setShowRipTideHeatmap(false);
+    } else {
+      // Show heatmap
+      if (heatmapData.length === 0) {
+        loadRipTideHeatmap();
+      } else {
+        if (mapRef.current.getLayer('rip-tide-heatmap-layer')) {
+          mapRef.current.setLayoutProperty('rip-tide-heatmap-layer', 'visibility', 'visible');
+        }
+        if (mapRef.current.getLayer('rip-tide-points-layer')) {
+          mapRef.current.setLayoutProperty('rip-tide-points-layer', 'visibility', 'visible');
+        }
+      }
+      setShowRipTideHeatmap(true);
+    }
+  };
 
   // Function to check if a point is within the bounding box
   const isPointInBounds = (lat: number, lng: number, bounds: BoundingBoxCoords) => {
@@ -331,6 +588,20 @@ const Map = () => {
       if (beachData) {
         const forecast = beachData.forecast;
 
+        // Get rip tide risk for this beach
+        let ripTideRisk = "Unknown";
+        if (beachData.cTide && beachData.cTide.height !== -1) {
+          // Simple risk calculation based on tide height and time
+          const tideHeight = beachData.cTide.height;
+          if (tideHeight < 1) {
+            ripTideRisk = "High";
+          } else if (tideHeight < 2) {
+            ripTideRisk = "Medium";
+          } else {
+            ripTideRisk = "Low";
+          }
+        }
+
         popupContent = `
           <div class="weather-section" style="background: ${getWeatherColor(forecast['weather_code'])}; padding: 10px; display: flex; align-items: center; flex-wrap: wrap;">
             ${getCardImg(forecast['weather_code'])}
@@ -345,6 +616,7 @@ const Map = () => {
             </div>
           </div>
           <div class="weather-row"><div class="weather-category">Tides</div><div class="weather-rating">${beachData.cTide.time ? beachData.cTide.height >= 0.5 ? 'High' : 'Low' : "No tide data"}</div></div>
+          <div class="weather-row"><div class="weather-category">Rip Tide Risk</div><div class="weather-rating">${ripTideRisk}</div></div>
           <div class="weather-row"><div class="weather-category">Air Quality</div><div class="weather-rating">${beachData.airQ}</div></div>
           <div class="weather-row"><div class="weather-category">UV Index</div><div class="weather-rating">${Math.round(forecast["uv_index"])}</div></div>
           <div class="weather-row"><div class="weather-category">Red Tide</div><div class="weather-rating">${redTide?.abundance || 'Unknown'}</div></div>
@@ -518,6 +790,34 @@ const Map = () => {
           if (!hoverSource) return;
           hoverSource.setData({ type: 'FeatureCollection', features: [] });
         });
+
+        // Add click handler for rip tide points
+        mapRef.current?.on('click', 'rip-tide-points-layer', (e) => {
+          const feature = e.features?.[0];
+          if (!feature || feature.geometry.type !== 'Point') return;
+
+          const coords = feature.geometry.coordinates as [number, number];
+          const [lng, lat] = coords;
+          const intensity = feature.properties?.intensity || 0;
+
+          const riskLevel = intensity < 0.3 ? 'Low' : intensity < 0.7 ? 'Medium' : 'High';
+          const riskColor = intensity < 0.3 ? '#2166ac' : intensity < 0.7 ? '#fdbf6f' : '#ef3b2c';
+
+          new mapboxgl.Popup()
+            .setLngLat([lng, lat])
+            .setHTML(`
+              <div style="padding: 10px;">
+                <h4 style="margin: 0 0 10px 0; color: ${riskColor};">Rip Tide Risk: ${riskLevel}</h4>
+                <div style="font-size: 14px;">
+                  <div style="margin-bottom: 5px;">Risk Score: ${(intensity * 100).toFixed(0)}%</div>
+                  <div style="font-size: 12px; color: #666;">
+                    Based on tidal conditions and current patterns
+                  </div>
+                </div>
+              </div>
+            `)
+            .addTo(mapRef.current!);
+        });
       });
 
       // Add event listeners for map movement and zoom
@@ -551,6 +851,54 @@ const Map = () => {
 
   return <div className='relative w-full h-[calc(100vh-5rem)]'> {/** Subtract height of header/navbar */}
     <div ref={mapContainerRef} className='w-full h-[calc(100vh-5rem)]' /> {/** Subtract height of header/navbar */}
+
+    {/* Rip Tide Heatmap Toggle */}
+    <div className='absolute top-4 right-4 z-10'>
+      <button
+        onClick={toggleRipTideHeatmap}
+        disabled={isLoadingHeatmap}
+        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-lg ${
+          showRipTideHeatmap
+            ? 'bg-red-500 hover:bg-red-600 text-white'
+            : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
+        } ${isLoadingHeatmap ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-xl'}`}
+      >
+        {isLoadingHeatmap ? (
+          <span className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+            Loading...
+          </span>
+        ) : showRipTideHeatmap ? (
+          'Hide Rip Tide Risk'
+        ) : (
+          'Show Rip Tide Risk'
+        )}
+      </button>
+    </div>
+
+    {/* Heatmap Legend */}
+    {showRipTideHeatmap && (
+      <div className='absolute bottom-8 right-4 z-10 bg-white p-4 rounded-lg shadow-lg border border-gray-200'>
+        <h4 className='text-sm font-medium mb-2 text-gray-700'>Rip Tide Risk</h4>
+        <div className='flex flex-col gap-2'>
+          <div className='flex items-center gap-2'>
+            <div className='w-4 h-4 rounded-full bg-blue-600'></div>
+            <span className='text-xs text-gray-600'>Low Risk</span>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='w-4 h-4 rounded-full bg-orange-400'></div>
+            <span className='text-xs text-gray-600'>Medium Risk</span>
+          </div>
+          <div className='flex items-center gap-2'>
+            <div className='w-4 h-4 rounded-full bg-red-500'></div>
+            <span className='text-xs text-gray-600'>High Risk</span>
+          </div>
+        </div>
+        <div className='mt-2 text-xs text-gray-500'>
+          Based on tidal conditions and current patterns
+        </div>
+      </div>
+    )}
 
     {/** Grid overlay */}
      <Collapsible
