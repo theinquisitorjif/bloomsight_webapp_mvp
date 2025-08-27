@@ -18,6 +18,13 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Interface for bounding box coordinates
+interface BoundingBoxCoords {
+  northEast: { lat: number; lng: number };
+  northWest: { lat: number; lng: number };
+  southEast: { lat: number; lng: number };
+  southWest: { lat: number; lng: number };
+}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const getBeachForecast = async (beachId: string) => {
@@ -143,6 +150,9 @@ const Map = () => {
   const [userLat, setUserLat] = useState<number>(28.5383);
   const [beachesOverlayOpen, setBeachesOverlayOpen] = useState<boolean>(true);
 
+  // State for bounding box coordinates
+  const [boundingBox, setBoundingBox] = useState<BoundingBoxCoords | null>(null);
+
   // fallback coords central FL
   const [lng] = useState<number>(-81.3792); 
   const [lat] = useState<number>(28.5383);
@@ -154,6 +164,67 @@ const Map = () => {
     long: number;
     abundance: string;
   }
+
+  // Function to check if a point is within the bounding box
+  const isPointInBounds = (lat: number, lng: number, bounds: BoundingBoxCoords) => {
+    return (
+      lat >= bounds.southWest.lat && 
+      lat <= bounds.northEast.lat &&
+      lng >= bounds.southWest.lng && 
+      lng <= bounds.northEast.lng
+    );
+  };
+
+  // Function to find beaches within bounding box
+  const findBeachesInBounds = (bounds: BoundingBoxCoords) => {
+    if (!beaches.data || !Array.isArray(beaches.data)) return [];
+
+    const beachesInBounds = beaches.data.filter((beach) => {
+      const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
+      return isPointInBounds(lat, lng, bounds);
+    });
+
+    return beachesInBounds;
+  };
+
+  // Function to update bounding box coordinates
+  const updateBoundingBox = () => {
+    if (!mapRef.current) return;
+
+    const bounds = mapRef.current.getBounds();
+    const newBoundingBox: BoundingBoxCoords = {
+      northEast: { lat: bounds.getNorthEast().lat, lng: bounds.getNorthEast().lng },
+      northWest: { lat: bounds.getNorthWest().lat, lng: bounds.getNorthWest().lng },
+      southEast: { lat: bounds.getSouthEast().lat, lng: bounds.getSouthEast().lng },
+      southWest: { lat: bounds.getSouthWest().lat, lng: bounds.getSouthWest().lng }
+    };
+
+    setBoundingBox(newBoundingBox);
+    
+    // Print coordinates to console
+    console.log('==========================================');
+    console.log('Bounding Box Coordinates:');
+    console.log('North East:', newBoundingBox.northEast);
+    console.log('North West:', newBoundingBox.northWest);
+    console.log('South East:', newBoundingBox.southEast);
+    console.log('South West:', newBoundingBox.southWest);
+    
+    // Find and print beaches within bounds
+    const beachesInBounds = findBeachesInBounds(newBoundingBox);
+    console.log(`\nBeaches within bounds (${beachesInBounds.length} total):`);
+    
+    if (beachesInBounds.length === 0) {
+      console.log('No beaches found within current bounds');
+    } else {
+      beachesInBounds.forEach((beach, index) => {
+        const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
+        console.log(`${index + 1}. ${beach.name}`);
+        console.log(`   Coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+        console.log(`   Mapbox ID: ${beach.mapbox_id}`);
+      });
+    }
+    console.log('==========================================');
+  };
 
   function getWeatherColor(weatherCode: number) {
     //console.log("weatherCode", weatherCode);
@@ -208,8 +279,6 @@ const Map = () => {
       return '<img src="https://openweathermap.org/img/wn/50d.png" style="width:50px;" alt="Cloudy">';
     }
   }
-
-
 
   const getRedTideData = (beachName: string, lat: number, lng: number) => {
     try {
@@ -327,6 +396,8 @@ const Map = () => {
       });
 
       mapRef.current.on('load', () => {
+        // Initialize bounding box on load
+        updateBoundingBox();
 
         if (!mapRef.current!.getSource('my-points')) {
           mapRef.current?.addSource('my-points', {
@@ -408,7 +479,6 @@ const Map = () => {
           }
         });
 
-
         // --- Hover: update hover-point source with the hovered feature geometry ---
         mapRef.current?.on('mousemove', 'points-layer', (e) => {
           const hoverSource = mapRef.current!.getSource('hover-point') as mapboxgl.GeoJSONSource | undefined;
@@ -450,6 +520,11 @@ const Map = () => {
         });
       });
 
+      // Add event listeners for map movement and zoom
+      mapRef.current.on('moveend', updateBoundingBox);
+      mapRef.current.on('zoomend', updateBoundingBox);
+      mapRef.current.on('dragend', updateBoundingBox);
+
       // marker for user location
       new mapboxgl.Marker()
         .setLngLat([centerLng, centerLat])
@@ -483,6 +558,7 @@ const Map = () => {
         onOpenChange={setBeachesOverlayOpen}
         className='absolute top-8 left-8 hidden md:block md:w-1/2 lg:w-1/3 bg-background border border-border rounded-xl'
       >
+        
         <CollapsibleTrigger className='flex items-center w-full justify-between gap-2 py-4 px-8'>
           <span className='flex items-center gap-2'>
             <Waves className='w-4 h-4' />
@@ -498,43 +574,56 @@ const Map = () => {
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <Skeleton key={i} className="w-full h-60 rounded-lg" />
             ))
-          ) : Array.isArray(beaches.data) && beaches.data.length > 0 ? (
-            [...beaches.data]
-              .map((beach) => {
-                const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
-                const distance = haversineDistanceMiles(lat, lng, userLat, userLng);
-                return { ...beach, lat, lng, distance };
-              })
-              .sort((a, b) => a.distance - b.distance)
-              .map((beach) => (
-                <div
-                  className="contents cursor-pointer"
-                  key={beach.mapbox_id}
-                  onClick={() => {
-                    mapRef.current!.flyTo({ center: [beach.lng, beach.lat], zoom: 10 });
-                    openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
-                  }}
-                  onMouseEnter={() => {
-                    openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
-                  }}
-                  onMouseLeave={() => {
-                    // close popup when leaving card
-                    if (popupRef.current) {
-                      popupRef.current.remove();
-                      popupRef.current = null;
-                    }
-                  }}
-                >
-                  <BeachCard
-                    coords={[beach.lng, beach.lat]}
-                    beachName={beach.name}
-                    imgSrc={beach.preview_picture ?? null}
-                    beachId={beach.mapbox_id}
-                    distance={`${Math.round(beach.distance)} mi`}
-                  />
-                </div>
-              ))
-          ) : <p>No beaches found...</p>}
+          ) : Array.isArray(beaches.data) && beaches.data.length > 0 && boundingBox ? (
+            (() => {
+              // Filter beaches to only those within bounding box
+              const beachesInBounds = findBeachesInBounds(boundingBox);
+              
+              if (beachesInBounds.length === 0) {
+                return <p className="col-span-full text-center text-gray-500">No beaches in current view. Zoom out or move the map to see more beaches.</p>;
+              }
+              
+              return beachesInBounds
+                .map((beach) => {
+                  const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
+                  const distance = haversineDistanceMiles(lat, lng, userLat, userLng);
+                  return { ...beach, lat, lng, distance };
+                })
+                .sort((a, b) => a.distance - b.distance)
+                .map((beach) => (
+                  <div
+                    className="contents cursor-pointer"
+                    key={beach.mapbox_id}
+                    onClick={() => {
+                      mapRef.current!.flyTo({ center: [beach.lng, beach.lat], zoom: 10 });
+                      openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
+                    }}
+                    onMouseEnter={() => {
+                      openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
+                    }}
+                    onMouseLeave={() => {
+                      // close popup when leaving card
+                      if (popupRef.current) {
+                        popupRef.current.remove();
+                        popupRef.current = null;
+                      }
+                    }}
+                  >
+                    <BeachCard
+                      coords={[beach.lng, beach.lat]}
+                      beachName={beach.name}
+                      imgSrc={beach.preview_picture ?? null}
+                      beachId={beach.mapbox_id}
+                      distance={`${Math.round(beach.distance)} mi`}
+                    />
+                  </div>
+                ));
+            })()
+          ) : boundingBox ? (
+            <p className="col-span-full text-center text-gray-500">No beaches found...</p>
+          ) : (
+            <p className="col-span-full text-center text-gray-500">Loading map bounds...</p>
+          )}
 
         </CollapsibleContent>
      </Collapsible>
