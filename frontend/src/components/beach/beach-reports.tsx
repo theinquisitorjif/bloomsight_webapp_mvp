@@ -112,7 +112,7 @@ export const BeachReports = ({ beachId }: { beachId: number }) => {
                     }
                     return (
                       <img
-                        className="ring-background rounded-full ring-2"
+                        className="ring-background rounded-full ring-2 size-10"
                         src={
                           userReport.user.picture ||
                           createAvatar(initials, {
