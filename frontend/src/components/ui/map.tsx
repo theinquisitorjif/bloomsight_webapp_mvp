@@ -499,28 +499,33 @@ const Map = () => {
               <Skeleton key={i} className="w-full h-60 rounded-lg" />
             ))
           ) : Array.isArray(beaches.data) && beaches.data.length > 0 ? (
-            beaches.data.map((beach) => {
-              const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
-              return (
+            [...beaches.data]
+              .map((beach) => {
+                const [lat, lng] = beach.location.split(",").map(v => parseFloat(v));
+                const distance = haversineDistanceMiles(lat, lng, userLat, userLng);
+                return { ...beach, lat, lng, distance };
+              })
+              .sort((a, b) => a.distance - b.distance)
+              .map((beach) => (
                 <div
                   className="contents cursor-pointer"
                   key={beach.mapbox_id}
                   onClick={() => {
-                    mapRef.current!.flyTo({ center: [lng, lat], zoom: 10 });
-                    openBeachPopup(lng, lat, beach.name, beach.mapbox_id);
+                    mapRef.current!.flyTo({ center: [beach.lng, beach.lat], zoom: 10 });
+                    openBeachPopup(beach.lng, beach.lat, beach.name, beach.mapbox_id);
                   }}
                 >
                   <BeachCard
-                    coords={[lng, lat]}
+                    coords={[beach.lng, beach.lat]}
                     beachName={beach.name}
                     imgSrc={beach.preview_picture ?? null}
                     beachId={beach.mapbox_id}
-                    distance={`${Math.round(haversineDistanceMiles(lat, lng, userLat, userLng))} mi`}
+                    distance={`${Math.round(beach.distance)} mi`}
                   />
                 </div>
-              );
-            })
+              ))
           ) : <p>No beaches found...</p>}
+
         </CollapsibleContent>
      </Collapsible>
   </div>;
