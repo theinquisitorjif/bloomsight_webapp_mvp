@@ -32,7 +32,7 @@ if __name__ == "__main__":
         res = requests.get(
             "https://api.unsplash.com/search/photos",
             params={
-                "query": beach_name + ", Florida, USA",
+                "query": beach_name + ", Beach, Florida, USA",
                 "per_page": 1,
             },
             headers={

@@ -19,6 +19,7 @@ import PrivacyPolicyPage from "./pages/privacy-policy";
 import TermsPage from "./pages/terms-page";
 import EmptyStatePage from "./pages/empty-state-page";
 import SettingsPage from "./pages/settings-page";
+import UserCommentsPage from "./pages/user-comments-page";
 
 const authRoutes = [
   {
@@ -47,6 +48,10 @@ const protectedRoutes = [
   {
     path: "/settings",
     element: <SettingsPage />,
+  },
+  {
+    path: "/comments",
+    element: <UserCommentsPage />,
   },
 ];
 

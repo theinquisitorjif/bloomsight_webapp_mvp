@@ -1,6 +1,20 @@
+import { useDeleteUser } from "@/api/account";
+import PageTitle from "@/components/page-title";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSession } from "@/context/session-context";
+import supabase from "@/supabase";
 import {
   Mail,
   Plus,
@@ -13,10 +27,13 @@ import {
   Clock,
 } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const SettingsPage = () => {
   const { session } = useSession();
+  const navigate = useNavigate();
+  const deleteUser = useDeleteUser();
 
   if (!session) {
     return <Navigate to="/" replace />;
@@ -32,14 +49,21 @@ const SettingsPage = () => {
     });
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteUser.mutateAsync();
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center pt-10 pb-20">
       <main className="container p-2 xl:max-w-[1000px] space-y-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-300 to-blue-500 bg-clip-text text-transparent">
-            Settings
-          </h1>
+          <PageTitle>Settings</PageTitle>
           <p className="text-slate-600 dark:text-slate-400">
             Manage your account preferences and security settings
           </p>
@@ -138,7 +162,7 @@ const SettingsPage = () => {
                   />
                   {session.user.email_confirmed_at && (
                     <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
                       Verified
                     </p>
                   )}
@@ -239,10 +263,12 @@ const SettingsPage = () => {
                     View, edit, or delete all your reviews and ratings
                   </p>
                 </div>
-                <Button className="flex items-center gap-2" variant={"brand"}>
-                  <Database className="w-4 h-4" />
-                  Manage Reviews
-                </Button>
+                <Link to="/comments">
+                  <Button className="flex items-center gap-2" variant={"brand"}>
+                    <Database className="w-4 h-4" />
+                    Manage Reviews
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -261,22 +287,36 @@ const SettingsPage = () => {
 
           <div className="bg-white dark:bg-slate-800 rounded-md shadow-sm border border-border overflow-hidden">
             {/* Password Recovery */}
-            <div className="p-6 border-b border-border">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
-                    Password Recovery
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Send a secure password reset link to your email address
-                  </p>
+            {session.user.app_metadata.providers.includes("email") && (
+              <div className="p-6 border-b border-border">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">
+                      Password Recovery
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400">
+                      Send a secure password reset link to your email address
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      if (!session.user.email) return;
+                      supabase.auth.resetPasswordForEmail(session.user.email, {
+                        redirectTo:
+                          import.meta.env.VITE_FRONTEND_URL +
+                          "/auth/reset-password",
+                      });
+                      toast.success("Password reset link sent successfully!");
+                    }}
+                    variant="brand"
+                    className="flex items-center gap-2"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Reset Password
+                  </Button>
                 </div>
-                <Button variant="brand" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Send Password Recovery
-                </Button>
               </div>
-            </div>
+            )}
 
             {/* Delete Account */}
             <div className="p-6">
@@ -290,13 +330,40 @@ const SettingsPage = () => {
                     This action cannot be undone.
                   </p>
                 </div>
-                <Button
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <Trash className="w-4 h-4" />
-                  Delete Account
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      className="flex items-center gap-2"
+                    >
+                      <Trash className="w-4 h-4" />
+                      Delete Account
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="!text-red-500 !text-lg !font-semibold">
+                        Are you sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete your account. All data such
+                        as reviews and pictures will be deleted.
+                      </AlertDialogDescription>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction asChild>
+                          <Button
+                            variant="destructive"
+                            onClick={handleDeleteAccount}
+                          >
+                            <Trash className="w-4 h-4 mr-2" />
+                            Delete Account
+                          </Button>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogHeader>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </div>
