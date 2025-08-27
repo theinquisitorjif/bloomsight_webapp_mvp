@@ -196,28 +196,26 @@ export function useGetReviewsByBeachID(id: number) {
   });
 }
 
-export function useDeleteCommentByBeachID(id: number) {
+export function useDeleteCommentByCommentID() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (comment_id: number) => {
-      const { data } = await api.delete(
-        `/beaches/${id}/comments/${comment_id}`
-      );
+      const { data } = await api.delete(`/comments/${comment_id}`);
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["comments", id],
+        queryKey: ["comments"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["beach-reports", id],
+        queryKey: ["beach-reports"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["pictures", id],
+        queryKey: ["pictures"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["reviews", id],
+        queryKey: ["reviews"],
       });
     },
     onError: (error) => {

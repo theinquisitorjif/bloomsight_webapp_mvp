@@ -29,7 +29,7 @@ export const NavMenu = () => {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuTrigger>About</NavigationMenuTrigger>
           <NavigationMenuContent className="z-[1000]">
             <ul className="grid gap-2 w-[250px]">
@@ -41,7 +41,7 @@ export const NavMenu = () => {
               </ListItem>
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
         <NavigationMenuItem>
           <NavigationMenuTrigger>Policy</NavigationMenuTrigger>
           <NavigationMenuContent className="z-[1000]">

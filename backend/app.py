@@ -430,6 +430,40 @@ def get_reviews(mapbox_id):
         "number_of_reviews_per_rating": breakdown
     })
 
+@app.route("/account/comments", methods=["GET"])
+def get_account_comments():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    res = supabase.table("comments").select("*").eq("user_id", user.id).execute()
+
+    # Get basic user data for each user
+    for comment in res.data:
+        user_res = supabase.auth.admin.get_user_by_id(comment["user_id"])
+        user_data = user_res.user
+
+        if user_data:
+            # Extract name and avatar from user_metadata
+            metadata = user_data.user_metadata
+            comment["user"] = {
+                "id": user_data.id,
+                "email": user_data.email,
+                "name": metadata.get("name"),
+                "picture": metadata.get("picture")
+            }
+        else:
+            comment["user"] = None
+
+    # Get public URLs for each picture
+    for comment in res.data:
+        picture_res = supabase.table("pictures").select("image_url").eq("comment_id", comment["id"]).execute()
+        comment["pictures"] = [picture["image_url"] for picture in picture_res.data]
+
+    return jsonify({
+        "comments": res.data
+    })
+
 @app.route("/beaches/<string:mapbox_id>/comments", methods=["POST"])
 def add_comment(mapbox_id):
     user = get_current_user()
@@ -474,8 +508,8 @@ def add_comment(mapbox_id):
 
     return jsonify(res.data[0]) if res.data else (jsonify({"error": "Insert failed"}), 400)
 
-@app.route("/beaches/<string:mapbox_id>/comments/<int:comment_id>", methods=["DELETE"])
-def delete_comment(mapbox_id, comment_id):
+@app.route("/comments/<int:comment_id>", methods=["DELETE"])
+def delete_comment(comment_id):
     user = get_current_user()
     if not user:
         return jsonify({"error": "Not authenticated"}), 401
@@ -486,7 +520,7 @@ def delete_comment(mapbox_id, comment_id):
     if not isUsersComment.data:
         return jsonify({"error": "Not authorized"}), 401
 
-    res = supabase.table("comments").delete().eq("id", comment_id).eq("mapbox_id", mapbox_id).execute()
+    res = supabase.table("comments").delete().eq("id", comment_id).execute()
     return jsonify({"deleted": True}) if res.data else (jsonify({"error": "Not found"}), 404)
 
 @app.route("/beaches/<string:mapbox_id>/reports", methods=["GET"])
@@ -551,6 +585,56 @@ def get_beach_by_id(mapbox_id):
     if not res.data:
         return jsonify({'error': 'Beach not found'}), 404
     return jsonify(res.data), 200
+
+@app.route('/account', methods=['DELETE'])
+def delete_account():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not authenticated"}), 401
+    supabase.auth.admin.delete_user(user.id)
+    return jsonify({"message": "Account deleted"}), 200
+
+@app.route('/account', methods=['PUT'])
+def update_account():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not authenticated"}), 401
+    data = request.json
+    username = data.get("username")
+    picture = data.get("picture")
+    if not username and not picture:
+        return jsonify({"error": "No data provided"}), 400
+    supabase.auth.admin.update_user_by_id(user.id, {
+        "user_metadata": {
+            "picture": picture or user.user_metadata.get("picture"),
+            "avatar_url": picture or user.user_metadata.get("avatar_url"),
+            "name": username or user.user_metadata.get("name"),
+            "full_name": username or user.user_metadata.get("full_name")
+        }
+    })
+    return jsonify({"message": "Account updated"}), 200
+
+@app.route("/account/picture", methods=["POST"])
+def generate_avatar_url():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Not authenticated"}), 401
+    file = request.files.get("file")
+
+    if not file:
+        return jsonify({"error": "No file provided"}), 400
+
+    # Create unique filename
+    file_ext = file.filename.split(".")[-1]
+    file_name = f"{uuid.uuid4()}.{file_ext}"
+
+    # Upload to Supabase storage bucket "pictures"
+    supabase.storage.from_("pictures").upload(file_name, file.read())
+
+    # Get public URL
+    public_url = supabase.storage.from_("pictures").get_public_url(file_name)
+
+    return jsonify({"url": public_url}), 200
 
 if __name__ == '__main__':
    # Run on port 5000 to match vite.config.ts proxy
