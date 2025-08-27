@@ -81,7 +81,6 @@ const LandingPage = () => {
           >
             Your browser does not support the video tag.
           </video>
-          <img src="https://gifdb.com/images/high/loud-noises-498-x-280-gif-t45khfqzv5l7me7t.gif" className="absolute top-12 right-12 w-40 h-40" />
         </div>
 
         {/* Right Side Content */}

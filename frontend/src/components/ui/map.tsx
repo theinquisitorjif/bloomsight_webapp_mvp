@@ -556,10 +556,10 @@ const Map = () => {
      <Collapsible
         open={beachesOverlayOpen}
         onOpenChange={setBeachesOverlayOpen}
-        className='absolute top-8 left-8 hidden md:block md:w-1/2 lg:w-1/3 bg-background border border-border rounded-xl'
+        className='absolute top-8 left-8 hidden md:block bg-background border border-border rounded-xl w-70'
       >
         
-        <CollapsibleTrigger className='flex items-center w-full justify-between gap-2 py-4 px-8'>
+        <CollapsibleTrigger className='flex items-center w-70 justify-between gap-2 py-4 px-8'>
           <span className='flex items-center gap-2'>
             <Waves className='w-4 h-4' />
             <h1 className='text-xl font-medium'>Beaches</h1>
@@ -569,7 +569,7 @@ const Map = () => {
             <ChevronUp className={`w-4 h-4 transition-transform ${beachesOverlayOpen ? 'rotate-180' : ''}`} />
           </span>
         </CollapsibleTrigger>
-        <CollapsibleContent className="p-4 grid h-[calc(100vh-13rem)] grid-cols-1 xl:grid-cols-2 overflow-y-auto gap-2 scrollbar-hide">
+        <CollapsibleContent className="p-4 grid h-[calc(100vh-13rem)] grid-cols-1 xl:grid-cols-1 overflow-y-auto gap-2 scrollbar-hide w-69">
           {beaches.isPending ? (
             [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <Skeleton key={i} className="w-full h-60 rounded-lg" />
