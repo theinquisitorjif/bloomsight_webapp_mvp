@@ -10,7 +10,7 @@ interface BeachHeaderProps {
   location: string;
   lat: number;
   lng: number;
-  beachId: number;
+  beachId: number | string;
 }
 
 export const BeachHeader = ({

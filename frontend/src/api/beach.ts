@@ -20,7 +20,7 @@ import {
   type BeachPicturesAPIResponse,
 } from "@/types/beach";
 
-export function useGetBeachByBeachID(id: string) {
+export function useGetBeachByBeachID(id: string | number) {
   return useQuery<BeachAPIResponse>({
     queryKey: ["beach", id],
     queryFn: async () => {
@@ -30,7 +30,7 @@ export function useGetBeachByBeachID(id: string) {
   });
 }
 
-export function useGetParkingSpotsByBeachID(id: string) {
+export function useGetParkingSpotsByBeachID(id: string | number) {
   return useQuery<ParkingSpotsAPIResponse>({
     queryKey: ["parking-spots", id],
     queryFn: async () => {
@@ -40,7 +40,7 @@ export function useGetParkingSpotsByBeachID(id: string) {
   });
 }
 
-export function useGetTidePredictionByBeachID(id: number) {
+export function useGetTidePredictionByBeachID(id: number | string) {
   return useQuery<TidePredictionAPIResponse>({
     queryKey: ["tide-prediction"],
     queryFn: async () => {
@@ -50,7 +50,7 @@ export function useGetTidePredictionByBeachID(id: number) {
   });
 }
 
-export function useGetWeatherForecastByBeachID(id: string) {
+export function useGetWeatherForecastByBeachID(id: string | number) {
   return useQuery<WeatherForecastAPIResponse[]>({
     queryKey: ["weather-forecast"],
     queryFn: async () => {
@@ -60,7 +60,7 @@ export function useGetWeatherForecastByBeachID(id: string) {
   });
 }
 
-export function useGetRiptideRiskByBeachID(id: number) {
+export function useGetRiptideRiskByBeachID(id: number | string) {
   return useQuery<RiptideRiskAPIResponse>({
     queryKey: ["riptide-risk"],
     queryFn: async () => {
@@ -70,7 +70,7 @@ export function useGetRiptideRiskByBeachID(id: number) {
   });
 }
 
-export function useGetRedtideRiskByBeachID(id: number) {
+export function useGetRedtideRiskByBeachID(id: number | string) {
   return useQuery<RedtideRiskAPIResponse>({
     queryKey: ["redtide-risk"],
     queryFn: async () => {
@@ -90,7 +90,7 @@ export function useGetCommentReports() {
   });
 }
 
-export function useGetBeachReportsByBeachID(id: number) {
+export function useGetBeachReportsByBeachID(id: number | string) {
   return useQuery<BeachReportsAPIResponse[]>({
     queryKey: ["beach-reports", id],
     queryFn: async () => {
@@ -100,7 +100,7 @@ export function useGetBeachReportsByBeachID(id: number) {
   });
 }
 
-export function useUploadCommentByBeachID(id: number) {
+export function useUploadCommentByBeachID(id: number | string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -135,7 +135,7 @@ export function useUploadCommentByBeachID(id: number) {
   });
 }
 
-export function useUploadPictureByBeachID(id: number) {
+export function useUploadPictureByBeachID(id: number | string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -166,7 +166,7 @@ export function useUploadPictureByBeachID(id: number) {
   });
 }
 
-export function useGetPicturesByBeachID(id: number) {
+export function useGetPicturesByBeachID(id: number | string) {
   return useQuery<BeachPicturesAPIResponse[]>({
     queryKey: ["pictures", id],
     queryFn: async () => {
@@ -176,7 +176,7 @@ export function useGetPicturesByBeachID(id: number) {
   });
 }
 
-export function useGetCommentsByBeachID(id: number, page: number = 1) {
+export function useGetCommentsByBeachID(id: number | string, page: number = 1) {
   return useQuery<CommentAPIResponse>({
     queryKey: ["comments", id],
     queryFn: async () => {
@@ -186,7 +186,7 @@ export function useGetCommentsByBeachID(id: number, page: number = 1) {
   });
 }
 
-export function useGetReviewsByBeachID(id: number) {
+export function useGetReviewsByBeachID(id: number | string) {
   return useQuery<ReviewAPIResponse>({
     queryKey: ["reviews", id],
     queryFn: async () => {

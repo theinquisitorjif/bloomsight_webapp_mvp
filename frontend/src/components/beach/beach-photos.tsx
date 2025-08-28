@@ -11,7 +11,7 @@ export const BeachPhotos = ({
   name = "No Name",
 }: {
   name: string;
-  beachId: number;
+  beachId: number | string;
 }) => {
   const photosQuery = useGetPicturesByBeachID(beachId);
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);

@@ -32,7 +32,7 @@ export const BeachConditions = ({
   beachName = "No Name",
   weatherForecastQuery,
 }: {
-  beachId: number;
+  beachId: number | string;
   beachName: string;
   weatherForecastQuery: UseQueryResult<WeatherForecastAPIResponse[], Error>;
 }) => {
@@ -42,22 +42,22 @@ export const BeachConditions = ({
 
   function degreesToDirection(deg: number): string {
     const directions = [
-      "N",
-      "NNE",
-      "NE",
-      "ENE",
       "E",
-      "ESE",
-      "SE",
-      "SSE",
-      "S",
-      "SSW",
-      "SW",
-      "WSW",
-      "W",
-      "WNW",
-      "NW",
+      "ENE",
+      "NE",
+      "NNE",
+      "N",
       "NNW",
+      "NW",
+      "WNW",
+      "W",
+      "WSW",
+      "SW",
+      "SSW",
+      "S",
+      "SSE",
+      "SE",
+      "ESE",
     ];
     // Each direction covers 360/16 = 22.5 degrees
     const index = Math.round(deg / 22.5) % 16;
@@ -171,7 +171,7 @@ const AtmosphereData = ({
   air_quality: string | number;
 }) => {
   return (
-    <div className="p-4 rounded-lg border lg:col-span-3 border-border h-40 bg-white bg-background shadow-sm">
+    <div className="p-4 rounded-lg border lg:col-span-3 border-border h-40 bg-background shadow-sm">
       <div className="grid grid-cols-2 gap-3 h-full">
         <dl>
           <dt className="text-sm text-muted-foreground flex items-center gap-1">

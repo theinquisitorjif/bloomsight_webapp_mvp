@@ -64,7 +64,7 @@ export const CommentForm = ({
   beachId,
 }: {
   setCommentOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  beachId: number;
+  beachId: number | string;
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const useUploadPicture = useUploadPictureByBeachID(beachId);

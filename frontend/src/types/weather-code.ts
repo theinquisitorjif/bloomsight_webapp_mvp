@@ -8,10 +8,11 @@ import {
   CloudSun,
   Cloudy,
   Sun,
+  type LucideIcon,
 } from "lucide-react";
 
 /** Weather codes from https://open-meteo.com/en/docs#weather_variable_documentation*/
-export const WeatherCode = {
+export const WeatherCode: Record<number, { name: string; icon: LucideIcon }> = {
   0: {
     name: "Clear Skies",
     icon: Sun,

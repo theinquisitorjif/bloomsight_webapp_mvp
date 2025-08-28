@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 import { ReportsIconMap, SeverityNumberToString } from "@/types/report";
 import { cn } from "@/lib/utils";
 
-export const BeachReports = ({ beachId }: { beachId: number }) => {
+export const BeachReports = ({ beachId }: { beachId: number | string }) => {
   const { ref } = useSectionInView("parking", 0.5);
 
   const reportTypes = useGetCommentReports();

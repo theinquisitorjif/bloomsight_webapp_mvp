@@ -15,7 +15,7 @@ import { useGetCommentsByBeachID, useGetReviewsByBeachID } from "@/api/beach";
 import { useState } from "react";
 import Comments from "../comments/comments";
 
-export const BeachComments = ({ beachId }: { beachId: number }) => {
+export const BeachComments = ({ beachId }: { beachId: number | string }) => {
   const { ref } = useSectionInView("comments", 0.5);
   const page = useParams().page;
   const { session } = useSession();

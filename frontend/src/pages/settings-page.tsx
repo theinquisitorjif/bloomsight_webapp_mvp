@@ -19,9 +19,7 @@ import { useSession } from "@/context/session-context";
 import supabase from "@/supabase";
 import {
   Mail,
-  Plus,
   Trash,
-  Edit,
   Shield,
   User,
   Database,
@@ -42,7 +40,7 @@ const SettingsPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -99,7 +97,9 @@ const SettingsPage = () => {
             {/* Profile Picture Section */}
             <EditableProfilePicture
               initialPicture={session.user.user_metadata.picture}
-              onUpdate={(picture) => handleUpdateUser({ picture })}
+              onUpdate={(picture) =>
+                handleUpdateUser({ picture: picture ?? undefined })
+              }
               initialSeed={session.user.user_metadata.name}
               isLoading={updateUser.isPending}
             />
@@ -188,7 +188,9 @@ const SettingsPage = () => {
                   </label>
                   <p className="text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    {formatDate(session.user.updated_at)}
+                    {formatDate(
+                      session.user.updated_at || session.user.created_at
+                    )}
                   </p>
                 </div>
                 <div>
@@ -197,7 +199,9 @@ const SettingsPage = () => {
                   </label>
                   <p className="text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    {formatDate(session.user.last_sign_in_at)}
+                    {formatDate(
+                      session.user.last_sign_in_at || session.user.created_at
+                    )}
                   </p>
                 </div>
               </div>
