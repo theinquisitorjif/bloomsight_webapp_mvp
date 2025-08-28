@@ -149,8 +149,6 @@ export const getBeachForecast = async (beachId: string) => {
 const calculateRipTideRisk = (tides: TideData[]): number => {
   if (!tides || tides.length === 0) return 0;
 
-  // Get current and upcoming tides
-  const currentTime = new Date();
   const upcomingTides = tides.slice(0, 4); // Look at next 4 tide cycles
 
   let riskScore = 0;
