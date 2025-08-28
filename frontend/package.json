@@ -5,13 +5,12 @@
   "type": "module",
   "homepage": "https://theinquisitorjif.github.io/bloomsight_webapp_mvp",
   "scripts": {
-    "start": "react-scripts start",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "build": "tsc -b && vite build",
-    "dev": "vite",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@dicebear/collection": "^9.2.3",
