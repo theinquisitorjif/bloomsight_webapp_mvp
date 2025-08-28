@@ -5,6 +5,7 @@
   "type": "module",
   "homepage": "https://theinquisitorjif.github.io/bloomsight_webapp_mvp",
   "scripts": {
+    "start": "react-scripts start",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "dev": "vite",
