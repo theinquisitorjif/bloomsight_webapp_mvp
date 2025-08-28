@@ -348,17 +348,17 @@ const Map = () => {
                 ["linear"],
                 ["heatmap-density"],
                 0,
-                "rgba(33, 102, 172, 0)",
+                "rgba(34, 139, 34, 0)",        // Transparent green
                 0.2,
-                "rgba(33, 102, 172, 0.2)",
+                "rgba(34, 139, 34, 0.3)",      // Low opacity green
                 0.4,
-                "rgba(103, 169, 207, 0.4)",
+                "rgba(154, 205, 50, 0.5)",     // Yellow-green
                 0.6,
-                "rgba(209, 229, 240, 0.6)",
+                "rgba(255, 255, 0, 0.7)",      // Yellow
                 0.8,
-                "rgba(253, 219, 199, 0.8)",
+                "rgba(255, 140, 0, 0.8)",      // Orange
                 1,
-                "rgba(239, 59, 44, 0.9)",
+                "rgba(220, 20, 60, 0.9)",      // Crimson red
               ],
               // Adjust the heatmap radius by zoom level
               "heatmap-radius": [
@@ -402,21 +402,20 @@ const Map = () => {
                 1,
                 12,
               ],
-              // Color circle by intensity
               "circle-color": [
                 "interpolate",
                 ["linear"],
                 ["get", "intensity"],
                 0,
-                "#2166ac",
+                "#228B22",      // Forest green for low risk
                 0.25,
-                "#67a9cf",
+                "#9ACD32",      // Yellow-green
                 0.5,
-                "#d1e5f0",
+                "#FFFF00",      // Yellow
                 0.75,
-                "#fdbf6f",
+                "#FF8C00",      // Dark orange
                 1,
-                "#ef3b2c",
+                "#DC143C",      // Crimson red for high risk
               ],
               "circle-stroke-color": "white",
               "circle-stroke-width": 1,
@@ -1031,15 +1030,15 @@ const Map = () => {
           </h4>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-blue-600"></div>
+              <div className="w-4 h-4 rounded-full bg-green-600"></div>
               <span className="text-xs text-gray-600">Low Risk</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-orange-400"></div>
+              <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
               <span className="text-xs text-gray-600">Medium Risk</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full bg-red-500"></div>
+              <div className="w-4 h-4 rounded-full bg-red-600"></div>
               <span className="text-xs text-gray-600">High Risk</span>
             </div>
           </div>
