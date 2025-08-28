@@ -3,7 +3,7 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from supabase_client import init_supabase
+from .supabase_client import init_supabase
 from rip_current import NOAAMarineData
 from beach_access_points import main as get_beach_access_json
 from tide_conditions import get_tide_prediction_json
