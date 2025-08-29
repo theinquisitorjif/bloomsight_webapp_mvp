@@ -6,7 +6,7 @@ import react from "@vitejs/plugin-react";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/bloomsight_webapp_mvp/',
+  base: '/',
   server: {
     proxy: {
       '/algae-data': {
