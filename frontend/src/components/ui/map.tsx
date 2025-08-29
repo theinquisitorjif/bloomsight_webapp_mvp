@@ -13,9 +13,8 @@ import {
 import { ChevronUp, Waves } from "lucide-react";
 import { haversineDistanceMiles } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
-//import { API_BASE } from "@/api/api-client";
+import { API_BASE } from "@/api/api-client";
 import type { BeachAPIResponse } from "@/types/beach";
-const API_BASE = import.meta.env.VITE_API_URL || "";
 
 type MapRef = mapboxgl.Map | null;
 
@@ -349,17 +348,17 @@ const Map = () => {
                 ["linear"],
                 ["heatmap-density"],
                 0,
-                "rgba(34, 139, 34, 0)",        // Transparent green
+                "rgba(34, 139, 34, 0)", // Transparent green
                 0.2,
-                "rgba(34, 139, 34, 0.3)",      // Low opacity green
+                "rgba(34, 139, 34, 0.3)", // Low opacity green
                 0.4,
-                "rgba(154, 205, 50, 0.5)",     // Yellow-green
+                "rgba(154, 205, 50, 0.5)", // Yellow-green
                 0.6,
-                "rgba(255, 255, 0, 0.7)",      // Yellow
+                "rgba(255, 255, 0, 0.7)", // Yellow
                 0.8,
-                "rgba(255, 140, 0, 0.8)",      // Orange
+                "rgba(255, 140, 0, 0.8)", // Orange
                 1,
-                "rgba(220, 20, 60, 0.9)",      // Crimson red
+                "rgba(220, 20, 60, 0.9)", // Crimson red
               ],
               // Adjust the heatmap radius by zoom level
               "heatmap-radius": [
@@ -408,15 +407,15 @@ const Map = () => {
                 ["linear"],
                 ["get", "intensity"],
                 0,
-                "#228B22",      // Forest green for low risk
+                "#228B22", // Forest green for low risk
                 0.25,
-                "#9ACD32",      // Yellow-green
+                "#9ACD32", // Yellow-green
                 0.5,
-                "#FFFF00",      // Yellow
+                "#FFFF00", // Yellow
                 0.75,
-                "#FF8C00",      // Dark orange
+                "#FF8C00", // Dark orange
                 1,
-                "#DC143C",      // Crimson red for high risk
+                "#DC143C", // Crimson red for high risk
               ],
               "circle-stroke-color": "white",
               "circle-stroke-width": 1,
