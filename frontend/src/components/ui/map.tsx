@@ -13,8 +13,9 @@ import {
 import { ChevronUp, Waves } from "lucide-react";
 import { haversineDistanceMiles } from "@/lib/utils";
 import { Skeleton } from "./skeleton";
-import { API_BASE } from "@/api/api-client";
+//import { API_BASE } from "@/api/api-client";
 import type { BeachAPIResponse } from "@/types/beach";
+const API_BASE = import.meta.env.VITE_API_URL || "";
 
 type MapRef = mapboxgl.Map | null;
 
