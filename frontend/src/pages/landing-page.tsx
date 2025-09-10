@@ -6,6 +6,7 @@ import { haversineDistanceMiles } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import type { BeachAPIResponse } from '@/types/beach';
 import BeachSearch from '@/components/beach/beach-search';
+import BeachFlagsSection from '@/components/beach-flags';
 
 const LandingPage = () => {
   const [userLocation, setUserLocation] = useState('your area');
@@ -93,7 +94,7 @@ const LandingPage = () => {
           <BeachSearch />
         </div>
       </div>
-
+      
       {/* Scrollable Beach Cards */}
       <div className="px-6 py-10 bg-blue-50">
         <div className="max-w-6xl mx-auto relative">
@@ -164,6 +165,8 @@ const LandingPage = () => {
         </div>
       </div>
       
+      <BeachFlagsSection />
+
       {/* About Section */}
       <div className="bg-blue-100 py-10">
         <div className="max-w-4xl mx-auto px-6 text-center">
